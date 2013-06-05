@@ -8,6 +8,16 @@ std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 std::string sregs [] = { "es", "cs", "ss", "ds" };
 
+std::string hex(uint16_t v) {
+	char buf[8];
+	snprintf(buf, sizeof(buf), "%04x", v);
+	return buf;
+}
+
+uint16_t disp8(const std::vector<uint8_t> &mem, off_t index) {
+	return index + 1 + (int8_t)mem.at(index);
+}
+
 struct OpCode {
 	size_t len;
 	std::string mne, op1, op2;
@@ -18,6 +28,8 @@ struct OpCode {
 		const std::string &op1 = "",
 		const std::string &op2 = "")
 		: len(len), mne(mne), op1(op1), op2(op2) {}
+	OpCode(int len, const std::string &mne, uint16_t addr)
+		: len(len), mne(mne), op1(hex(addr)) {}
 
 	inline bool empty() { return len == 0; }
 
@@ -37,6 +49,22 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x2f: return OpCode(1, "das");
 	case 0x37: return OpCode(1, "aaa");
 	case 0x3f: return OpCode(1, "aas");
+	case 0x70: return OpCode(2, "jo"  , disp8(mem, index + 1));
+	case 0x71: return OpCode(2, "jno" , disp8(mem, index + 1));
+	case 0x72: return OpCode(2, "jb"  , disp8(mem, index + 1));
+	case 0x73: return OpCode(2, "jnb" , disp8(mem, index + 1));
+	case 0x74: return OpCode(2, "je"  , disp8(mem, index + 1));
+	case 0x75: return OpCode(2, "jne" , disp8(mem, index + 1));
+	case 0x76: return OpCode(2, "jbe" , disp8(mem, index + 1));
+	case 0x77: return OpCode(2, "jnbe", disp8(mem, index + 1));
+	case 0x78: return OpCode(2, "js"  , disp8(mem, index + 1));
+	case 0x79: return OpCode(2, "jns" , disp8(mem, index + 1));
+	case 0x7a: return OpCode(2, "jp"  , disp8(mem, index + 1));
+	case 0x7b: return OpCode(2, "jnp" , disp8(mem, index + 1));
+	case 0x7c: return OpCode(2, "jl"  , disp8(mem, index + 1));
+	case 0x7d: return OpCode(2, "jnl" , disp8(mem, index + 1));
+	case 0x7e: return OpCode(2, "jle" , disp8(mem, index + 1));
+	case 0x7f: return OpCode(2, "jnle", disp8(mem, index + 1));
 	case 0x98: return OpCode(1, "cbw");
 	case 0x99: return OpCode(1, "cwd");
 	case 0x90: return OpCode(1, "nop");
@@ -63,6 +91,11 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xd4: if (mem.at(1) == 0x0a) return OpCode(2, "aam"); else break;
 	case 0xd5: if (mem.at(1) == 0x0a) return OpCode(2, "aad"); else break;
 	case 0xd7: return OpCode(1, "xlat");
+	case 0xe0: return OpCode(2, "loopnz"   , disp8(mem, index + 1));
+	case 0xe1: return OpCode(2, "loopz"    , disp8(mem, index + 1));
+	case 0xe2: return OpCode(2, "loop"     , disp8(mem, index + 1));
+	case 0xe3: return OpCode(2, "jcxz"     , disp8(mem, index + 1));
+	case 0xeb: return OpCode(2, "jmp short", disp8(mem, index + 1));
 	case 0xec: return OpCode(1, "in", "al", "dx");
 	case 0xed: return OpCode(1, "in", "ax", "dx");
 	case 0xee: return OpCode(1, "out", "dx", "al");
