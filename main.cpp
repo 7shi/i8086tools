@@ -51,9 +51,14 @@ OpCode disasm0(uint8_t *p) {
 	case 0xaf: return OpCode(1, "scansw");
 	case 0xc3: return OpCode(1, "ret");
 	case 0xcb: return OpCode(1, "retf");
+	case 0xcc: return OpCode(1, "int3");
 	case 0xce: return OpCode(1, "into");
 	case 0xcf: return OpCode(1, "iret");
 	case 0xd7: return OpCode(1, "xlat");
+	case 0xec: return OpCode(1, "in", "al", "dx");
+	case 0xed: return OpCode(1, "in", "ax", "dx");
+	case 0xee: return OpCode(1, "out", "dx", "al");
+	case 0xef: return OpCode(1, "out", "dx", "ax");
 	case 0xf0: return OpCode(1, "lock");
 	case 0xf2: return OpCode(1, "repnz");
 	case 0xf3: return OpCode(1, "repz");
