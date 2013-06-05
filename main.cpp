@@ -315,6 +315,20 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xd4: if (mem.at(1) == 0x0a) return OpCode(2, "aam"); else break;
 	case 0xd5: if (mem.at(1) == 0x0a) return OpCode(2, "aad"); else break;
 	case 0xd7: return OpCode(1, "xlat");
+#if 0
+	case 0xd8:
+	case 0xd9:
+	case 0xda:
+	case 0xdb:
+	case 0xdc:
+	case 0xdd:
+	case 0xde:
+	case 0xdf: {
+		OpCode op = modrm(mem, index + 1);
+		int code = ((b & 7) << 8) | ((mem.at(index + 1) >> 3) & 7);
+		return OpCode(op.len + 1, "esc", hex(code, 2), op.op1);
+	}
+#endif
 	case 0xe0: return OpCode(2, "loopnz", disp8(mem, index + 1));
 	case 0xe1: return OpCode(2, "loopz" , disp8(mem, index + 1));
 	case 0xe2: return OpCode(2, "loop"  , disp8(mem, index + 1));
