@@ -11,6 +11,8 @@ std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 std::string sregs [] = { "es", "cs", "ss", "ds" };
 std::string rms   [] = { "bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx" };
 std::string shifts[] = { "rol", "ror", "rcl", "rcr", "shl", "shr", "", "sar" };
+std::string mne_f6[] = { "", "", "not", "neg", "mul", "imul", "div", "idiv" };
+std::string mne_fe[] = { "inc", "dec", "call", "callf", "jmp", "jmpf", "push", "" };
 
 std::string hex(uint16_t v, int len = 4) {
 	char buf[16];
@@ -334,13 +336,28 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xf3: return OpCode(1, "repz");
 	case 0xf4: return OpCode(1, "hlt");
 	case 0xf5: return OpCode(1, "cmc");
+	case 0xf6:
+	case 0xf7: {
+		OpCode op = modrm(mem, index + 1);
+		std::string mne = mne_f6[(mem.at(index + 1) >> 3) & 7];
+		if (mne.empty()) break;
+		if (!(b & 1)) mne += " byte";
+		return OpCode(op.len + 1, mne, op.op1);
+	}
 	case 0xf8: return OpCode(1, "clc");
 	case 0xf9: return OpCode(1, "stc");
 	case 0xfa: return OpCode(1, "cli");
 	case 0xfb: return OpCode(1, "sti");
 	case 0xfc: return OpCode(1, "cld");
 	case 0xfd: return OpCode(1, "std");
-	}
+	case 0xfe:
+	case 0xff: {
+		OpCode op = modrm(mem, index + 1);
+		std::string mne = mne_fe[(mem.at(index + 1) >> 3) & 7];
+		if (mne.empty()) break;
+		if (!(b & 1)) mne += " byte";
+		return OpCode(op.len + 1, mne, op.op1);
+	}}
 	undefined++;
 	return OpCode(1, "(undefined)");
 }
