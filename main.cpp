@@ -6,12 +6,22 @@
 
 struct OpCode {
 	size_t len;
-	std::string mne;
+	std::string mne, op1, op2;
 
-	OpCode(): len(0) {}
-	OpCode(int len, const std::string &mne)
-		: len(len), mne(mne) {}
+	OpCode(
+		int len = 0,
+		const std::string &mne = "",
+		const std::string &op1 = "",
+		const std::string &op2 = "")
+		: len(len), mne(mne), op1(op1), op2(op2) {}
+
 	inline bool empty() { return len == 0; }
+
+	std::string str() {
+		if (op1.empty()) return mne;
+		if (op2.empty()) return mne + " " + op1;
+		return mne + " " + op1 + ", " + op2;
+	}
 };
 
 int undefined;
@@ -94,7 +104,7 @@ int main(int argc, char *argv[]) {
 			snprintf(buf, sizeof(buf), "%02x", aout[index + i]);
 			hex += buf;
 		}
-		printf("%04x: %-10s %s\n", index, hex.c_str(), op.mne.c_str());
+		printf("%04x: %-10s %s\n", index, hex.c_str(), op.str().c_str());
 		index += op.len;
 	}
 	printf("undefined: %d\n", undefined);
