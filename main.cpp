@@ -85,8 +85,8 @@ OpCode disasm(uint8_t *p) {
 	}
 	if (p[0] != 0x0f) {
 		switch (p[0] & 0xe7) {
-			case 6: return OpCode(1, "push", sregs[(p[0] >> 3) & 7]);
-			case 7: return OpCode(1, "pop" , sregs[(p[0] >> 3) & 7]);
+			case 6: return OpCode(1, "push", sregs[(p[0] >> 3) & 3]);
+			case 7: return OpCode(1, "pop" , sregs[(p[0] >> 3) & 3]);
 		}
 	}
 	undefined++;
