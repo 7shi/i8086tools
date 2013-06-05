@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 
+std::string aregs [] = { "al", "ax" };
 std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 std::string sregs [] = { "es", "cs", "ss", "ds" };
@@ -98,8 +99,8 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x9d: return OpCode(1, "popf");
 	case 0x9e: return OpCode(1, "sahf");
 	case 0x9f: return OpCode(1, "lahf");
-	case 0xa0: return OpCode(3, "mov", "al", "[" + hex(read16(mem, index + 1)) + "]");
-	case 0xa1: return OpCode(3, "mov", "ax", "[" + hex(read16(mem, index + 1)) + "]");
+	case 0xa0:
+	case 0xa1: return OpCode(3, "mov", aregs[b & 1], "[" + hex(read16(mem, index + 1)) + "]");
 	case 0xa2: return OpCode(3, "mov", "[" + hex(read16(mem, index + 1)) + "]", "al");
 	case 0xa3: return OpCode(3, "mov", "[" + hex(read16(mem, index + 1)) + "]", "ax");
 	case 0xa4: return OpCode(1, "movsb");
@@ -127,18 +128,18 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xe1: return OpCode(2, "loopz" , disp8(mem, index + 1));
 	case 0xe2: return OpCode(2, "loop"  , disp8(mem, index + 1));
 	case 0xe3: return OpCode(2, "jcxz"  , disp8(mem, index + 1));
-	case 0xe4: return OpCode(2, "in", "al", hex(mem.at(index + 1), 2));
-	case 0xe5: return OpCode(2, "in", "ax", hex(mem.at(index + 1), 2));
-	case 0xe6: return OpCode(2, "out", hex(mem.at(index + 1), 2), "al");
-	case 0xe7: return OpCode(2, "out", hex(mem.at(index + 1), 2), "ax");
+	case 0xe4:
+	case 0xe5: return OpCode(2, "in", aregs[b & 1], hex(mem.at(index + 1), 2));
+	case 0xe6:
+	case 0xe7: return OpCode(2, "out", hex(mem.at(index + 1), 2), aregs[b & 1]);
 	case 0xe8: return OpCode(3, "call", disp16(mem, index + 1));
 	case 0xe9: return OpCode(3, "jmp" , disp16(mem, index + 1));
 	case 0xea: return OpCode(5, "jmpf", readfar(mem, index + 1));
 	case 0xeb: return OpCode(2, "jmp short", disp8(mem, index + 1));
-	case 0xec: return OpCode(1, "in", "al", "dx");
-	case 0xed: return OpCode(1, "in", "ax", "dx");
-	case 0xee: return OpCode(1, "out", "dx", "al");
-	case 0xef: return OpCode(1, "out", "dx", "ax");
+	case 0xec:
+	case 0xed: return OpCode(1, "in", aregs[b & 1], "dx");
+	case 0xee:
+	case 0xef: return OpCode(1, "out", "dx", aregs[b & 1]);
 	case 0xf0: return OpCode(1, "lock");
 	case 0xf2: return OpCode(1, "repnz");
 	case 0xf3: return OpCode(1, "repz");
