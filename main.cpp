@@ -180,6 +180,22 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xad: return OpCode(1, "lodsw");
 	case 0xae: return OpCode(1, "scansb");
 	case 0xaf: return OpCode(1, "scansw");
+	case 0xb0:
+	case 0xb1:
+	case 0xb2:
+	case 0xb3:
+	case 0xb4:
+	case 0xb5:
+	case 0xb6:
+	case 0xb7: return OpCode(2, "mov", regs8[b & 7], hex(mem.at(index + 1), 2));
+	case 0xb8:
+	case 0xb9:
+	case 0xba:
+	case 0xbb:
+	case 0xbc:
+	case 0xbd:
+	case 0xbe:
+	case 0xbf: return OpCode(3, "mov", regs16[b & 7], read16(mem, index + 1));
 	case 0xc2: return OpCode(3, "ret", read16(mem, index + 1));
 	case 0xc3: return OpCode(1, "ret");
 	case 0xca: return OpCode(3, "retf", read16(mem, index + 1));
