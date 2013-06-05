@@ -254,13 +254,14 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "can not open: %s\n", argv[1]);
 		return 1;
 	}
-	std::vector<uint8_t> aout(st.st_size);
+	std::vector<uint8_t> aout(st.st_size + 4);
 	fread(&aout[0], 1, st.st_size, f);
 	fclose(f);
 
 	off_t index = 0;
-	while (index < aout.size()) {
+	while (index < st.st_size) {
 		OpCode op = disasm(aout, index);
+		if (index + op.len > st.st_size) break;
 		std::string hex;
 		char buf[3];
 		for (int i = 0; i < op.len; i++) {
