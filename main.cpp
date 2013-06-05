@@ -20,6 +20,10 @@ uint16_t read16(const std::vector<uint8_t> &mem, off_t index) {
 	return mem.at(index) | (mem.at(index + 1) << 8);
 }
 
+std::string readfar(const std::vector<uint8_t> &mem, off_t index) {
+	return hex(read16(mem, index)) + ":" + hex(read16(mem, index + 2));
+}
+
 uint16_t disp8(const std::vector<uint8_t> &mem, off_t index) {
 	return index + 1 + (int8_t)mem.at(index);
 }
@@ -85,9 +89,10 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x7d: return OpCode(2, "jnl" , disp8(mem, index + 1));
 	case 0x7e: return OpCode(2, "jle" , disp8(mem, index + 1));
 	case 0x7f: return OpCode(2, "jnle", disp8(mem, index + 1));
+	case 0x90: return OpCode(1, "nop");
 	case 0x98: return OpCode(1, "cbw");
 	case 0x99: return OpCode(1, "cwd");
-	case 0x90: return OpCode(1, "nop");
+	case 0x9a: return OpCode(5, "callf", readfar(mem, index + 1));
 	case 0x9b: return OpCode(1, "wait");
 	case 0x9c: return OpCode(1, "pushf");
 	case 0x9d: return OpCode(1, "popf");
@@ -128,6 +133,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xe7: return OpCode(2, "out", hex(mem.at(index + 1), 2), "ax");
 	case 0xe8: return OpCode(3, "call", disp16(mem, index + 1));
 	case 0xe9: return OpCode(3, "jmp" , disp16(mem, index + 1));
+	case 0xea: return OpCode(5, "jmpf", readfar(mem, index + 1));
 	case 0xeb: return OpCode(2, "jmp short", disp8(mem, index + 1));
 	case 0xec: return OpCode(1, "in", "al", "dx");
 	case 0xed: return OpCode(1, "in", "ax", "dx");
