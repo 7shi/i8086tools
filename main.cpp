@@ -75,8 +75,11 @@ struct OpCode {
 	}
 };
 
-OpCode modrm(const std::vector<uint8_t> &mem, off_t index) {
-	OpCode ret(1);
+OpCode modrm(
+	const std::vector<uint8_t> &mem, off_t index,
+	const std::string &mne, bool w
+) {
+	OpCode ret(2, mne);
 	uint8_t b = mem.at(index), mod = b >> 6, rm = b & 7;
 	int16_t disp = 0;
 	switch (mod) {
@@ -84,17 +87,18 @@ OpCode modrm(const std::vector<uint8_t> &mem, off_t index) {
 		if (rm == 6) disp = read16(mem, index + 1);
 		break;
 	case 1:
-		ret.len = 2;
+		ret.len++;
 		disp = (int8_t)mem.at(index + 1);
 		break;
 	case 2:
-		ret.len = 3;
+		ret.len += 2;
 		disp = read16(mem, index + 1);
 		break;
 	case 3:
-		ret.op1 = regs16[rm];
+		ret.op1 = w ? regs16[rm] : regs8[rm];
 		return ret;
 	}
+	if (!w) ret.mne += " byte";
 	if (disp == 0) {
 		ret.op1 = "[" + rms[rm] + "]";
 	} else if (disp > 0) {
@@ -110,12 +114,12 @@ OpCode regrm(
 	const std::string &mne, int d, int w
 ) {
 	int reg = (mem.at(index) >> 3) & 7;
-	OpCode op = modrm(mem, index);
-	if (d == 1) return OpCode(op.len + 1, mne, op.op1);
+	OpCode op = modrm(mem, index, mne, w);
+	if (d == 1) return op;
 	std::string r = w == 0 ? regs8[reg] : w == 1 ? regs16[reg] : sregs[reg];
-	return d ?
-		OpCode(op.len + 1, mne, r, op.op1):
-		OpCode(op.len + 1, mne, op.op1, r);
+	return d == 2 ?
+		OpCode(op.len, mne, r, op.op1):
+		OpCode(op.len, mne, op.op1, r);
 }
 
 int undefined;
@@ -238,9 +242,8 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x81:
 	case 0x82:
 	case 0x83: {
-		OpCode op = modrm(mem, index + 1);
 		std::string mne = mne_80[(mem.at(index + 1) >> 3) & 7];
-		if (!(b & 1)) mne += " byte";
+		OpCode op = modrm(mem, index + 1, mne, b & 1);
 		off_t iimm = index + 1 + op.len;
 		uint16_t imm;
 		if (b & 2) {
@@ -251,7 +254,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 		} else {
 			imm = mem.at(iimm);
 		}
-		return OpCode(op.len + 1, mne, op.op1, imm);
+		return OpCode(op.len, mne, op.op1, imm);
 	}
 	case 0x84:
 	case 0x85: return regrm(mem, index + 1, "test", 2, b & 1);
@@ -262,7 +265,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x8a:
 	case 0x8b: return regrm(mem, index + 1, "mov", b & 2, b & 1);
 	case 0x8c: return regrm(mem, index + 1, "mov", 0, 2);
-	case 0x8d: return regrm(mem, index + 1, "lea", 2, 0);
+	case 0x8d: return regrm(mem, index + 1, "lea", 2, 1);
 	case 0x8e: return regrm(mem, index + 1, "mov", 2, 2);
 	case 0x8f: return regrm(mem, index + 1, "pop", 1, 0);
 	case 0x90: return OpCode(1, "nop");
@@ -315,15 +318,15 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xbf: return OpCode(3, "mov", regs16[b & 7], read16(mem, index + 1));
 	case 0xc2: return OpCode(3, "ret", read16(mem, index + 1));
 	case 0xc3: return OpCode(1, "ret");
-	case 0xc4: return regrm(mem, index + 1, "les", 2, 0);
-	case 0xc5: return regrm(mem, index + 1, "lds", 2, 0);
+	case 0xc4: return regrm(mem, index + 1, "les", 2, 1);
+	case 0xc5: return regrm(mem, index + 1, "lds", 2, 1);
 	case 0xc6:
 	case 0xc7: {
-		OpCode op = modrm(mem, index + 1);
+		OpCode op = modrm(mem, index + 1, "mov", b & 1);
 		off_t iimm = index + 1 + op.len;
 		return b & 1 ?
-			OpCode(op.len + 3, "mov", op.op1, read16(mem, iimm)):
-			OpCode(op.len + 2, "mov byte", op.op1, mem.at(iimm));
+			OpCode(op.len + 2, op.mne, op.op1, read16(mem, iimm)):
+			OpCode(op.len + 1, op.mne, op.op1, mem.at(iimm));
 	}
 	case 0xca: return OpCode(3, "retf", read16(mem, index + 1));
 	case 0xcb: return OpCode(1, "retf");
@@ -335,10 +338,10 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xd1:
 	case 0xd2:
 	case 0xd3: {
-		OpCode op = modrm(mem, index + 1);
 		std::string mne = shifts[(mem.at(index + 1) >> 3) & 7];
 		if (mne.empty()) break;
-		return OpCode(op.len + 1, mne, op.op1, b & 2 ? "cl" : "1");
+		OpCode op = modrm(mem, index + 1, mne, b & 1);
+		return OpCode(op.len, op.mne, op.op1, b & 2 ? "cl" : "1");
 	}
 	case 0xd4: if (mem.at(1) == 0x0a) return OpCode(2, "aam"); else break;
 	case 0xd5: if (mem.at(1) == 0x0a) return OpCode(2, "aad"); else break;
@@ -352,9 +355,9 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xdd:
 	case 0xde:
 	case 0xdf: {
-		OpCode op = modrm(mem, index + 1);
+		OpCode op = modrm(mem, index + 1, "esc", false);
 		int code = ((b & 7) << 8) | ((mem.at(index + 1) >> 3) & 7);
-		return OpCode(op.len + 1, "esc", hex(code, 2), op.op1);
+		return OpCode(op.len, op.mne, hex(code, 2), op.op1);
 	}
 #endif
 	case 0xe0: return OpCode(2, "loopnz", disp8(mem, index + 1));
@@ -380,18 +383,15 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xf5: return OpCode(1, "cmc");
 	case 0xf6:
 	case 0xf7: {
-		OpCode op = modrm(mem, index + 1);
 		int t = (mem.at(index + 1) >> 3) & 7;
 		std::string mne = mne_f6[t];
 		if (mne.empty()) break;
-		if (!(b & 1)) mne += " byte";
-		if (t == 0) {
-			off_t iimm = index + 1 + op.len;
-			return b & 1 ?
-				OpCode(op.len + 3, mne, op.op1, read16(mem, iimm)):
-				OpCode(op.len + 2, mne, op.op1, mem.at(iimm));
-		}
-		return OpCode(op.len + 1, mne, op.op1);
+		OpCode op = modrm(mem, index + 1, mne, b & 1);
+		if (t > 0) return op;
+		off_t iimm = index + 1 + op.len;
+		return b & 1 ?
+			OpCode(op.len + 2, op.mne, op.op1, read16(mem, iimm)):
+			OpCode(op.len + 1, op.mne, op.op1, mem.at(iimm));
 	}
 	case 0xf8: return OpCode(1, "clc");
 	case 0xf9: return OpCode(1, "stc");
@@ -401,11 +401,9 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xfd: return OpCode(1, "std");
 	case 0xfe:
 	case 0xff: {
-		OpCode op = modrm(mem, index + 1);
 		std::string mne = mne_fe[(mem.at(index + 1) >> 3) & 7];
 		if (mne.empty()) break;
-		if (!(b & 1)) mne += " byte";
-		return OpCode(op.len + 1, mne, op.op1);
+		return modrm(mem, index + 1, mne, b & 1);
 	}}
 	undefined++;
 	return OpCode(1, "(undefined)");
