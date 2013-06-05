@@ -241,6 +241,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x8c: return regrm(mem, index + 1, "mov", 0, 2);
 	case 0x8d: return regrm(mem, index + 1, "lea", 2, 0);
 	case 0x8e: return regrm(mem, index + 1, "mov", 2, 2);
+	case 0x8f: return regrm(mem, index + 1, "pop", 1, 0);
 	case 0x90: return OpCode(1, "nop");
 	case 0x91:
 	case 0x92:
