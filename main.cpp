@@ -8,9 +8,11 @@ std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 std::string sregs [] = { "es", "cs", "ss", "ds" };
 
-std::string hex(uint16_t v) {
-	char buf[8];
-	snprintf(buf, sizeof(buf), "%04x", v);
+std::string hex(uint16_t v, int len = 4) {
+	char buf[16];
+	snprintf(buf, sizeof(buf), "%%0%dx", len);
+	std::string format = buf;
+	snprintf(buf, sizeof(buf), format.c_str(), v);
 	return buf;
 }
 
@@ -86,6 +88,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xc3: return OpCode(1, "ret");
 	case 0xcb: return OpCode(1, "retf");
 	case 0xcc: return OpCode(1, "int3");
+	case 0xcd: return OpCode(2, "int", hex(mem.at(index + 1), 2));
 	case 0xce: return OpCode(1, "into");
 	case 0xcf: return OpCode(1, "iret");
 	case 0xd4: if (mem.at(1) == 0x0a) return OpCode(2, "aam"); else break;
