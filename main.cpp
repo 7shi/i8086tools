@@ -30,8 +30,9 @@ struct OpCode {
 
 int undefined;
 
-OpCode disasm(uint8_t *p) {
-	switch (p[0]) {
+OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
+	uint8_t b = mem.at(index);
+	switch (b) {
 	case 0x27: return OpCode(1, "baa");
 	case 0x2f: return OpCode(1, "das");
 	case 0x37: return OpCode(1, "aaa");
@@ -59,8 +60,8 @@ OpCode disasm(uint8_t *p) {
 	case 0xcc: return OpCode(1, "int3");
 	case 0xce: return OpCode(1, "into");
 	case 0xcf: return OpCode(1, "iret");
-	case 0xd4: if (p[1] == 0x0a) return OpCode(2, "aam"); else break;
-	case 0xd5: if (p[1] == 0x0a) return OpCode(2, "aad"); else break;
+	case 0xd4: if (mem.at(1) == 0x0a) return OpCode(2, "aam"); else break;
+	case 0xd5: if (mem.at(1) == 0x0a) return OpCode(2, "aad"); else break;
 	case 0xd7: return OpCode(1, "xlat");
 	case 0xec: return OpCode(1, "in", "al", "dx");
 	case 0xed: return OpCode(1, "in", "ax", "dx");
@@ -78,18 +79,18 @@ OpCode disasm(uint8_t *p) {
 	case 0xfc: return OpCode(1, "cld");
 	case 0xfd: return OpCode(1, "std");
 	}
-	switch (p[0] & ~7) {
-	case 0x40: return OpCode(1, "inc" , regs16[p[0] & 7]);
-	case 0x48: return OpCode(1, "dec" , regs16[p[0] & 7]);
-	case 0x50: return OpCode(1, "push", regs16[p[0] & 7]);
-	case 0x58: return OpCode(1, "pop" , regs16[p[0] & 7]);
-	case 0x90: return OpCode(1, "xchg", regs16[p[0] & 7], "ax");
+	switch (b & ~7) {
+	case 0x40: return OpCode(1, "inc" , regs16[b & 7]);
+	case 0x48: return OpCode(1, "dec" , regs16[b & 7]);
+	case 0x50: return OpCode(1, "push", regs16[b & 7]);
+	case 0x58: return OpCode(1, "pop" , regs16[b & 7]);
+	case 0x90: return OpCode(1, "xchg", regs16[b & 7], "ax");
 	}
-	if (p[0] != 0x0f) {
-		switch (p[0] & 0xe7) {
-			case 0x06: return OpCode(1, "push", sregs[(p[0] >> 3) & 3]);
-			case 0x07: return OpCode(1, "pop" , sregs[(p[0] >> 3) & 3]);
-			case 0x26: return OpCode(1, sregs[(p[0] >> 3) & 3] + ":");
+	if (b != 0x0f) {
+		switch (b & 0xe7) {
+			case 0x06: return OpCode(1, "push", sregs[(b >> 3) & 3]);
+			case 0x07: return OpCode(1, "pop" , sregs[(b >> 3) & 3]);
+			case 0x26: return OpCode(1, sregs[(b >> 3) & 3] + ":");
 		}
 	}
 	undefined++;
@@ -117,7 +118,7 @@ int main(int argc, char *argv[]) {
 
 	off_t index = 0;
 	while (index < aout.size()) {
-		OpCode op = disasm(&aout[index]);
+		OpCode op = disasm(aout, index);
 		std::string hex;
 		char buf[3];
 		for (int i = 0; i < op.len; i++) {
