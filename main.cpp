@@ -126,6 +126,8 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xe5: return OpCode(2, "in", "ax", hex(mem.at(index + 1), 2));
 	case 0xe6: return OpCode(2, "out", hex(mem.at(index + 1), 2), "al");
 	case 0xe7: return OpCode(2, "out", hex(mem.at(index + 1), 2), "ax");
+	case 0xe8: return OpCode(3, "call", disp16(mem, index + 1));
+	case 0xe9: return OpCode(3, "jmp" , disp16(mem, index + 1));
 	case 0xeb: return OpCode(2, "jmp short", disp8(mem, index + 1));
 	case 0xec: return OpCode(1, "in", "al", "dx");
 	case 0xed: return OpCode(1, "in", "ax", "dx");
