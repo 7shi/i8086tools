@@ -18,31 +18,31 @@ int undefined;
 
 OpCode disasm0(uint8_t *p) {
 	switch (p[0]) {
-	case 0x27: return OpCode(1,"baa");
-	case 0x2f: return OpCode(1,"das");
-	case 0x37: return OpCode(1,"aaa");
-	case 0x3f: return OpCode(1,"aas");
-	case 0x98: return OpCode(1,"cbw");
-	case 0x99: return OpCode(1,"cwd");
-	case 0x9b: return OpCode(1,"wait");
-	case 0x9c: return OpCode(1,"pushf");
-	case 0x9d: return OpCode(1,"popf");
-	case 0x9e: return OpCode(1,"sahf");
-	case 0x9f: return OpCode(1,"lahf");
-	case 0xc3: return OpCode(1,"ret");
-	case 0xcb: return OpCode(1,"retf");
-	case 0xce: return OpCode(1,"into");
-	case 0xcf: return OpCode(1,"iret");
-	case 0xd7: return OpCode(1,"xlat");
-	case 0xf0: return OpCode(1,"lock");
-	case 0xf4: return OpCode(1,"hlt");
-	case 0xf5: return OpCode(1,"cmc");
-	case 0xf8: return OpCode(1,"clc");
-	case 0xf9: return OpCode(1,"stc");
-	case 0xfa: return OpCode(1,"cli");
-	case 0xfb: return OpCode(1,"sti");
-	case 0xfc: return OpCode(1,"cld");
-	case 0xfd: return OpCode(1,"std");
+	case 0x27: return OpCode(1, "baa");
+	case 0x2f: return OpCode(1, "das");
+	case 0x37: return OpCode(1, "aaa");
+	case 0x3f: return OpCode(1, "aas");
+	case 0x98: return OpCode(1, "cbw");
+	case 0x99: return OpCode(1, "cwd");
+	case 0x9b: return OpCode(1, "wait");
+	case 0x9c: return OpCode(1, "pushf");
+	case 0x9d: return OpCode(1, "popf");
+	case 0x9e: return OpCode(1, "sahf");
+	case 0x9f: return OpCode(1, "lahf");
+	case 0xc3: return OpCode(1, "ret");
+	case 0xcb: return OpCode(1, "retf");
+	case 0xce: return OpCode(1, "into");
+	case 0xcf: return OpCode(1, "iret");
+	case 0xd7: return OpCode(1, "xlat");
+	case 0xf0: return OpCode(1, "lock");
+	case 0xf4: return OpCode(1, "hlt");
+	case 0xf5: return OpCode(1, "cmc");
+	case 0xf8: return OpCode(1, "clc");
+	case 0xf9: return OpCode(1, "stc");
+	case 0xfa: return OpCode(1, "cli");
+	case 0xfb: return OpCode(1, "sti");
+	case 0xfc: return OpCode(1, "cld");
+	case 0xfd: return OpCode(1, "std");
 	}
 	return OpCode();
 }
