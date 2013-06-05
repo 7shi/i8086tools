@@ -8,13 +8,15 @@ struct OpCode {
 	size_t len;
 	std::string mne;
 
+	OpCode(): len(0) {}
 	OpCode(int len, const std::string &mne)
 		: len(len), mne(mne) {}
+	inline bool empty() { return len == 0; }
 };
 
 int undefined;
 
-OpCode disasm(uint8_t *p) {
+OpCode disasm0(uint8_t *p) {
 	switch (p[0]) {
 	case 0x27: return OpCode(1,"baa");
 	case 0x2F: return OpCode(1,"das");
@@ -42,6 +44,12 @@ OpCode disasm(uint8_t *p) {
 	case 0xFC: return OpCode(1,"cld");
 	case 0xFD: return OpCode(1,"std");
 	}
+	return OpCode();
+}
+
+OpCode disasm(uint8_t *p) {
+	OpCode ret = disasm0(p);
+	if (!ret.empty()) return ret;
 	undefined++;
 	return OpCode(1, "(undefined)");
 }
