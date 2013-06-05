@@ -10,6 +10,7 @@ std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 std::string sregs [] = { "es", "cs", "ss", "ds" };
 std::string rms   [] = { "bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx" };
+std::string shifts[] = { "rol", "ror", "rcl", "rcr", "shl", "shr", "", "sar" };
 
 std::string hex(uint16_t v, int len = 4) {
 	char buf[16];
@@ -300,6 +301,15 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xcd: return OpCode(2, "int", hex(mem.at(index + 1), 2));
 	case 0xce: return OpCode(1, "into");
 	case 0xcf: return OpCode(1, "iret");
+	case 0xd0:
+	case 0xd1:
+	case 0xd2:
+	case 0xd3: {
+		OpCode op = modrm(mem, index + 1);
+		std::string mne = shifts[(mem.at(index + 1) >> 3) & 7];
+		if (mne.empty()) break;
+		return OpCode(op.len + 1, mne, op.op1, b & 2 ? "cl" : "1");
+	}
 	case 0xd4: if (mem.at(1) == 0x0a) return OpCode(2, "aam"); else break;
 	case 0xd5: if (mem.at(1) == 0x0a) return OpCode(2, "aad"); else break;
 	case 0xd7: return OpCode(1, "xlat");
