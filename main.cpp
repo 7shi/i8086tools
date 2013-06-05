@@ -59,6 +59,8 @@ OpCode disasm(uint8_t *p) {
 	case 0xcc: return OpCode(1, "int3");
 	case 0xce: return OpCode(1, "into");
 	case 0xcf: return OpCode(1, "iret");
+	case 0xd4: if (p[1] == 0x0a) return OpCode(2, "aam"); else break;
+	case 0xd5: if (p[1] == 0x0a) return OpCode(2, "aad"); else break;
 	case 0xd7: return OpCode(1, "xlat");
 	case 0xec: return OpCode(1, "in", "al", "dx");
 	case 0xed: return OpCode(1, "in", "ax", "dx");
