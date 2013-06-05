@@ -94,10 +94,14 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xd4: if (mem.at(1) == 0x0a) return OpCode(2, "aam"); else break;
 	case 0xd5: if (mem.at(1) == 0x0a) return OpCode(2, "aad"); else break;
 	case 0xd7: return OpCode(1, "xlat");
-	case 0xe0: return OpCode(2, "loopnz"   , disp8(mem, index + 1));
-	case 0xe1: return OpCode(2, "loopz"    , disp8(mem, index + 1));
-	case 0xe2: return OpCode(2, "loop"     , disp8(mem, index + 1));
-	case 0xe3: return OpCode(2, "jcxz"     , disp8(mem, index + 1));
+	case 0xe0: return OpCode(2, "loopnz", disp8(mem, index + 1));
+	case 0xe1: return OpCode(2, "loopz" , disp8(mem, index + 1));
+	case 0xe2: return OpCode(2, "loop"  , disp8(mem, index + 1));
+	case 0xe3: return OpCode(2, "jcxz"  , disp8(mem, index + 1));
+	case 0xe4: return OpCode(2, "in", "al", hex(mem.at(index + 1), 2));
+	case 0xe5: return OpCode(2, "in", "ax", hex(mem.at(index + 1), 2));
+	case 0xe6: return OpCode(2, "out", hex(mem.at(index + 1), 2), "al");
+	case 0xe7: return OpCode(2, "out", hex(mem.at(index + 1), 2), "ax");
 	case 0xeb: return OpCode(2, "jmp short", disp8(mem, index + 1));
 	case 0xec: return OpCode(1, "in", "al", "dx");
 	case 0xed: return OpCode(1, "in", "ax", "dx");
