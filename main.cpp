@@ -7,7 +7,6 @@
 std::string aregs [] = { "al", "ax" };
 std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
-std::string sregs [] = { "es", "cs", "ss", "ds" };
 
 std::string hex(uint16_t v, int len = 4) {
 	char buf[16];
@@ -70,10 +69,53 @@ int undefined;
 OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	uint8_t b = mem.at(index);
 	switch (b) {
+	case 0x06: return OpCode(1, "push", "es");
+	case 0x07: return OpCode(1, "pop" , "es");
+	case 0x0e: return OpCode(1, "push", "cs");
+	case 0x16: return OpCode(1, "push", "ss");
+	case 0x17: return OpCode(1, "pop" , "ss");
+	case 0x1e: return OpCode(1, "push", "ds");
+	case 0x1f: return OpCode(1, "pop" , "ds");
+	case 0x26: return OpCode(1, "es:");
 	case 0x27: return OpCode(1, "baa");
+	case 0x2e: return OpCode(1, "cs:");
 	case 0x2f: return OpCode(1, "das");
+	case 0x36: return OpCode(1, "ss:");
 	case 0x37: return OpCode(1, "aaa");
+	case 0x3e: return OpCode(1, "ds:");
 	case 0x3f: return OpCode(1, "aas");
+	case 0x40:
+	case 0x41:
+	case 0x42:
+	case 0x43:
+	case 0x44:
+	case 0x45:
+	case 0x46:
+	case 0x47: return OpCode(1, "inc" , regs16[b & 7]);
+	case 0x48:
+	case 0x49:
+	case 0x4a:
+	case 0x4b:
+	case 0x4c:
+	case 0x4d:
+	case 0x4e:
+	case 0x4f: return OpCode(1, "dec" , regs16[b & 7]);
+	case 0x50:
+	case 0x51:
+	case 0x52:
+	case 0x53:
+	case 0x54:
+	case 0x55:
+	case 0x56:
+	case 0x57: return OpCode(1, "push", regs16[b & 7]);
+	case 0x58:
+	case 0x59:
+	case 0x5a:
+	case 0x5b:
+	case 0x5c:
+	case 0x5d:
+	case 0x5e:
+	case 0x5f: return OpCode(1, "pop" , regs16[b & 7]);
 	case 0x70: return OpCode(2, "jo"  , disp8(mem, index + 1));
 	case 0x71: return OpCode(2, "jno" , disp8(mem, index + 1));
 	case 0x72: return OpCode(2, "jb"  , disp8(mem, index + 1));
@@ -91,6 +133,13 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x7e: return OpCode(2, "jle" , disp8(mem, index + 1));
 	case 0x7f: return OpCode(2, "jnle", disp8(mem, index + 1));
 	case 0x90: return OpCode(1, "nop");
+	case 0x91:
+	case 0x92:
+	case 0x93:
+	case 0x94:
+	case 0x95:
+	case 0x96:
+	case 0x97: return OpCode(1, "xchg", regs16[b & 7], "ax");
 	case 0x98: return OpCode(1, "cbw");
 	case 0x99: return OpCode(1, "cwd");
 	case 0x9a: return OpCode(5, "callf", readfar(mem, index + 1));
@@ -151,20 +200,6 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xfb: return OpCode(1, "sti");
 	case 0xfc: return OpCode(1, "cld");
 	case 0xfd: return OpCode(1, "std");
-	}
-	switch (b & ~7) {
-	case 0x40: return OpCode(1, "inc" , regs16[b & 7]);
-	case 0x48: return OpCode(1, "dec" , regs16[b & 7]);
-	case 0x50: return OpCode(1, "push", regs16[b & 7]);
-	case 0x58: return OpCode(1, "pop" , regs16[b & 7]);
-	case 0x90: return OpCode(1, "xchg", regs16[b & 7], "ax");
-	}
-	if (b != 0x0f) {
-		switch (b & 0xe7) {
-			case 0x06: return OpCode(1, "push", sregs[(b >> 3) & 3]);
-			case 0x07: return OpCode(1, "pop" , sregs[(b >> 3) & 3]);
-			case 0x26: return OpCode(1, sregs[(b >> 3) & 3] + ":");
-		}
 	}
 	undefined++;
 	return OpCode(1, "(undefined)");
