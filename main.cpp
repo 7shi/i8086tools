@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdint.h>
 #include <sys/stat.h>
 #include <vector>
@@ -7,10 +8,16 @@
 std::string aregs [] = { "al", "ax" };
 std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
+std::string sregs [] = { "es", "cs", "ss", "ds" };
+std::string rms   [] = { "bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx" };
 
 std::string hex(uint16_t v, int len = 4) {
 	char buf[16];
-	snprintf(buf, sizeof(buf), "%%0%dx", len);
+	if (len == 0) {
+		strcpy(buf, "%x");
+	} else {
+		snprintf(buf, sizeof(buf), "%%0%dx", len);
+	}
 	std::string format = buf;
 	snprintf(buf, sizeof(buf), format.c_str(), v);
 	return buf;
@@ -64,38 +71,113 @@ struct OpCode {
 	}
 };
 
+OpCode modrm(const std::vector<uint8_t> &mem, off_t index) {
+	OpCode ret(1);
+	uint8_t b = mem.at(index), mod = b >> 6, rm = b & 7;
+	int16_t disp = 0;
+	switch (mod) {
+	case 0:
+		if (rm == 6) disp = read16(mem, index + 1);
+		break;
+	case 1:
+		ret.len = 2;
+		disp = (int8_t)mem.at(index + 1);
+		break;
+	case 2:
+		ret.len = 3;
+		disp = read16(mem, index + 1);
+		break;
+	case 3:
+		ret.op1 = regs16[rm];
+		return ret;
+	}
+	if (disp == 0) {
+		ret.op1 = "[" + rms[rm] + "]";
+	} else if (disp > 0) {
+		ret.op1 = "[" + rms[rm] + "+" + hex(disp, 0) + "]";
+	} else {
+		ret.op1 = "[" + rms[rm] + "-" + hex(-disp, 0) + "]";
+	}
+	return ret;
+}
+
+OpCode regrm(
+	const std::vector<uint8_t> &mem, off_t index,
+	const std::string &mne, int d, int w
+) {
+	int reg = (mem.at(index) >> 3) & 7;
+	OpCode op = modrm(mem, index);
+	if (d == 1) return OpCode(op.len + 1, mne, op.op1);
+	std::string r = w == 0 ? regs8[reg] : w == 1 ? regs16[reg] : sregs[reg];
+	return d ?
+		OpCode(op.len + 1, mne, r, op.op1):
+		OpCode(op.len + 1, mne, op.op1, r);
+}
+
 int undefined;
 
 OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	uint8_t b = mem.at(index);
 	switch (b) {
+	case 0x00:
+	case 0x01:
+	case 0x02:
+	case 0x03: return regrm(mem, index + 1, "add", b & 2, b & 1);
 	case 0x04: return OpCode(2, "add", "al", hex(mem.at(index + 1), 2));
 	case 0x05: return OpCode(3, "add", "ax", read16(mem, index + 1));
 	case 0x06: return OpCode(1, "push", "es");
 	case 0x07: return OpCode(1, "pop" , "es");
+	case 0x08:
+	case 0x09:
+	case 0x0a:
+	case 0x0b: return regrm(mem, index + 1, "or", b & 2, b & 1);
 	case 0x0c: return OpCode(2, "or" , "al", hex(mem.at(index + 1), 2));
 	case 0x0d: return OpCode(3, "or" , "ax", read16(mem, index + 1));
 	case 0x0e: return OpCode(1, "push", "cs");
+	case 0x10:
+	case 0x11:
+	case 0x12:
+	case 0x13: return regrm(mem, index + 1, "adc", b & 2, b & 1);
 	case 0x14: return OpCode(2, "adc", "al", hex(mem.at(index + 1), 2));
 	case 0x15: return OpCode(3, "adc", "ax", read16(mem, index + 1));
 	case 0x16: return OpCode(1, "push", "ss");
 	case 0x17: return OpCode(1, "pop" , "ss");
+	case 0x18:
+	case 0x19:
+	case 0x1a:
+	case 0x1b: return regrm(mem, index + 1, "ssb", b & 2, b & 1);
 	case 0x1c: return OpCode(2, "ssb", "al", hex(mem.at(index + 1), 2));
 	case 0x1d: return OpCode(3, "ssb", "ax", read16(mem, index + 1));
 	case 0x1e: return OpCode(1, "push", "ds");
 	case 0x1f: return OpCode(1, "pop" , "ds");
+	case 0x20:
+	case 0x21:
+	case 0x22:
+	case 0x23: return regrm(mem, index + 1, "and", b & 2, b & 1);
 	case 0x24: return OpCode(2, "and", "al", hex(mem.at(index + 1), 2));
 	case 0x25: return OpCode(3, "and", "ax", read16(mem, index + 1));
 	case 0x26: return OpCode(1, "es:");
 	case 0x27: return OpCode(1, "baa");
+	case 0x28:
+	case 0x29:
+	case 0x2a:
+	case 0x2b: return regrm(mem, index + 1, "sub", b & 2, b & 1);
 	case 0x2c: return OpCode(2, "sub", "al", hex(mem.at(index + 1), 2));
 	case 0x2d: return OpCode(3, "sub", "ax", read16(mem, index + 1));
 	case 0x2e: return OpCode(1, "cs:");
 	case 0x2f: return OpCode(1, "das");
+	case 0x30:
+	case 0x31:
+	case 0x32:
+	case 0x33: return regrm(mem, index + 1, "xor", b & 2, b & 1);
 	case 0x34: return OpCode(2, "xor", "al", hex(mem.at(index + 1), 2));
 	case 0x35: return OpCode(3, "xor", "ax", read16(mem, index + 1));
 	case 0x36: return OpCode(1, "ss:");
 	case 0x37: return OpCode(1, "aaa");
+	case 0x38:
+	case 0x39:
+	case 0x3a:
+	case 0x3b: return regrm(mem, index + 1, "cmp", b & 2, b & 1);
 	case 0x3c: return OpCode(2, "cmp", "al", hex(mem.at(index + 1), 2));
 	case 0x3d: return OpCode(3, "cmp", "ax", read16(mem, index + 1));
 	case 0x3e: return OpCode(1, "ds:");
@@ -148,6 +230,17 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x7d: return OpCode(2, "jnl" , disp8(mem, index + 1));
 	case 0x7e: return OpCode(2, "jle" , disp8(mem, index + 1));
 	case 0x7f: return OpCode(2, "jnle", disp8(mem, index + 1));
+	case 0x84:
+	case 0x85: return regrm(mem, index + 1, "test", 2, b & 1);
+	case 0x86:
+	case 0x87: return regrm(mem, index + 1, "xchg", 2, b & 1);
+	case 0x88:
+	case 0x89:
+	case 0x8a:
+	case 0x8b: return regrm(mem, index + 1, "mov", b & 2, b & 1);
+	case 0x8c: return regrm(mem, index + 1, "mov", 0, 2);
+	case 0x8d: return regrm(mem, index + 1, "lea", 2, 0);
+	case 0x8e: return regrm(mem, index + 1, "mov", 2, 2);
 	case 0x90: return OpCode(1, "nop");
 	case 0x91:
 	case 0x92:
@@ -198,6 +291,8 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xbf: return OpCode(3, "mov", regs16[b & 7], read16(mem, index + 1));
 	case 0xc2: return OpCode(3, "ret", read16(mem, index + 1));
 	case 0xc3: return OpCode(1, "ret");
+	case 0xc4: return regrm(mem, index + 1, "les", 2, 0);
+	case 0xc5: return regrm(mem, index + 1, "lds", 2, 0);
 	case 0xca: return OpCode(3, "retf", read16(mem, index + 1));
 	case 0xcb: return OpCode(1, "retf");
 	case 0xcc: return OpCode(1, "int3");
