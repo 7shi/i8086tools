@@ -16,8 +16,16 @@ std::string hex(uint16_t v, int len = 4) {
 	return buf;
 }
 
+uint16_t read16(const std::vector<uint8_t> &mem, off_t index) {
+	return mem.at(index) | (mem.at(index + 1) << 8);
+}
+
 uint16_t disp8(const std::vector<uint8_t> &mem, off_t index) {
 	return index + 1 + (int8_t)mem.at(index);
+}
+
+uint16_t disp16(const std::vector<uint8_t> &mem, off_t index) {
+	return index + 2 + (int16_t)read16(mem, index);
 }
 
 struct OpCode {
@@ -30,8 +38,18 @@ struct OpCode {
 		const std::string &op1 = "",
 		const std::string &op2 = "")
 		: len(len), mne(mne), op1(op1), op2(op2) {}
-	OpCode(int len, const std::string &mne, uint16_t addr)
-		: len(len), mne(mne), op1(hex(addr)) {}
+	OpCode(
+		int len,
+		const std::string &mne,
+		uint16_t value,
+		const std::string &op2 = "")
+		: len(len), mne(mne), op1(hex(value)), op2(op2) {}
+	OpCode(
+		int len,
+		const std::string &mne,
+		const std::string &op1,
+		uint16_t value)
+		: len(len), mne(mne), op1(op1), op2(hex(value)) {}
 
 	inline bool empty() { return len == 0; }
 
@@ -75,6 +93,10 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x9d: return OpCode(1, "popf");
 	case 0x9e: return OpCode(1, "sahf");
 	case 0x9f: return OpCode(1, "lahf");
+	case 0xa0: return OpCode(3, "mov", "al", "[" + hex(read16(mem, index + 1)) + "]");
+	case 0xa1: return OpCode(3, "mov", "ax", "[" + hex(read16(mem, index + 1)) + "]");
+	case 0xa2: return OpCode(3, "mov", "[" + hex(read16(mem, index + 1)) + "]", "al");
+	case 0xa3: return OpCode(3, "mov", "[" + hex(read16(mem, index + 1)) + "]", "ax");
 	case 0xa4: return OpCode(1, "movsb");
 	case 0xa5: return OpCode(1, "movsw");
 	case 0xa6: return OpCode(1, "cmpsb");
@@ -85,7 +107,9 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xad: return OpCode(1, "lodsw");
 	case 0xae: return OpCode(1, "scansb");
 	case 0xaf: return OpCode(1, "scansw");
+	case 0xc2: return OpCode(3, "ret", read16(mem, index + 1));
 	case 0xc3: return OpCode(1, "ret");
+	case 0xca: return OpCode(3, "retf", read16(mem, index + 1));
 	case 0xcb: return OpCode(1, "retf");
 	case 0xcc: return OpCode(1, "int3");
 	case 0xcd: return OpCode(2, "int", hex(mem.at(index + 1), 2));
