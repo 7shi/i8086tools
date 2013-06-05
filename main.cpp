@@ -15,6 +15,33 @@ struct OpCode {
 int undefined;
 
 OpCode disasm(uint8_t *p) {
+	switch (p[0]) {
+	case 0x27: return OpCode(1,"baa");
+	case 0x2F: return OpCode(1,"das");
+	case 0x37: return OpCode(1,"aaa");
+	case 0x3F: return OpCode(1,"aas");
+	case 0x98: return OpCode(1,"cbw");
+	case 0x99: return OpCode(1,"cwd");
+	case 0x9B: return OpCode(1,"wait");
+	case 0x9C: return OpCode(1,"pushf");
+	case 0x9D: return OpCode(1,"popf");
+	case 0x9E: return OpCode(1,"sahf");
+	case 0x9F: return OpCode(1,"lahf");
+	case 0xC3: return OpCode(1,"ret");
+	case 0xCB: return OpCode(1,"retf");
+	case 0xCE: return OpCode(1,"into");
+	case 0xCF: return OpCode(1,"iret");
+	case 0xD7: return OpCode(1,"xlat");
+	case 0xF0: return OpCode(1,"lock");
+	case 0xF4: return OpCode(1,"hlt");
+	case 0xF5: return OpCode(1,"cmc");
+	case 0xF8: return OpCode(1,"clc");
+	case 0xF9: return OpCode(1,"stc");
+	case 0xFA: return OpCode(1,"cli");
+	case 0xFB: return OpCode(1,"sti");
+	case 0xFC: return OpCode(1,"cld");
+	case 0xFD: return OpCode(1,"std");
+	}
 	undefined++;
 	return OpCode(1, "(undefined)");
 }
