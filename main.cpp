@@ -9,11 +9,6 @@ std::string aregs [] = { "al", "ax" };
 std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 std::string sregs [] = { "es", "cs", "ss", "ds" };
-std::string rms   [] = { "bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx" };
-std::string shifts[] = { "rol", "ror", "rcl", "rcr", "shl", "shr", "", "sar" };
-std::string mne_80[] = { "add", "or", "adc", "ssb", "and", "sub", "xor", "cmp" };
-std::string mne_f6[] = { "test", "", "not", "neg", "mul", "imul", "div", "idiv" };
-std::string mne_fe[] = { "inc", "dec", "call", "callf", "jmp", "jmpf", "push", "" };
 
 std::string hex(uint16_t v, int len = 4) {
 	char buf[16];
@@ -99,13 +94,15 @@ OpCode modrm(
 		return ret;
 	}
 	if (!w) ret.mne += " byte";
-	if (disp == 0) {
-		ret.op1 = "[" + rms[rm] + "]";
-	} else if (disp > 0) {
-		ret.op1 = "[" + rms[rm] + "+" + hex(disp, 0) + "]";
-	} else {
-		ret.op1 = "[" + rms[rm] + "-" + hex(-disp, 0) + "]";
+	ret.op1 = "[";
+	const char *rms[] = { "bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx" };
+	ret.op1 += rms[rm];
+	if (disp > 0) {
+		ret.op1 += "+" + hex(disp, 0);
+	} else if (disp < 0) {
+		ret.op1 += "-" + hex(-disp, 0);
 	}
+	ret.op1 += "]";
 	return ret;
 }
 
@@ -242,7 +239,8 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x81:
 	case 0x82:
 	case 0x83: {
-		std::string mne = mne_80[(mem.at(index + 1) >> 3) & 7];
+		const char *mnes[] = { "add", "or", "adc", "ssb", "and", "sub", "xor", "cmp" };
+		std::string mne = mnes[(mem.at(index + 1) >> 3) & 7];
 		OpCode op = modrm(mem, index + 1, mne, b & 1);
 		off_t iimm = index + 1 + op.len;
 		uint16_t imm;
@@ -338,7 +336,8 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xd1:
 	case 0xd2:
 	case 0xd3: {
-		std::string mne = shifts[(mem.at(index + 1) >> 3) & 7];
+		const char *mnes[] = { "rol", "ror", "rcl", "rcr", "shl", "shr", "", "sar" };
+		std::string mne = mnes[(mem.at(index + 1) >> 3) & 7];
 		if (mne.empty()) break;
 		OpCode op = modrm(mem, index + 1, mne, b & 1);
 		return OpCode(op.len, op.mne, op.op1, b & 2 ? "cl" : "1");
@@ -383,8 +382,9 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xf5: return OpCode(1, "cmc");
 	case 0xf6:
 	case 0xf7: {
+		const char *mnes[] = { "test", "", "not", "neg", "mul", "imul", "div", "idiv" };
 		int t = (mem.at(index + 1) >> 3) & 7;
-		std::string mne = mne_f6[t];
+		std::string mne = mnes[t];
 		if (mne.empty()) break;
 		OpCode op = modrm(mem, index + 1, mne, b & 1);
 		if (t > 0) return op;
@@ -401,7 +401,8 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xfd: return OpCode(1, "std");
 	case 0xfe:
 	case 0xff: {
-		std::string mne = mne_fe[(mem.at(index + 1) >> 3) & 7];
+		const char *mnes[] = { "inc", "dec", "call", "callf", "jmp", "jmpf", "push", "" };
+		std::string mne = mnes[(mem.at(index + 1) >> 3) & 7];
 		if (mne.empty()) break;
 		return modrm(mem, index + 1, mne, b & 1);
 	}}
