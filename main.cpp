@@ -11,7 +11,8 @@ std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 std::string sregs [] = { "es", "cs", "ss", "ds" };
 std::string rms   [] = { "bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx" };
 std::string shifts[] = { "rol", "ror", "rcl", "rcr", "shl", "shr", "", "sar" };
-std::string mne_f6[] = { "", "", "not", "neg", "mul", "imul", "div", "idiv" };
+std::string mne_80[] = { "add", "or", "adc", "ssb", "and", "sub", "xor", "cmp" };
+std::string mne_f6[] = { "test", "", "not", "neg", "mul", "imul", "div", "idiv" };
 std::string mne_fe[] = { "inc", "dec", "call", "callf", "jmp", "jmpf", "push", "" };
 
 std::string hex(uint16_t v, int len = 4) {
@@ -233,6 +234,25 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x7d: return OpCode(2, "jnl" , disp8(mem, index + 1));
 	case 0x7e: return OpCode(2, "jle" , disp8(mem, index + 1));
 	case 0x7f: return OpCode(2, "jnle", disp8(mem, index + 1));
+	case 0x80:
+	case 0x81:
+	case 0x82:
+	case 0x83: {
+		OpCode op = modrm(mem, index + 1);
+		std::string mne = mne_80[(mem.at(index + 1) >> 3) & 7];
+		if (!(b & 1)) mne += " byte";
+		off_t iimm = index + 1 + op.len;
+		uint16_t imm;
+		if (b & 2) {
+			imm = (int8_t)mem.at(iimm);
+		} else if (b & 1) {
+			imm = read16(mem, iimm);
+			op.len++;
+		} else {
+			imm = mem.at(iimm);
+		}
+		return OpCode(op.len + 1, mne, op.op1, imm);
+	}
 	case 0x84:
 	case 0x85: return regrm(mem, index + 1, "test", 2, b & 1);
 	case 0x86:
@@ -297,6 +317,14 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xc3: return OpCode(1, "ret");
 	case 0xc4: return regrm(mem, index + 1, "les", 2, 0);
 	case 0xc5: return regrm(mem, index + 1, "lds", 2, 0);
+	case 0xc6:
+	case 0xc7: {
+		OpCode op = modrm(mem, index + 1);
+		off_t iimm = index + 1 + op.len;
+		return b & 1 ?
+			OpCode(op.len + 3, "mov", op.op1, read16(mem, iimm)):
+			OpCode(op.len + 2, "mov byte", op.op1, mem.at(iimm));
+	}
 	case 0xca: return OpCode(3, "retf", read16(mem, index + 1));
 	case 0xcb: return OpCode(1, "retf");
 	case 0xcc: return OpCode(1, "int3");
@@ -353,9 +381,16 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xf6:
 	case 0xf7: {
 		OpCode op = modrm(mem, index + 1);
-		std::string mne = mne_f6[(mem.at(index + 1) >> 3) & 7];
+		int t = (mem.at(index + 1) >> 3) & 7;
+		std::string mne = mne_f6[t];
 		if (mne.empty()) break;
 		if (!(b & 1)) mne += " byte";
+		if (t == 0) {
+			off_t iimm = index + 1 + op.len;
+			return b & 1 ?
+				OpCode(op.len + 3, mne, op.op1, read16(mem, iimm)):
+				OpCode(op.len + 2, mne, op.op1, mem.at(iimm));
+		}
 		return OpCode(op.len + 1, mne, op.op1);
 	}
 	case 0xf8: return OpCode(1, "clc");
