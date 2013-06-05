@@ -26,7 +26,7 @@ struct OpCode {
 
 int undefined;
 
-OpCode disasm0(uint8_t *p) {
+OpCode disasm(uint8_t *p) {
 	switch (p[0]) {
 	case 0x27: return OpCode(1, "baa");
 	case 0x2f: return OpCode(1, "das");
@@ -71,12 +71,6 @@ OpCode disasm0(uint8_t *p) {
 	case 0xfc: return OpCode(1, "cld");
 	case 0xfd: return OpCode(1, "std");
 	}
-	return OpCode();
-}
-
-OpCode disasm(uint8_t *p) {
-	OpCode ret = disasm0(p);
-	if (!ret.empty()) return ret;
 	undefined++;
 	return OpCode(1, "(undefined)");
 }
