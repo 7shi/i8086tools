@@ -69,19 +69,35 @@ int undefined;
 OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	uint8_t b = mem.at(index);
 	switch (b) {
+	case 0x04: return OpCode(2, "add", "al", hex(mem.at(index + 1), 2));
+	case 0x05: return OpCode(3, "add", "ax", read16(mem, index + 1));
 	case 0x06: return OpCode(1, "push", "es");
 	case 0x07: return OpCode(1, "pop" , "es");
+	case 0x0c: return OpCode(2, "or" , "al", hex(mem.at(index + 1), 2));
+	case 0x0d: return OpCode(3, "or" , "ax", read16(mem, index + 1));
 	case 0x0e: return OpCode(1, "push", "cs");
+	case 0x14: return OpCode(2, "adc", "al", hex(mem.at(index + 1), 2));
+	case 0x15: return OpCode(3, "adc", "ax", read16(mem, index + 1));
 	case 0x16: return OpCode(1, "push", "ss");
 	case 0x17: return OpCode(1, "pop" , "ss");
+	case 0x1c: return OpCode(2, "ssb", "al", hex(mem.at(index + 1), 2));
+	case 0x1d: return OpCode(3, "ssb", "ax", read16(mem, index + 1));
 	case 0x1e: return OpCode(1, "push", "ds");
 	case 0x1f: return OpCode(1, "pop" , "ds");
+	case 0x24: return OpCode(2, "and", "al", hex(mem.at(index + 1), 2));
+	case 0x25: return OpCode(3, "and", "ax", read16(mem, index + 1));
 	case 0x26: return OpCode(1, "es:");
 	case 0x27: return OpCode(1, "baa");
+	case 0x2c: return OpCode(2, "sub", "al", hex(mem.at(index + 1), 2));
+	case 0x2d: return OpCode(3, "sub", "ax", read16(mem, index + 1));
 	case 0x2e: return OpCode(1, "cs:");
 	case 0x2f: return OpCode(1, "das");
+	case 0x34: return OpCode(2, "xor", "al", hex(mem.at(index + 1), 2));
+	case 0x35: return OpCode(3, "xor", "ax", read16(mem, index + 1));
 	case 0x36: return OpCode(1, "ss:");
 	case 0x37: return OpCode(1, "aaa");
+	case 0x3c: return OpCode(2, "cmp", "al", hex(mem.at(index + 1), 2));
+	case 0x3d: return OpCode(3, "cmp", "ax", read16(mem, index + 1));
 	case 0x3e: return OpCode(1, "ds:");
 	case 0x3f: return OpCode(1, "aas");
 	case 0x40:
@@ -156,6 +172,8 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xa5: return OpCode(1, "movsw");
 	case 0xa6: return OpCode(1, "cmpsb");
 	case 0xa7: return OpCode(1, "cmpsw");
+	case 0xa8: return OpCode(2, "test", "al", hex(mem.at(index + 1), 2));
+	case 0xa9: return OpCode(3, "test", "ax", read16(mem, index + 1));
 	case 0xaa: return OpCode(1, "stosb");
 	case 0xab: return OpCode(1, "stosw");
 	case 0xac: return OpCode(1, "lodsb");
