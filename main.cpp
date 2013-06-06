@@ -238,11 +238,12 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x7c:
 	case 0x7d:
 	case 0x7e:
-	case 0x7f:
+	case 0x7f: {
 		const char *mnes[] = {
 			"jo", "jno", "jb", "jnb", "je", "jne", "jbe", "jnbe",
 			"js", "jns", "jp", "jnp", "jl", "jnl", "jle", "jnle" };
-		return opCode(2, mnes[b & 15], disp8(mem, index + 1));
+		return OpCode(2, mnes[b & 15], disp8(mem, index + 1));
+	}
 	case 0x80:
 	case 0x81:
 	case 0x82:
