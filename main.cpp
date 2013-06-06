@@ -117,7 +117,7 @@ OpCode regrm(
 	int reg = (mem.at(index) >> 3) & 7;
 	OpCode op = modrm(mem, index, mne, w);
 	if (d == 1) return op;
-	std::string r = w == 0 ? regs8[reg] : w == 1 ? regs16[reg] : sregs[reg];
+	std::string r = w == 0 ? regs8[reg] : w == 1 ? regs16[reg] : sregs[reg & 3];
 	return d == 2 ?
 		OpCode(op.len, mne, r, op.op1):
 		OpCode(op.len, mne, op.op1, r);
