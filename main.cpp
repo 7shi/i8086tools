@@ -429,21 +429,27 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "can not open: %s\n", argv[1]);
 		return 1;
 	}
-	std::vector<uint8_t> aout(st.st_size + 4);
+	std::vector<uint8_t> aout(st.st_size + 16);
 	fread(&aout[0], 1, st.st_size, f);
 	fclose(f);
 
 	off_t index = 0;
 	while (index < st.st_size) {
 		OpCode op = disasm(aout, index);
-		if (index + op.len > st.st_size) break;
+		if (index + op.len > st.st_size) {
+			op = OpCode(st.st_size - index, "db");
+			for (; index < st.st_size; index++) {
+				if (!op.op1.empty()) op.op1 += ", ";
+				op.op1 += hex(aout.at(index), 2);
+			}
+		}
 		std::string hex;
 		char buf[3];
 		for (int i = 0; i < op.len; i++) {
 			snprintf(buf, sizeof(buf), "%02x", aout[index + i]);
 			hex += buf;
 		}
-		printf("%04x: %-10s %s\n", index, hex.c_str(), op.str().c_str());
+		printf("%04x: %-12s %s\n", index, hex.c_str(), op.str().c_str());
 		index += op.len;
 	}
 	printf("undefined: %d\n", undefined);
