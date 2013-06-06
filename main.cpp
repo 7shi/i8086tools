@@ -327,7 +327,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xc6:
 	case 0xc7: {
 		OpCode op = modrm(mem, index + 1, "mov", b & 1);
-		off_t iimm = index + 1 + op.len;
+		off_t iimm = index + op.len;
 		return b & 1 ?
 			OpCode(op.len + 2, op.mne, op.op1, read16(mem, iimm)):
 			OpCode(op.len + 1, op.mne, op.op1, hex(mem.at(iimm), 2));
