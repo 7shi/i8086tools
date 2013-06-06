@@ -162,7 +162,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x24: return OpCode(2, "and", "al", hex(mem.at(index + 1), 2));
 	case 0x25: return OpCode(3, "and", "ax", read16(mem, index + 1));
 	case 0x26: return OpCode(1, "es:");
-	case 0x27: return OpCode(1, "baa");
+	case 0x27: return OpCode(1, "daa");
 	case 0x28:
 	case 0x29:
 	case 0x2a:
@@ -296,8 +296,8 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xab: return OpCode(1, "stosw");
 	case 0xac: return OpCode(1, "lodsb");
 	case 0xad: return OpCode(1, "lodsw");
-	case 0xae: return OpCode(1, "scansb");
-	case 0xaf: return OpCode(1, "scansw");
+	case 0xae: return OpCode(1, "scasb");
+	case 0xaf: return OpCode(1, "scasw");
 	case 0xb0:
 	case 0xb1:
 	case 0xb2:
