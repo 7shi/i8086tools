@@ -39,6 +39,7 @@ uint16_t disp16(const std::vector<uint8_t> &mem, off_t index) {
 }
 
 struct OpCode {
+	bool prefix;
 	size_t len;
 	std::string mne, op1, op2;
 
@@ -47,19 +48,20 @@ struct OpCode {
 		const std::string &mne = "",
 		const std::string &op1 = "",
 		const std::string &op2 = "")
-		: len(len), mne(mne), op1(op1), op2(op2) {}
+		: prefix(false), len(len), mne(mne), op1(op1), op2(op2) {}
 	OpCode(
 		int len,
 		const std::string &mne,
 		uint16_t value,
 		const std::string &op2 = "")
-		: len(len), mne(mne), op1(hex(value)), op2(op2) {}
+		: prefix(false), len(len), mne(mne), op1(hex(value)), op2(op2) {}
 	OpCode(
 		int len,
 		const std::string &mne,
 		const std::string &op1,
 		uint16_t value)
-		: len(len), mne(mne), op1(op1), op2(hex(value)) {}
+		: prefix(false), len(len), mne(mne), op1(op1), op2(hex(value)) {}
+	OpCode(const std::string &mne): prefix(true), len(1), mne(mne) {}
 
 	inline bool empty() { return len == 0; }
 
@@ -163,7 +165,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x23: return regrm(mem, index + 1, "and", b & 2, b & 1);
 	case 0x24: return OpCode(2, "and", "al", hex(mem.at(index + 1), 2));
 	case 0x25: return OpCode(3, "and", "ax", read16(mem, index + 1));
-	case 0x26: return OpCode(1, "es:");
+	case 0x26: return OpCode("es:");
 	case 0x27: return OpCode(1, "daa");
 	case 0x28:
 	case 0x29:
@@ -171,7 +173,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x2b: return regrm(mem, index + 1, "sub", b & 2, b & 1);
 	case 0x2c: return OpCode(2, "sub", "al", hex(mem.at(index + 1), 2));
 	case 0x2d: return OpCode(3, "sub", "ax", read16(mem, index + 1));
-	case 0x2e: return OpCode(1, "cs:");
+	case 0x2e: return OpCode("cs:");
 	case 0x2f: return OpCode(1, "das");
 	case 0x30:
 	case 0x31:
@@ -179,7 +181,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x33: return regrm(mem, index + 1, "xor", b & 2, b & 1);
 	case 0x34: return OpCode(2, "xor", "al", hex(mem.at(index + 1), 2));
 	case 0x35: return OpCode(3, "xor", "ax", read16(mem, index + 1));
-	case 0x36: return OpCode(1, "ss:");
+	case 0x36: return OpCode("ss:");
 	case 0x37: return OpCode(1, "aaa");
 	case 0x38:
 	case 0x39:
@@ -187,7 +189,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x3b: return regrm(mem, index + 1, "cmp", b & 2, b & 1);
 	case 0x3c: return OpCode(2, "cmp", "al", hex(mem.at(index + 1), 2));
 	case 0x3d: return OpCode(3, "cmp", "ax", read16(mem, index + 1));
-	case 0x3e: return OpCode(1, "ds:");
+	case 0x3e: return OpCode("ds:");
 	case 0x3f: return OpCode(1, "aas");
 	case 0x40:
 	case 0x41:
@@ -379,9 +381,9 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0xed: return OpCode(1, "in", aregs[b & 1], "dx");
 	case 0xee:
 	case 0xef: return OpCode(1, "out", "dx", aregs[b & 1]);
-	case 0xf0: return OpCode(1, "lock");
-	case 0xf2: return OpCode(1, "repnz");
-	case 0xf3: return OpCode(1, "repz");
+	case 0xf0: return OpCode("lock");
+	case 0xf2: return OpCode("repnz");
+	case 0xf3: return OpCode("repz");
 	case 0xf4: return OpCode(1, "hlt");
 	case 0xf5: return OpCode(1, "cmc");
 	case 0xf6:
@@ -434,6 +436,7 @@ int main(int argc, char *argv[]) {
 	fclose(f);
 
 	off_t index = 0;
+	OpCode prefix;
 	while (index < st.st_size) {
 		OpCode op = disasm(aout, index);
 		if (index + op.len > st.st_size) {
@@ -443,13 +446,35 @@ int main(int argc, char *argv[]) {
 				op.op1 += hex(aout.at(index), 2);
 			}
 		}
-		std::string hex;
-		char buf[3];
-		for (int i = 0; i < op.len; i++) {
-			snprintf(buf, sizeof(buf), "%02x", aout[index + i]);
-			hex += buf;
+		if (op.prefix) {
+			prefix = op;
+		} else {
+			if (prefix.len > 0) {
+				index -= prefix.len;
+				op.len += prefix.len;
+				prefix.len = 0;
+				if (prefix.mne[prefix.mne.size() - 1] == ':') {
+					char f1 = op.op1.size() < 1 ? 0 : op.op1[0];
+					char f2 = op.op2.size() < 1 ? 0 : op.op2[0];
+					if (f1 == '[') {
+						op.op1.insert(1, prefix.mne);
+					} else if (f2 == '[') {
+						op.op2.insert(1, prefix.mne);
+					} else {
+						op.mne = prefix.mne + " " + op.mne;
+					}
+				} else {
+					op.mne = prefix.mne + " " + op.mne;
+				}
+			}
+			std::string hex;
+			char buf[3];
+			for (int i = 0; i < op.len; i++) {
+				snprintf(buf, sizeof(buf), "%02x", aout[index + i]);
+				hex += buf;
+			}
+			printf("%04x: %-12s %s\n", index, hex.c_str(), op.str().c_str());
 		}
-		printf("%04x: %-12s %s\n", index, hex.c_str(), op.str().c_str());
 		index += op.len;
 	}
 	printf("undefined: %d\n", undefined);
