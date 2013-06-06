@@ -431,22 +431,29 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "can not stat: %s\n", argv[1]);
 		return 1;
 	}
+	size_t size = st.st_size;
 	FILE *f = fopen(argv[1], "rb");
 	if (!f) {
 		fprintf(stderr, "can not open: %s\n", argv[1]);
 		return 1;
 	}
-	std::vector<uint8_t> aout(st.st_size + 16);
-	fread(&aout[0], 1, st.st_size, f);
+	unsigned char buf[4], hdrlen = 0;
+	if (fread(buf, 1, 2, f) == 2 && buf[0] == 1 && buf[1] == 3 &&
+		!fseek(f, 4, SEEK_SET) && fread(&hdrlen, 1, 1, f) == 1 &&
+		!fseek(f, 8, SEEK_SET) && fread(buf, 1, 4, f) == 4)
+		size = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+	fseek(f, hdrlen, SEEK_SET);
+	std::vector<uint8_t> aout(size + 16);
+	fread(&aout[0], 1, size, f);
 	fclose(f);
 
 	off_t index = 0;
 	OpCode prefix;
-	while (index < st.st_size) {
+	while (index < size) {
 		OpCode op = disasm(aout, index);
-		if (index + op.len > st.st_size) {
-			op = OpCode(st.st_size - index, "db");
-			for (; index < st.st_size; index++) {
+		if (index + op.len > size) {
+			op = OpCode(size - index, "db");
+			for (; index < size; index++) {
 				if (!op.op1.empty()) op.op1 += ", ";
 				op.op1 += hex(aout.at(index), 2);
 			}
