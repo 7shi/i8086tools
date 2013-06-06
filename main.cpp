@@ -10,7 +10,7 @@ std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 std::string sregs [] = { "es", "cs", "ss", "ds" };
 
-std::string hex(uint16_t v, int len = 4) {
+std::string hex(uint16_t v, int len = 0) {
 	char buf[16];
 	if (len == 0) {
 		strcpy(buf, "%x");
@@ -27,7 +27,7 @@ uint16_t read16(const std::vector<uint8_t> &mem, off_t index) {
 }
 
 std::string readfar(const std::vector<uint8_t> &mem, off_t index) {
-	return hex(read16(mem, index)) + ":" + hex(read16(mem, index + 2));
+	return hex(read16(mem, index), 4) + ":" + hex(read16(mem, index + 2), 4);
 }
 
 uint16_t disp8(const std::vector<uint8_t> &mem, off_t index) {
@@ -54,13 +54,13 @@ struct OpCode {
 		const std::string &mne,
 		uint16_t value,
 		const std::string &op2 = "")
-		: prefix(false), len(len), mne(mne), op1(hex(value)), op2(op2) {}
+		: prefix(false), len(len), mne(mne), op1(hex(value, 4)), op2(op2) {}
 	OpCode(
 		int len,
 		const std::string &mne,
 		const std::string &op1,
 		uint16_t value)
-		: prefix(false), len(len), mne(mne), op1(op1), op2(hex(value)) {}
+		: prefix(false), len(len), mne(mne), op1(op1), op2(hex(value, 4)) {}
 	OpCode(const std::string &mne): prefix(true), len(1), mne(mne) {}
 
 	inline bool empty() { return len == 0; }
@@ -96,14 +96,14 @@ OpCode modrm(
 	ret.op1 = "[";
 	if (mod == 0 && rm == 6) {
 		ret.len += 2;
-		ret.op1 += hex(read16(mem, index + 1));
+		ret.op1 += hex(read16(mem, index + 1), 4);
 	} else {
 		const char *rms[] = { "bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx" };
 		ret.op1 += rms[rm];
 		if (disp > 0) {
-			ret.op1 += "+" + hex(disp, 0);
+			ret.op1 += "+" + hex(disp);
 		} else if (disp < 0) {
-			ret.op1 += "-" + hex(-disp, 0);
+			ret.op1 += "-" + hex(-disp);
 		}
 	}
 	ret.op1 += "]";
@@ -250,10 +250,10 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 		if (b & 2) {
 			op.len++;
 			int8_t v = (int8_t)mem.at(iimm);
-			op.op2 = v >= 0 ? hex(v, 0) : "-" + hex(-v, 0);
+			op.op2 = v >= 0 ? hex(v) : "-" + hex(-v);
 		} else if (b & 1) {
 			op.len += 2;
-			op.op2 = hex(read16(mem, iimm));
+			op.op2 = hex(read16(mem, iimm), 4);
 		} else {
 			op.len++;
 			op.op2 = hex(mem.at(iimm), 2);
@@ -289,9 +289,9 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x9e: return OpCode(1, "sahf");
 	case 0x9f: return OpCode(1, "lahf");
 	case 0xa0:
-	case 0xa1: return OpCode(3, "mov", aregs[b & 1], "[" + hex(read16(mem, index + 1)) + "]");
-	case 0xa2: return OpCode(3, "mov", "[" + hex(read16(mem, index + 1)) + "]", "al");
-	case 0xa3: return OpCode(3, "mov", "[" + hex(read16(mem, index + 1)) + "]", "ax");
+	case 0xa1: return OpCode(3, "mov", aregs[b & 1], "[" + hex(read16(mem, index + 1), 4) + "]");
+	case 0xa2: return OpCode(3, "mov", "[" + hex(read16(mem, index + 1), 4) + "]", "al");
+	case 0xa3: return OpCode(3, "mov", "[" + hex(read16(mem, index + 1), 4) + "]", "ax");
 	case 0xa4: return OpCode(1, "movsb");
 	case 0xa5: return OpCode(1, "movsw");
 	case 0xa6: return OpCode(1, "cmpsb");
