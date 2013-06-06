@@ -250,7 +250,7 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 		if (b & 2) {
 			op.len++;
 			int8_t v = (int8_t)mem.at(iimm);
-			op.op2 = v >= 0 ? hex(v, 2) : "-" + hex(-v, 2);
+			op.op2 = v >= 0 ? hex(v, 0) : "-" + hex(-v, 0);
 		} else if (b & 1) {
 			op.len += 2;
 			op.op2 = hex(read16(mem, iimm));
