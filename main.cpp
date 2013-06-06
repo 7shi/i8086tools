@@ -223,22 +223,26 @@ OpCode disasm(const std::vector<uint8_t> &mem, off_t index) {
 	case 0x5d:
 	case 0x5e:
 	case 0x5f: return OpCode(1, "pop" , regs16[b & 7]);
-	case 0x70: return OpCode(2, "jo"  , disp8(mem, index + 1));
-	case 0x71: return OpCode(2, "jno" , disp8(mem, index + 1));
-	case 0x72: return OpCode(2, "jb"  , disp8(mem, index + 1));
-	case 0x73: return OpCode(2, "jnb" , disp8(mem, index + 1));
-	case 0x74: return OpCode(2, "je"  , disp8(mem, index + 1));
-	case 0x75: return OpCode(2, "jne" , disp8(mem, index + 1));
-	case 0x76: return OpCode(2, "jbe" , disp8(mem, index + 1));
-	case 0x77: return OpCode(2, "jnbe", disp8(mem, index + 1));
-	case 0x78: return OpCode(2, "js"  , disp8(mem, index + 1));
-	case 0x79: return OpCode(2, "jns" , disp8(mem, index + 1));
-	case 0x7a: return OpCode(2, "jp"  , disp8(mem, index + 1));
-	case 0x7b: return OpCode(2, "jnp" , disp8(mem, index + 1));
-	case 0x7c: return OpCode(2, "jl"  , disp8(mem, index + 1));
-	case 0x7d: return OpCode(2, "jnl" , disp8(mem, index + 1));
-	case 0x7e: return OpCode(2, "jle" , disp8(mem, index + 1));
-	case 0x7f: return OpCode(2, "jnle", disp8(mem, index + 1));
+	case 0x70:
+	case 0x71:
+	case 0x72:
+	case 0x73:
+	case 0x74:
+	case 0x75:
+	case 0x76:
+	case 0x77:
+	case 0x78:
+	case 0x79:
+	case 0x7a:
+	case 0x7b:
+	case 0x7c:
+	case 0x7d:
+	case 0x7e:
+	case 0x7f:
+		const char *mnes[] = {
+			"jo", "jno", "jb", "jnb", "je", "jne", "jbe", "jnbe",
+			"js", "jns", "jp", "jnp", "jl", "jnl", "jle", "jnle" };
+		return opCode(2, mnes[b & 15], disp8(mem, index + 1));
 	case 0x80:
 	case 0x81:
 	case 0x82:
