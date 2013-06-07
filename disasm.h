@@ -26,6 +26,16 @@ inline uint16_t disp16(uint8_t *mem, uint16_t addr) {
 extern std::string hex(int v, int len = 0);
 extern std::string readfar(uint8_t *mem);
 
+enum OperandType { Reg, SReg, Imm, Ptr, ModRM };
+
+struct Operand {
+	int len;
+	bool w;
+	int type, value;
+	Operand(int len, int type, int value);
+	std::string str(bool w);
+};
+
 struct OpCode {
 	bool prefix;
 	size_t len;
@@ -53,6 +63,7 @@ struct OpCode {
 	std::string str();
 };
 
+Operand modrm(uint8_t *mem, bool w);
 OpCode disasm1(uint8_t *mem, uint16_t addr);
 OpCode disasm1(uint8_t *mem, uint16_t addr, size_t last);
 void disasm(uint8_t *mem, size_t size);

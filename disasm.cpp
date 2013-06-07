@@ -40,39 +40,47 @@ std::string OpCode::str() {
 	return mne + " " + op1 + ", " + op2;
 }
 
-static OpCode modrm(uint8_t *mem, const std::string &mne, bool w) {
-	OpCode ret(2, mne);
-	uint8_t b = mem[1], mod = b >> 6, rm = b & 7;
-	int16_t disp = 0;
-	switch (mod) {
-	case 1:
-		ret.len++;
-		disp = (int8_t)mem[2];
-		break;
-	case 2:
-		ret.len += 2;
-		disp = read16(&mem[2]);
-		break;
-	case 3:
-		ret.op1 = w ? regs16[rm] : regs8[rm];
-		return ret;
+Operand::Operand(int len, int type, int value)
+	: len(len), type(type), value(value) {}
+
+std::string Operand::str(bool w) {
+	switch (type) {
+	case Reg : return (w ? regs16 : regs8)[value];
+	case SReg: return sregs[value];
+	case Imm : return hex(value, w ? 4 : 0);
+	case Ptr : return "[" + hex(value, 4) + "]";
 	}
-	if (!w) ret.mne += " byte";
-	ret.op1 = "[";
-	if (mod == 0 && rm == 6) {
-		ret.len += 2;
-		ret.op1 += hex(read16(&mem[2]), 4);
-	} else {
-		const char *rms[] = { "bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx" };
-		ret.op1 += rms[rm];
-		if (disp > 0) {
-			ret.op1 += "+" + hex(disp);
-		} else if (disp < 0) {
-			ret.op1 += "-" + hex(-disp);
-		}
+	std::string ret = "[";
+	const char *ms[] = { "bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx" };
+	ret += ms[type - ModRM];
+	if (value > 0) {
+		ret += "+" + hex(value);
+	} else if (value < 0) {
+		ret += "-" + hex(-value);
 	}
-	ret.op1 += "]";
+	ret += "]";
 	return ret;
+}
+
+Operand modrm(uint8_t *mem, bool w) {
+	uint8_t b = mem[1], mod = b >> 6, rm = b & 7;
+	switch (mod) {
+	case 0:
+		if (rm == 6) return Operand(3, Ptr, read16(mem + 2));
+		return Operand(1, ModRM + rm, 0);
+	case 1:
+		return Operand(2, ModRM + rm, (int8_t)mem[2]);
+	case 2:
+		return Operand(3, ModRM + rm, (int16_t)read16(mem + 2));
+	default:
+		return Operand(1, Reg, rm);
+	}
+}
+
+static OpCode modrm(uint8_t *mem, std::string mne, bool w) {
+	Operand opr = modrm(mem, w);
+	if (!w && opr.type >= Ptr) mne += " byte";
+	return OpCode(1 + opr.len, mne, opr.str(w));
 }
 
 static OpCode regrm(uint8_t *mem, const std::string &mne, bool d, int w) {
