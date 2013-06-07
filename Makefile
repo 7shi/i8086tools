@@ -2,11 +2,12 @@ TARGET = i8086tools
 
 all: $(TARGET)
 
-$(TARGET): disasm.o main.o
+$(TARGET): utils.o disasm.o main.o
 	g++ -o $@ $^
 
-disasm.o: disasm.cpp disasm.h
-main.o: main.cpp disasm.h
+utils.o: utils.cpp utils.h
+disasm.o: disasm.cpp disasm.h utils.h
+main.o: main.cpp disasm.h utils.h
 
 clean:
 	rm -f $(TARGET) *.o
