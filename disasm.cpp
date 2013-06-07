@@ -1,7 +1,5 @@
 #include "disasm.h"
 #include <stdio.h>
-#include <string.h>
-#include <vector>
 
 Operand modrm(uint8_t *mem, bool w) {
 	uint8_t b = mem[1], mod = b >> 6, rm = b & 7;

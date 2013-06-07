@@ -1,7 +1,6 @@
 #include "utils.h"
 #include <stdio.h>
 #include <string.h>
-#include <vector>
 
 std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
