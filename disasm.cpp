@@ -385,6 +385,7 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
 }
 
 void disasm(uint8_t *mem, size_t size) {
+	undefined = 0;
 	off_t index = 0;
 	OpCode prefix;
 	while (index < size) {
