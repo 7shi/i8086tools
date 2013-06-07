@@ -384,12 +384,35 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
 	return OpCode(1, "(undefined)");
 }
 
+OpCode disasm1(uint8_t *mem, uint16_t addr, size_t last) {
+	OpCode op1 = disasm1(mem, addr);
+	uint16_t addr2 = addr + op1.len;
+	if (!op1.prefix || addr2 > last) return op1;
+
+	OpCode op2 = disasm1(mem + op1.len, addr2);
+	if (op2.prefix || addr2 + op2.len > last) return op1;
+
+	op2.len += op1.len;
+	if (op1.mne[op1.mne.size() - 1] == ':') {
+		char f1 = op2.op1.size() < 1 ? 0 : op2.op1[0];
+		char f2 = op2.op2.size() < 1 ? 0 : op2.op2[0];
+		if (f1 == '[') {
+			op2.op1.insert(1, op1.mne);
+			return op2;
+		} else if (f2 == '[') {
+			op2.op2.insert(1, op1.mne);
+			return op2;
+		}
+	}
+	op2.mne = op1.mne + " " + op2.mne;
+	return op2;
+}
+
 void disasm(uint8_t *mem, size_t size) {
 	undefined = 0;
 	off_t index = 0;
-	OpCode prefix;
 	while (index < size) {
-		OpCode op = disasm1(mem + index, index);
+		OpCode op = disasm1(mem + index, index, size);
 		if (index + op.len > size) {
 			op = OpCode(size - index, "db");
 			for (; index < size; index++) {
@@ -397,35 +420,13 @@ void disasm(uint8_t *mem, size_t size) {
 				op.op1 += hex(mem[index], 2);
 			}
 		}
-		if (op.prefix) {
-			prefix = op;
-		} else {
-			if (prefix.len > 0) {
-				index -= prefix.len;
-				op.len += prefix.len;
-				prefix.len = 0;
-				if (prefix.mne[prefix.mne.size() - 1] == ':') {
-					char f1 = op.op1.size() < 1 ? 0 : op.op1[0];
-					char f2 = op.op2.size() < 1 ? 0 : op.op2[0];
-					if (f1 == '[') {
-						op.op1.insert(1, prefix.mne);
-					} else if (f2 == '[') {
-						op.op2.insert(1, prefix.mne);
-					} else {
-						op.mne = prefix.mne + " " + op.mne;
-					}
-				} else {
-					op.mne = prefix.mne + " " + op.mne;
-				}
-			}
-			std::string hex;
-			char buf[3];
-			for (int i = 0; i < op.len; i++) {
-				snprintf(buf, sizeof(buf), "%02x", mem[index + i]);
-				hex += buf;
-			}
-			printf("%04x: %-12s %s\n", index, hex.c_str(), op.str().c_str());
+		std::string hex;
+		char buf[3];
+		for (int i = 0; i < op.len; i++) {
+			snprintf(buf, sizeof(buf), "%02x", mem[index + i]);
+			hex += buf;
 		}
+		printf("%04x: %-12s %s\n", index, hex.c_str(), op.str().c_str());
 		index += op.len;
 	}
 	printf("undefined: %d\n", undefined);
