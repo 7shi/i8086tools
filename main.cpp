@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 	if (size >= 0x20) {
 		uint8_t h[0x20];
 		int hdrlen = 0;
-		if (fread(h, sizeof(h), 1, f)) {
+		if (fread(h, sizeof(h), 1, f) && h[0] == 1 && h[1] == 3) {
 			hdrlen = h[4];
 			size = read32(h + 8);
 		}
