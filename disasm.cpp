@@ -1,6 +1,7 @@
 #include "disasm.h"
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 
 std::string aregs [] = { "al", "ax" };
 std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
@@ -8,14 +9,11 @@ std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 std::string sregs [] = { "es", "cs", "ss", "ds" };
 
 std::string hex(int v, int len) {
-	char buf[16];
-	if (len == 0) {
-		strcpy(buf, "%x");
-	} else {
-		snprintf(buf, sizeof(buf), "%%0%dx", len);
+	char buf[32], format[16] = "%x";
+	if (0 < len && len < 32) {
+		snprintf(format, sizeof(format), "%%0%dx", len);
 	}
-	std::string format = buf;
-	snprintf(buf, sizeof(buf), format.c_str(), v);
+	snprintf(buf, sizeof(buf), format, v);
 	return buf;
 }
 
