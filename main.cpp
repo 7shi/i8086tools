@@ -7,6 +7,12 @@ uint16_t ip, r[8];
 uint8_t *r8[8];
 uint8_t text[65536], mem[65536], *data;
 
+static void debug() {
+	fprintf(stderr,
+		"%04x %04x %04x %04x %04x %04x %04x %04x %04x\n",
+		r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], ip);
+}
+
 static void init_r8() {
 	uint16_t tmp = 0x1234;
 	uint8_t *p = (uint8_t *)r;
@@ -23,6 +29,12 @@ static void init_r8() {
 	}
 }
 
+static void run() {
+	init_r8();
+	fprintf(stderr, " AX   CX   DX   BX   SP   BP   SI   DI   IP\n");
+	debug();
+}
+	
 int main(int argc, char *argv[]) {
 	bool dis = false;
 	const char *file = NULL;
@@ -87,8 +99,7 @@ int main(int argc, char *argv[]) {
 	if (dis) {
 		disasm(text, size);
 	} else {
-		init_r8();
-		printf("entry: %04x\n", ip);
+		run();
 	}
 	return 0;
 }
