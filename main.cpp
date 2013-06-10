@@ -9,7 +9,7 @@ uint8_t text[65536], mem[65536], *data;
 
 static void debug() {
 	fprintf(stderr,
-		"%04x %04x %04x %04x %04x %04x %04x %04x %04x\n",
+		"%04x %04x %04x %04x %04x %04x %04x %04x %04x",
 		r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], ip);
 }
 
@@ -29,10 +29,22 @@ static void init_r8() {
 	}
 }
 
+static bool run1() {
+	OpCode op = disasm1(text + ip, ip);
+	std::string hex = hexdump(text + ip, op.len);
+	debug();
+	fprintf(stderr, ":%-12s %s\n", hex.c_str(), op.str().c_str());
+	uint8_t b = text[ip];
+	switch (b) {
+	}
+	fprintf(stderr, "not implemented\n");
+	return false;
+}
+
 static void run() {
 	init_r8();
 	fprintf(stderr, " AX   CX   DX   BX   SP   BP   SI   DI   IP\n");
-	debug();
+	while (run1());
 }
 	
 int main(int argc, char *argv[]) {
