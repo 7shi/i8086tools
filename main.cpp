@@ -7,6 +7,8 @@ uint16_t ip, r[8];
 uint8_t *r8[8];
 uint8_t text[65536], mem[65536], *data;
 
+#define SP r[4]
+
 static void debug() {
 	fprintf(stderr,
 		"%04x %04x %04x %04x %04x %04x %04x %04x %04x",
@@ -35,7 +37,29 @@ static bool run1() {
 	debug();
 	fprintf(stderr, ":%-12s %s\n", hex.c_str(), op.str().c_str());
 	uint8_t b = text[ip];
+	uint16_t oldip = ip;
+	ip += op.len;
 	switch (b) {
+	case 0xb0:
+	case 0xb1:
+	case 0xb2:
+	case 0xb3:
+	case 0xb4:
+	case 0xb5:
+	case 0xb6:
+	case 0xb7:
+		*r8[op.opr1.value] = op.opr2.value;
+		return true;
+	case 0xb8:
+	case 0xb9:
+	case 0xba:
+	case 0xbb:
+	case 0xbc:
+	case 0xbd:
+	case 0xbe:
+	case 0xbf:
+		r[op.opr1.value] = op.opr2.value;
+		return true;
 	}
 	fprintf(stderr, "not implemented\n");
 	return false;
