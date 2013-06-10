@@ -491,6 +491,12 @@ static bool run1() {
 			return true;
 		}
 		break;
+	case 0x84: // test r/m, reg8
+		setf8(int8_t(get8(op.opr1) & *r8[opr2]), false);
+		return true;
+	case 0x85: // test r/m, reg16
+		setf16(int16_t(get16(op.opr1) & r[opr2]), false);
+		return true;
 	case 0x88: // mov r/m, reg8
 		set8(op.opr1, *r8[opr2]);
 		return true;
@@ -517,6 +523,12 @@ static bool run1() {
 		return true;
 	case 0xa3: // mov [addr], ax
 		set16(op.opr2, AX);
+		return true;
+	case 0xa8: // test al, imm8
+		setf8(int8_t(AL & opr2), false);
+		return true;
+	case 0xa9: // test ax, imm16
+		setf16(int16_t(AX & opr2), false);
 		return true;
 	case 0xb0: // mov reg8, imm8
 	case 0xb1:
@@ -547,6 +559,34 @@ static bool run1() {
 	case 0xc7: // mov r/m, imm16
 		set16(op.opr1, opr2);
 		return true;
+	case 0xf6:
+		switch ((mem[1] >> 3) & 7) {
+		case 0: // test r/m, imm8
+			setf8(int8_t(get8(op.opr1) & opr2), false);
+			return true;
+		case 2: // not byte r/m
+		case 3: // neg byte r/m
+		case 4: // mul byte r/m
+		case 5: // imul byte r/m
+		case 6: // div byte r/m
+		case 7: // idiv byte r/m
+			break;
+		}
+		break;
+	case 0xf7:
+		switch ((mem[1] >> 3) & 7) {
+		case 0: // test r/m, imm16
+			setf16(int16_t(get16(op.opr1) & opr2), false);
+			return true;
+		case 2: // not r/m
+		case 3: // neg r/m
+		case 4: // mul r/m
+		case 5: // imul r/m
+		case 6: // div r/m
+		case 7: // idiv r/m
+			break;
+		}
+		break;
 	}
 	fprintf(stderr, "not implemented\n");
 	return false;
