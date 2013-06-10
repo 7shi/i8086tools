@@ -1,7 +1,8 @@
 #include "disasm.h"
 #include <stdio.h>
 #include <sys/stat.h>
-#include <vector>
+
+uint8_t text[65536], mem[65536], *data;
 
 int main(int argc, char *argv[]) {
 	if (argc != 2) {
@@ -21,16 +22,37 @@ int main(int argc, char *argv[]) {
 	}
 	if (size >= 0x20) {
 		uint8_t h[0x20];
-		int hdrlen = 0;
-		if (fread(h, sizeof(h), 1, f) && h[0] == 1 && h[1] == 3) {
-			hdrlen = h[4];
+		if (fread(h, sizeof(h), 1, f) && h[0] == 1 && h[1] == 3
+			&& !fseek(f, h[4], SEEK_SET)) {
+			if (h[3] != 4) {
+				fprintf(stderr, "unknown cpu id: %d\n", h[3]);
+				fclose(f);
+				return 1;
+			}
 			size = read32(h + 8);
+			int dsize = read32(h + 12);
+			if (h[2] & 0x20) {
+				data = mem;
+				fread(text, 1,  size, f);
+				fread(data, 1, dsize, f);
+			} else {
+				data = text;
+				fread(text, 1, size + dsize, f);
+			}
+		} else {
+			fseek(f, 0, SEEK_SET);
 		}
-		fseek(f, hdrlen, SEEK_SET);
 	}
-	std::vector<uint8_t> aout(size + 16);
-	fread(&aout[0], 1, size, f);
+	if (!data) {
+		if (size > sizeof(text)) {
+			fprintf(stderr, "too long raw binary: %s\n", argv[1]);
+			fclose(f);
+			return 1;
+		}
+		data = text;
+		fread(text, 1, size, f);
+	}
 	fclose(f);
-	disasm(&aout[0], size);
+	disasm(text, size);
 	return 0;
 }
