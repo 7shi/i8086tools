@@ -149,9 +149,33 @@ static bool run1() {
 	fprintf(stderr, ":%-12s %s\n", hex.c_str(), op.str().c_str());
 	uint8_t b = text[ip];
 	uint16_t oldip = ip;
-	int val;
+	int dst, val;
 	ip += op.len;
 	switch (b) {
+	case 0x00: // add r/m, reg8
+		val = int8_t(dst = get8(op.opr1)) + int8_t(*r8[opr2]);
+		set8(op.opr1, setf8(val, dst > uint8_t(val)));
+		return true;
+	case 0x01: // add r/m, reg16
+		val = int16_t(dst = get16(op.opr1)) + int16_t(r[opr2]);
+		set16(op.opr1, setf16(val, dst > uint16_t(val)));
+		return true;
+	case 0x02: // add reg8, r/m
+		val = int8_t(dst = *r8[opr1]) + int8_t(get8(op.opr2));
+		*r8[opr1] = setf8(val, dst > uint8_t(val));
+		return true;
+	case 0x03: // add reg16, r/m
+		val = int16_t(dst = r[opr1]) + int16_t(get16(op.opr2));
+		r[opr1] = setf16(val, dst > uint16_t(val));
+		return true;
+	case 0x04: // add al, imm8
+		val = int8_t(dst = AL) + int8_t(opr2);
+		AL = setf8(val, dst > uint8_t(val));
+		return true;
+	case 0x05: // add ax, imm16
+		val = int16_t(dst = AX) + int16_t(opr2);
+		AX = setf16(val, dst > uint16_t(val));
+		return true;
 	case 0x50: // push reg16
 	case 0x51:
 	case 0x52:
@@ -173,6 +197,38 @@ static bool run1() {
 	case 0x5f:
 		r[opr1] = read16(SP);
 		SP += 2;
+		return true;
+	case 0x80: // r/m, imm8
+		switch ((text[oldip + 1] >> 3) & 7) {
+		case 0: // add
+			val = int8_t(dst = get8(op.opr1)) + int8_t(opr2);
+			set8(op.opr1, setf8(val, dst > uint8_t(val)));
+			break;
+		}
+		return true;
+	case 0x81: // r/m, imm16
+		switch ((text[oldip + 1] >> 3) & 7) {
+		case 0: // add
+			val = int16_t(dst = get16(op.opr1)) + int16_t(opr2);
+			set16(op.opr1, setf16(val, dst > uint16_t(val)));
+			break;
+		}
+		return true;
+	case 0x82: // r/m, imm8(signed)
+		switch ((text[oldip + 1] >> 3) & 7) {
+		case 0: // add
+			val = int8_t(dst = get8(op.opr1)) + int8_t(opr2);
+			set8(op.opr1, setf8(val, dst > uint8_t(val)));
+			break;
+		}
+		return true;
+	case 0x83: // r/m, imm16(signed)
+		switch ((text[oldip + 1] >> 3) & 7) {
+		case 0: // add
+			val = int16_t(dst = get16(op.opr1)) + int8_t(opr2);
+			set16(op.opr1, setf16(val, dst > uint8_t(val)));
+			break;
+		}
 		return true;
 	case 0x88: // mov r/m, reg8
 		set8(op.opr1, *r8[opr2]);
