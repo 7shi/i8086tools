@@ -15,6 +15,7 @@ inline uint32_t read32(uint8_t *mem) {
 }
 
 extern std::string hex(int v, int len = 0);
+extern std::string hexdump(uint8_t *mem, int len);
 
 enum OperandType { Reg, SReg, Imm, Addr, Far, Ptr, ModRM };
 

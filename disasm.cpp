@@ -367,12 +367,7 @@ void disasm(uint8_t *mem, size_t size) {
 				ops += hex(mem[index], 2);
 			}
 		}
-		std::string hex;
-		char buf[3];
-		for (int i = 0; i < op.len; i++) {
-			snprintf(buf, sizeof(buf), "%02x", mem[index + i]);
-			hex += buf;
-		}
+		std::string hex = hexdump(mem + index, op.len);
 		printf("%04x: %-12s %s\n", index, hex.c_str(), ops.c_str());
 		index += op.len;
 	}

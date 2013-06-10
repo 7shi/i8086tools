@@ -25,6 +25,16 @@ std::string hex(int v, int len) {
 	return buf;
 }
 
+std::string hexdump(uint8_t *mem, int len) {
+	std::string ret;
+	char buf[3];
+	for (int i = 0; i < len; i++) {
+		snprintf(buf, sizeof(buf), "%02x", mem[i]);
+		ret += buf;
+	}
+	return ret;
+}
+
 OpCode::OpCode()
 	: prefix(false), len(0) {}
 OpCode::OpCode(
