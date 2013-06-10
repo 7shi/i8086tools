@@ -123,19 +123,22 @@ static void set16(const Operand &opr, uint16_t value) {
 	}
 }
 
-inline void set_sz(int16_t value) {
-	SF = value < 0;
-	ZF = value == 0;
+inline int setf8(int value) {
+	int8_t v = value;
+	OF = value != v;
+	SF = v < 0;
+	ZF = v == 0;
+	CF = value != uint8_t(v);
+	return value;
 }
 
-inline void set_co(bool cf, bool of) {
-	CF = cf;
-	OF = of;
-}
-
-inline void set_szco(int16_t value, bool cf, bool of) {
-	set_sz(value);
-	set_co(cf, of);
+inline int setf16(int value) {
+	int16_t v = value;
+	OF = value != v;
+	SF = v < 0;
+	ZF = v == 0;
+	CF = value != uint16_t(v);
+	return value;
 }
 
 static bool run1() {
