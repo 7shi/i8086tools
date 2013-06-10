@@ -461,6 +461,9 @@ static bool run1() {
 	case 0x8b: // mov reg16, r/m
 		r[opr1] = get16(op.opr2);
 		return true;
+	case 0x8d: // lea reg16, r/m
+		r[opr1] = addr(op.opr2);
+		return true;
 	case 0xa0: // mov al, [addr]
 		AL = get8(op.opr2);
 		return true;
