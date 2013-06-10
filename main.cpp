@@ -55,6 +55,70 @@ inline void write16(uint16_t addr, uint16_t value) {
 	data[addr + 1] = value >> 8;
 }
 
+static uint8_t get8(const Operand &opr) {
+	switch (opr.type) {
+	case Reg: return *r8[opr.value];
+	case Imm: return opr.value;
+	case Ptr: return data[opr.value];
+	case ModRM + 0: return data[BX + SI + opr.value];
+	case ModRM + 1: return data[BX + DI + opr.value];
+	case ModRM + 2: return data[BP + SI + opr.value];
+	case ModRM + 3: return data[BP + DI + opr.value];
+	case ModRM + 4: return data[     SI + opr.value];
+	case ModRM + 5: return data[     DI + opr.value];
+	case ModRM + 6: return data[BP      + opr.value];
+	case ModRM + 7: return data[BX      + opr.value];
+	}
+	return 0;
+}
+
+static uint16_t get16(const Operand &opr) {
+	switch (opr.type) {
+	case Reg: return r[opr.value];
+	case Imm: return opr.value;
+	case Ptr: return read16(opr.value);
+	case ModRM + 0: return read16(BX + SI + opr.value);
+	case ModRM + 1: return read16(BX + DI + opr.value);
+	case ModRM + 2: return read16(BP + SI + opr.value);
+	case ModRM + 3: return read16(BP + DI + opr.value);
+	case ModRM + 4: return read16(     SI + opr.value);
+	case ModRM + 5: return read16(     DI + opr.value);
+	case ModRM + 6: return read16(BP      + opr.value);
+	case ModRM + 7: return read16(BX      + opr.value);
+	}
+	return 0;
+}
+
+static void set8(const Operand &opr, uint8_t value) {
+	switch (opr.type) {
+	case Reg: *r8[opr.value] = value; return;
+	case Ptr: data[opr.value] = value; return;
+	case ModRM + 0: data[BX + SI + opr.value] = value; return;
+	case ModRM + 1: data[BX + DI + opr.value] = value; return;
+	case ModRM + 2: data[BP + SI + opr.value] = value; return;
+	case ModRM + 3: data[BP + DI + opr.value] = value; return;
+	case ModRM + 4: data[     SI + opr.value] = value; return;
+	case ModRM + 5: data[     DI + opr.value] = value; return;
+	case ModRM + 6: data[BP      + opr.value] = value; return;
+	case ModRM + 7: data[BX      + opr.value] = value; return;
+	}
+}
+
+static void set16(const Operand &opr, uint16_t value) {
+	switch (opr.type) {
+	case Reg: r[opr.value] = value; return;
+	case Ptr: write16(opr.value, value); return;
+	case ModRM + 0: write16(BX + SI + opr.value, value); return;
+	case ModRM + 1: write16(BX + DI + opr.value, value); return;
+	case ModRM + 2: write16(BP + SI + opr.value, value); return;
+	case ModRM + 3: write16(BP + DI + opr.value, value); return;
+	case ModRM + 4: write16(     SI + opr.value, value); return;
+	case ModRM + 5: write16(     DI + opr.value, value); return;
+	case ModRM + 6: write16(BP      + opr.value, value); return;
+	case ModRM + 7: write16(BX      + opr.value, value); return;
+	}
+}
+
 static bool run1() {
 	OpCode op = disasm1(text + ip, ip);
 	std::string hex = hexdump(text + ip, op.len);
