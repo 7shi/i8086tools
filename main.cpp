@@ -60,6 +60,9 @@ static bool run1() {
 	case 0xbf:
 		r[op.opr1.value] = op.opr2.value;
 		return true;
+	case 0xc3:
+		if (SP == 0) return false;
+		break;
 	}
 	fprintf(stderr, "not implemented\n");
 	return false;
