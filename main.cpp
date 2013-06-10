@@ -149,7 +149,7 @@ static bool run1() {
 	fprintf(stderr, ":%-12s %s\n", hex.c_str(), op.str().c_str());
 	uint8_t b = text[ip];
 	uint16_t oldip = ip;
-	int dst, val;
+	int dst, src, val;
 	ip += op.len;
 	switch (b) {
 	case 0x00: // add r/m, reg8
@@ -175,6 +175,156 @@ static bool run1() {
 	case 0x05: // add ax, imm16
 		val = int16_t(dst = AX) + int16_t(opr2);
 		AX = setf16(val, dst > uint16_t(val));
+		return true;
+	case 0x08: // or r/m, reg8
+		set8(op.opr1, setf8(int8_t(get8(op.opr1) | *r8[opr2]), false));
+		return true;
+	case 0x09: // or r/m, reg16
+		set16(op.opr1, setf16(int16_t(get16(op.opr1) | r[opr2]), false));
+		return true;
+	case 0x0a: // or reg8, r/m
+		*r8[opr1] = setf8(int8_t(*r8[opr1] | get8(op.opr2)), false);
+		return true;
+	case 0x0b: // or reg16, r/m
+		r[opr1] = setf16(int16_t(r[opr1] | get16(op.opr2)), false);
+		return true;
+	case 0x0c: // or al, imm8
+		AL = setf8(int8_t(AL | opr2), false);
+		return true;
+	case 0x0d: // or ax, imm16
+		AX = setf16(int16_t(AX | opr2), false);
+		return true;
+	case 0x10: // adc r/m, reg8
+		val = int8_t(dst = get8(op.opr1)) + int8_t(*r8[opr2]) + int(CF);
+		set8(op.opr1, setf8(val, dst > uint8_t(val)));
+		return true;
+	case 0x11: // adc r/m, reg16
+		val = int16_t(dst = get16(op.opr1)) + int16_t(r[opr2]) + int(CF);
+		set16(op.opr1, setf16(val, dst > uint16_t(val)));
+		return true;
+	case 0x12: // adc reg8, r/m
+		val = int8_t(dst = *r8[opr1]) + int8_t(get8(op.opr2)) + int(CF);
+		*r8[opr1] = setf8(val, dst > uint8_t(val));
+		return true;
+	case 0x13: // adc reg16, r/m
+		val = int16_t(dst = r[opr1]) + int16_t(get16(op.opr2)) + int(CF);
+		r[opr1] = setf16(val, dst > uint16_t(val));
+		return true;
+	case 0x14: // adc al, imm8
+		val = int8_t(dst = AL) + int8_t(opr2) + int(CF);
+		AL = setf8(val, dst > uint8_t(val));
+		return true;
+	case 0x15: // adc ax, imm16
+		val = int16_t(dst = AX) + int16_t(opr2) + int(CF);
+		AX = setf16(val, dst > uint16_t(val));
+		return true;
+	case 0x18: // sbb r/m, reg8
+		val = int8_t(dst = get8(op.opr1)) - int8_t(src = *r8[opr2] + int(CF));
+		set8(op.opr1, setf8(val, dst < src));
+		return true;
+	case 0x19: // sbb r/m, reg16
+		val = int16_t(dst = get16(op.opr1)) - int16_t(src = r[opr2] + int(CF));
+		set16(op.opr1, setf16(val, dst < src));
+		return true;
+	case 0x1a: // sbb reg8, r/m
+		val = int8_t(dst = *r8[opr1]) - int8_t(src = get8(op.opr2) + int(CF));
+		*r8[opr1] = setf8(val, dst < src);
+		return true;
+	case 0x1b: // sbb reg16, r/m
+		val = int16_t(dst = r[opr1]) - int16_t(src = get16(op.opr2) + int(CF));
+		r[opr1] = setf16(val, dst < src);
+		return true;
+	case 0x1c: // sbb al, imm8
+		val = int8_t(dst = AL) - int8_t(src = opr2 + int(CF));
+		AL = setf8(val, dst < src);
+		return true;
+	case 0x1d: // sbb ax, imm16
+		val = int16_t(dst = AX) - int16_t(src = opr2 + int(CF));
+		AX = setf16(val, dst < src);
+		return true;
+	case 0x20: // and r/m, reg8
+		set8(op.opr1, setf8(int8_t(get8(op.opr1) & *r8[opr2]), false));
+		return true;
+	case 0x21: // and r/m, reg16
+		set16(op.opr1, setf16(int16_t(get16(op.opr1) & r[opr2]), false));
+		return true;
+	case 0x22: // and reg8, r/m
+		*r8[opr1] = setf8(int8_t(*r8[opr1] & get8(op.opr2)), false);
+		return true;
+	case 0x23: // and reg16, r/m
+		r[opr1] = setf16(int16_t(r[opr1] & get16(op.opr2)), false);
+		return true;
+	case 0x24: // and al, imm8
+		AL = setf8(int8_t(AL & opr2), false);
+		return true;
+	case 0x25: // and ax, imm16
+		AX = setf16(int16_t(AX & opr2), false);
+		return true;
+	case 0x28: // sub r/m, reg8
+		val = int8_t(dst = get8(op.opr1)) - int8_t(src = *r8[opr2]);
+		set8(op.opr1, setf8(val, dst < src));
+		return true;
+	case 0x29: // sub r/m, reg16
+		val = int16_t(dst = get16(op.opr1)) - int16_t(src = r[opr2]);
+		set16(op.opr1, setf16(val, dst < src));
+		return true;
+	case 0x2a: // sub reg8, r/m
+		val = int8_t(dst = *r8[opr1]) - int8_t(src = get8(op.opr2));
+		*r8[opr1] = setf8(val, dst < src);
+		return true;
+	case 0x2b: // sub reg16, r/m
+		val = int16_t(dst = r[opr1]) - int16_t(src = get16(op.opr2));
+		r[opr1] = setf16(val, dst < src);
+		return true;
+	case 0x2c: // sub al, imm8
+		val = int8_t(dst = AL) - int8_t(src = opr2);
+		AL = setf8(val, dst < src);
+		return true;
+	case 0x2d: // sub ax, imm16
+		val = int16_t(dst = AX) - int16_t(src = opr2);
+		AX = setf16(val, dst < src);
+		return true;
+	case 0x30: // xor r/m, reg8
+		set8(op.opr1, setf8(int8_t(get8(op.opr1) ^ *r8[opr2]), false));
+		return true;
+	case 0x31: // xor r/m, reg16
+		set16(op.opr1, setf16(int16_t(get16(op.opr1) ^ r[opr2]), false));
+		return true;
+	case 0x32: // xor reg8, r/m
+		*r8[opr1] = setf8(int8_t(*r8[opr1] ^ get8(op.opr2)), false);
+		return true;
+	case 0x33: // xor reg16, r/m
+		r[opr1] = setf16(int16_t(r[opr1] ^ get16(op.opr2)), false);
+		return true;
+	case 0x34: // xor al, imm8
+		AL = setf8(int8_t(AL ^ opr2), false);
+		return true;
+	case 0x35: // xor ax, imm16
+		AX = setf16(int16_t(AX ^ opr2), false);
+		return true;
+	case 0x38: // cmp r/m, reg8
+		val = int8_t(dst = get8(op.opr1)) - int8_t(src = *r8[opr2]);
+		setf8(val, dst < src);
+		return true;
+	case 0x39: // cmp r/m, reg16
+		val = int16_t(dst = get16(op.opr1)) - int16_t(src = r[opr2]);
+		setf16(val, dst < src);
+		return true;
+	case 0x3a: // cmp reg8, r/m
+		val = int8_t(dst = *r8[opr1]) - int8_t(src = get8(op.opr2));
+		setf8(val, dst < src);
+		return true;
+	case 0x3b: // cmp reg16, r/m
+		val = int16_t(dst = r[opr1]) - int16_t(src = get16(op.opr2));
+		setf16(val, dst < src);
+		return true;
+	case 0x3c: // cmp al, imm8
+		val = int8_t(dst = AL) - int8_t(src = opr2);
+		setf8(val, dst < src);
+		return true;
+	case 0x3d: // cmp ax, imm16
+		val = int16_t(dst = AX) - int16_t(src = opr2);
+		setf16(val, dst < src);
 		return true;
 	case 0x50: // push reg16
 	case 0x51:
@@ -203,33 +353,115 @@ static bool run1() {
 		case 0: // add
 			val = int8_t(dst = get8(op.opr1)) + int8_t(opr2);
 			set8(op.opr1, setf8(val, dst > uint8_t(val)));
-			break;
+			return true;
+		case 1: // or
+			set8(op.opr1, setf8(int8_t(get8(op.opr1) | opr2), false));
+			return true;
+		case 2: // adc
+			val = int8_t(dst = get8(op.opr1)) + int8_t(opr2) + int(CF);
+			set8(op.opr1, setf8(val, dst > uint8_t(val)));
+			return true;
+		case 3: // sbb
+			val = int8_t(dst = get8(op.opr1)) - int8_t(src = opr2 + int(CF));
+			set8(op.opr1, setf8(val, dst < src));
+			return true;
+		case 4: // and
+			set8(op.opr1, setf8(int8_t(get8(op.opr1) & opr2), false));
+			return true;
+		case 5: // sub
+			val = int8_t(dst = get8(op.opr1)) - int8_t(src = opr2);
+			set8(op.opr1, setf8(val, dst < src));
+			return true;
+		case 6: // xor
+			set8(op.opr1, setf8(int8_t(get8(op.opr1) ^ opr2), false));
+			return true;
+		case 7: // cmp
+			val = int8_t(dst = get8(op.opr1)) - int8_t(src = opr2);
+			setf8(val, dst < src);
+			return true;
 		}
-		return true;
+		break;
 	case 0x81: // r/m, imm16
 		switch ((text[oldip + 1] >> 3) & 7) {
 		case 0: // add
 			val = int16_t(dst = get16(op.opr1)) + int16_t(opr2);
 			set16(op.opr1, setf16(val, dst > uint16_t(val)));
-			break;
+			return true;
+		case 1: // or
+			set16(op.opr1, setf16(int16_t(get16(op.opr1) | opr2), false));
+			return true;
+		case 2: // adc
+			val = int16_t(dst = get16(op.opr1)) + int16_t(opr2) + int(CF);
+			set16(op.opr1, setf16(val, dst > uint16_t(val)));
+			return true;
+		case 3: // sbb
+			val = int16_t(dst = get16(op.opr1)) - int16_t(src = opr2 + int(CF));
+			set16(op.opr1, setf16(val, dst < src));
+			return true;
+		case 4: // and
+			set16(op.opr1, setf16(int16_t(get16(op.opr1) & opr2), false));
+			return true;
+		case 5: // sub
+			val = int16_t(dst = get16(op.opr1)) - int16_t(src = opr2);
+			set16(op.opr1, setf16(val, dst < src));
+			return true;
+		case 6: // xor
+			set16(op.opr1, setf16(int16_t(get16(op.opr1) ^ opr2), false));
+			return true;
+		case 7: // cmp
+			val = int16_t(dst = get16(op.opr1)) - int16_t(src = opr2);
+			setf16(val, dst < src);
+			return true;
 		}
-		return true;
+		break;
 	case 0x82: // r/m, imm8(signed)
 		switch ((text[oldip + 1] >> 3) & 7) {
 		case 0: // add
 			val = int8_t(dst = get8(op.opr1)) + int8_t(opr2);
 			set8(op.opr1, setf8(val, dst > uint8_t(val)));
-			break;
+			return true;
+		case 2: // adc
+			val = int8_t(dst = get8(op.opr1)) + int8_t(opr2) + int(CF);
+			set8(op.opr1, setf8(val, dst > uint8_t(val)));
+			return true;
+		case 3: // sbb
+			val = int8_t(dst = get8(op.opr1)) - int8_t(src = opr2 + int(CF));
+			set8(op.opr1, setf8(val, dst < uint8_t(src)));
+			return true;
+		case 5: // sub
+			val = int8_t(dst = get8(op.opr1)) - int8_t(src = opr2);
+			set8(op.opr1, setf8(val, dst < uint8_t(src)));
+			return true;
+		case 7: // cmp
+			val = int8_t(dst = get8(op.opr1)) - int8_t(src = opr2);
+			setf8(val, dst < uint8_t(src));
+			return true;
 		}
-		return true;
+		break;
 	case 0x83: // r/m, imm16(signed)
 		switch ((text[oldip + 1] >> 3) & 7) {
 		case 0: // add
 			val = int16_t(dst = get16(op.opr1)) + int8_t(opr2);
 			set16(op.opr1, setf16(val, dst > uint8_t(val)));
-			break;
+			return true;
+		case 2: // adc
+			val = int16_t(dst = get16(op.opr1)) + int8_t(opr2) + int(CF);
+			set16(op.opr1, setf16(val, dst > uint8_t(val)));
+			return true;
+		case 3: // sbb
+			val = int8_t(dst = get8(op.opr1)) - int8_t(src = opr2 + int(CF));
+			set8(op.opr1, setf8(val, dst < uint8_t(src)));
+			return true;
+		case 5: // sub
+			val = int16_t(dst = get16(op.opr1)) - int8_t(src = opr2);
+			set16(op.opr1, setf16(val, dst < uint16_t(src)));
+			return true;
+		case 7: // cmp
+			val = int16_t(dst = get16(op.opr1)) - int8_t(src = opr2);
+			setf16(val, dst < uint16_t(src));
+			return true;
 		}
-		return true;
+		break;
 	case 0x88: // mov r/m, reg8
 		set8(op.opr1, *r8[opr2]);
 		return true;
