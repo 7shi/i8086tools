@@ -123,21 +123,21 @@ static void set16(const Operand &opr, uint16_t value) {
 	}
 }
 
-inline int setf8(int value) {
+inline int setf8(int value, bool cf) {
 	int8_t v = value;
 	OF = value != v;
 	SF = v < 0;
 	ZF = v == 0;
-	CF = value != uint8_t(v);
+	CF = cf;
 	return value;
 }
 
-inline int setf16(int value) {
+inline int setf16(int value, bool cf) {
 	int16_t v = value;
 	OF = value != v;
 	SF = v < 0;
 	ZF = v == 0;
-	CF = value != uint16_t(v);
+	CF = cf;
 	return value;
 }
 
