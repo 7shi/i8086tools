@@ -65,9 +65,9 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
 	case 0x18:
 	case 0x19:
 	case 0x1a:
-	case 0x1b: return regrm(mem, "ssb", b & 2, b & 1);
+	case 0x1b: return regrm(mem, "sbb", b & 2, b & 1);
 	case 0x1c: 
-	case 0x1d: return aimm(mem, "ssb");
+	case 0x1d: return aimm(mem, "sbb");
 	case 0x1e: return OpCode(1, "push", ds);
 	case 0x1f: return OpCode(1, "pop" , ds);
 	case 0x20:
@@ -159,7 +159,7 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
 	case 0x81:
 	case 0x82:
 	case 0x83: {
-		const char *mnes[] = { "add", "or", "adc", "ssb", "and", "sub", "xor", "cmp" };
+		const char *mnes[] = { "add", "or", "adc", "sbb", "and", "sub", "xor", "cmp" };
 		std::string mne = mnes[(mem[1] >> 3) & 7];
 		OpCode op = modrm(mem, mne, b & 1);
 		off_t iimm = op.len;
