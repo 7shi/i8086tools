@@ -150,6 +150,18 @@ static bool run1() {
 		r[op.opr1.value] = read16(SP);
 		SP += 2;
 		return true;
+	case 0x88: // mov r/m, reg8
+		set8(op.opr1, *r8[op.opr2.value]);
+		return true;
+	case 0x89: // mov r/m, reg16
+		set16(op.opr1, r[op.opr2.value]);
+		return true;
+	case 0x8a: // mov reg8, r/m
+		*r8[op.opr1.value] = get8(op.opr2);
+		return true;
+	case 0x8b: // mov reg16, r/m
+		r[op.opr1.value] = get16(op.opr2);
+		return true;
 	case 0xb0: // mov reg8, imm8
 	case 0xb1:
 	case 0xb2:
