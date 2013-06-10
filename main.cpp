@@ -143,11 +143,13 @@ inline int setf16(int value) {
 
 static bool run1() {
 	OpCode op = disasm1(text + ip, ip);
+	int opr1 = op.opr1.value, opr2 = op.opr2.value;
 	std::string hex = hexdump(text + ip, op.len);
 	debug();
 	fprintf(stderr, ":%-12s %s\n", hex.c_str(), op.str().c_str());
 	uint8_t b = text[ip];
 	uint16_t oldip = ip;
+	int val;
 	ip += op.len;
 	switch (b) {
 	case 0x50: // push reg16
@@ -159,7 +161,7 @@ static bool run1() {
 	case 0x56:
 	case 0x57:
 		SP -= 2;
-		write16(SP, r[op.opr1.value]);
+		write16(SP, r[opr1]);
 		return true;
 	case 0x58: // pop reg16
 	case 0x59:
@@ -169,20 +171,20 @@ static bool run1() {
 	case 0x5d:
 	case 0x5e:
 	case 0x5f:
-		r[op.opr1.value] = read16(SP);
+		r[opr1] = read16(SP);
 		SP += 2;
 		return true;
 	case 0x88: // mov r/m, reg8
-		set8(op.opr1, *r8[op.opr2.value]);
+		set8(op.opr1, *r8[opr2]);
 		return true;
 	case 0x89: // mov r/m, reg16
-		set16(op.opr1, r[op.opr2.value]);
+		set16(op.opr1, r[opr2]);
 		return true;
 	case 0x8a: // mov reg8, r/m
-		*r8[op.opr1.value] = get8(op.opr2);
+		*r8[opr1] = get8(op.opr2);
 		return true;
 	case 0x8b: // mov reg16, r/m
-		r[op.opr1.value] = get16(op.opr2);
+		r[opr1] = get16(op.opr2);
 		return true;
 	case 0xa0: // mov al, [addr]
 		AL = get8(op.opr2);
@@ -204,7 +206,7 @@ static bool run1() {
 	case 0xb5:
 	case 0xb6:
 	case 0xb7:
-		*r8[op.opr1.value] = op.opr2.value;
+		*r8[opr1] = opr2;
 		return true;
 	case 0xb8: // mov reg16, imm16
 	case 0xb9:
@@ -214,16 +216,16 @@ static bool run1() {
 	case 0xbd:
 	case 0xbe:
 	case 0xbf:
-		r[op.opr1.value] = op.opr2.value;
+		r[opr1] = opr2;
 		return true;
 	case 0xc3: // ret
 		if (SP == 0) return false;
 		break;
 	case 0xc6: // mov r/m, imm8
-		set8(op.opr1, op.opr2.value);
+		set8(op.opr1, opr2);
 		return true;
 	case 0xc7: // mov r/m, imm16
-		set16(op.opr1, op.opr2.value);
+		set16(op.opr1, opr2);
 		return true;
 	}
 	fprintf(stderr, "not implemented\n");
