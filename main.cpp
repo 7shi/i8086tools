@@ -3,8 +3,25 @@
 #include <string.h>
 #include <sys/stat.h>
 
-uint16_t ip;
+uint16_t ip, r[8];
+uint8_t *r8[8];
 uint8_t text[65536], mem[65536], *data;
+
+static void init_r8() {
+	uint16_t tmp = 0x1234;
+	uint8_t *p = (uint8_t *)r;
+	if (*(uint8_t *)&tmp == 0x34) {
+		for (int i = 0; i < 4; i++) {
+			r8[i] = p + i * 2;
+			r8[i + 4] = r8[i] + 1;
+		}
+	} else {
+		for (int i = 0; i < 4; i++) {
+			r8[i] = p + i * 2 + 1;
+			r8[i + 4] = r8[i] - 1;
+		}
+	}
+}
 
 int main(int argc, char *argv[]) {
 	bool dis = false;
@@ -70,6 +87,7 @@ int main(int argc, char *argv[]) {
 	if (dis) {
 		disasm(text, size);
 	} else {
+		init_r8();
 		printf("entry: %04x\n", ip);
 	}
 	return 0;
