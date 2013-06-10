@@ -6,6 +6,7 @@
 uint16_t ip, r[8];
 uint8_t *r8[8];
 uint8_t text[65536], mem[65536], *data;
+bool OF, SF, ZF, CF;
 
 #define AX r[0]
 #define CX r[1]
@@ -24,10 +25,13 @@ uint8_t text[65536], mem[65536], *data;
 #define DH *r8[6]
 #define BH *r8[7]
 
+const char *header = " AX   CX   DX   BX   SP   BP   SI   DI  FLAGS IP\n";
+
 static void debug() {
 	fprintf(stderr,
-		"%04x %04x %04x %04x %04x %04x %04x %04x %04x",
-		r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], ip);
+		"%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x",
+		r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7],
+		OF ? 'O' : '-', SF ? 'S' : '-', ZF ? 'Z' : '-', CF ? 'C' : '-', ip);
 }
 
 static void init_r8() {
@@ -117,6 +121,21 @@ static void set16(const Operand &opr, uint16_t value) {
 	case ModRM + 6: write16(BP      + opr.value, value); return;
 	case ModRM + 7: write16(BX      + opr.value, value); return;
 	}
+}
+
+inline void set_sz(int16_t value) {
+	SF = value < 0;
+	ZF = value == 0;
+}
+
+inline void set_co(bool cf, bool of) {
+	CF = cf;
+	OF = of;
+}
+
+inline void set_szco(int16_t value, bool cf, bool of) {
+	set_sz(value);
+	set_co(cf, of);
 }
 
 static bool run1() {
@@ -210,7 +229,7 @@ static bool run1() {
 
 static void run() {
 	init_r8();
-	fprintf(stderr, " AX   CX   DX   BX   SP   BP   SI   DI   IP\n");
+	fprintf(stderr, header);
 	while (run1());
 }
 	
