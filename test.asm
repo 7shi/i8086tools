@@ -10,4 +10,7 @@ mov cx, [bp]
 mov [bp], bh
 mov [bp+1], bl
 pop di
+push cx
+mov [bp], word 0x1234
+pop cx
 ret

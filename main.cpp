@@ -185,6 +185,12 @@ static bool run1() {
 	case 0xc3: // ret
 		if (SP == 0) return false;
 		break;
+	case 0xc6: // mov r/m, imm8
+		set8(op.opr1, op.opr2.value);
+		return true;
+	case 0xc7: // mov r/m, imm16
+		set16(op.opr1, op.opr2.value);
+		return true;
 	}
 	fprintf(stderr, "not implemented\n");
 	return false;
