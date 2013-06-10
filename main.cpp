@@ -335,6 +335,48 @@ static bool run1() {
 		r[opr1] = read16(SP);
 		SP += 2;
 		return true;
+	case 0x70: // jo
+		if (OF) ip = opr1;
+		return true;
+	case 0x71: // jno
+		if (!OF) ip = opr1;
+		return true;
+	case 0x72: // jb/jnae
+		if (CF) ip = opr1;
+		return true;
+	case 0x73: // jnb/jae
+		if (!CF) ip = opr1;
+		return true;
+	case 0x74: // je/jz
+		if (ZF) ip = opr1;
+		return true;
+	case 0x75: // jne/jnz
+		if (!ZF) ip = opr1;
+		return true;
+	case 0x76: // jbe/jna
+		if (CF || ZF) ip = opr1;
+		return true;
+	case 0x77: // jnbe/ja
+		if (!CF && !ZF) ip = opr1;
+		return true;
+	case 0x78: // js
+		if (SF) ip = opr1;
+		return true;
+	case 0x79: // jns
+		if (!SF) ip = opr1;
+		return true;
+	case 0x7c: // jl/jnge
+		if (SF != OF) ip = opr1;
+		return true;
+	case 0x7d: // jnl/jge
+		if (SF == OF) ip = opr1;
+		return true;
+	case 0x7e: // jle/jng
+		if (ZF || SF != OF) ip = opr1;
+		return true;
+	case 0x7f: // jnle/jg
+		if (!ZF && SF == OF) ip = opr1;
+		return true;
 	case 0x80: // r/m, imm8
 		switch ((text[oldip + 1] >> 3) & 7) {
 		case 0: // add
