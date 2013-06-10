@@ -31,6 +31,15 @@ static void init_r8() {
 	}
 }
 
+inline uint16_t read16(uint16_t addr) {
+	return data[addr] | (data[addr + 1] << 8);
+}
+
+inline void write16(uint16_t addr, uint16_t value) {
+	data[addr] = value;
+	data[addr + 1] = value >> 8;
+}
+
 static bool run1() {
 	OpCode op = disasm1(text + ip, ip);
 	std::string hex = hexdump(text + ip, op.len);
@@ -40,6 +49,28 @@ static bool run1() {
 	uint16_t oldip = ip;
 	ip += op.len;
 	switch (b) {
+	case 0x50: // push reg16
+	case 0x51:
+	case 0x52:
+	case 0x53:
+	case 0x54:
+	case 0x55:
+	case 0x56:
+	case 0x57:
+		SP -= 2;
+		write16(SP, r[op.opr1.value]);
+		return true;
+	case 0x58: // pop reg16
+	case 0x59:
+	case 0x5a:
+	case 0x5b:
+	case 0x5c:
+	case 0x5d:
+	case 0x5e:
+	case 0x5f:
+		r[op.opr1.value] = read16(SP);
+		SP += 2;
+		return true;
 	case 0xb0: // mov reg8, imm8
 	case 0xb1:
 	case 0xb2:
