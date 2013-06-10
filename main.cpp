@@ -162,6 +162,18 @@ static bool run1() {
 	case 0x8b: // mov reg16, r/m
 		r[op.opr1.value] = get16(op.opr2);
 		return true;
+	case 0xa0: // mov al, [addr]
+		AL = get8(op.opr2);
+		return true;
+	case 0xa1: // mov ax, [addr]
+		AX = get16(op.opr2);
+		return true;
+	case 0xa2: // mov [addr], al
+		set8(op.opr2, AL);
+		return true;
+	case 0xa3: // mov [addr], ax
+		set16(op.opr2, AX);
+		return true;
 	case 0xb0: // mov reg8, imm8
 	case 0xb1:
 	case 0xb2:

@@ -12,5 +12,6 @@ mov [bp+1], bl
 pop di
 push cx
 mov [bp], word 0x1234
+mov al, [0xffff]
 pop cx
 ret
