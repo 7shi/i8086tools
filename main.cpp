@@ -624,11 +624,85 @@ static bool run1(uint8_t prefix = 0) {
 	case 0xa3: // mov [addr], ax
 		set16(op.opr2, AX);
 		return true;
+	case 0xa4: // movsb
+		do {
+			data[DI] = data[SI];
+			if (DF) { SI--; DI--; } else { SI++; DI++; }
+			if (prefix) CX--;
+		} while (prefix == 0xf3 && CX);
+		return true;
+	case 0xa5: // movsw
+		do {
+			write16(DI, read16(SI));
+			if (DF) { SI -= 2; DI -= 2; } else { SI += 2; DI += 2; }
+			if (prefix) CX--;
+		} while (prefix == 0xf3 && CX);
+		return true;
+	case 0xa6: // cmpsb
+		do {
+			val = int8_t(dst = data[SI]) - int8_t(src = data[DI]);
+			setf8(val, dst < src);
+			if (DF) { SI--; DI--; } else { SI++; DI++; }
+			if (prefix) CX--;
+		} while (((prefix == 0xf2 && !ZF) || (prefix == 0xf3 && ZF)) && CX);
+		return true;
+	case 0xa7: // cmpsw
+		do {
+			val = int16_t(dst = read16(SI)) - int16_t(src = read16(DI));
+			setf16(val, dst < src);
+			if (DF) { SI -= 2; DI -= 2; } else { SI += 2; DI += 2; }
+			if (prefix) CX--;
+		} while (((prefix == 0xf2 && !ZF) || (prefix == 0xf3 && ZF)) && CX);
+		return true;
 	case 0xa8: // test al, imm8
 		setf8(int8_t(AL & opr2), false);
 		return true;
 	case 0xa9: // test ax, imm16
 		setf16(int16_t(AX & opr2), false);
+		return true;
+	case 0xaa: // stosb
+		do {
+			data[DI] = AL;
+			if (DF) DI--; else DI++;
+			if (prefix) CX--;
+		} while (prefix == 0xf3 && CX);
+		return true;
+	case 0xab: // stosw
+		do {
+			write16(DI, AX);
+			if (DF) DI -= 2; else DI += 2;
+			if (prefix) CX--;
+		} while (prefix == 0xf3 && CX);
+		return true;
+	case 0xac: // lodsb
+		do {
+			AL = data[SI];
+			if (DF) SI--; else SI++;
+			if (prefix) CX--;
+		} while (prefix == 0xf3 && CX);
+		return true;
+	case 0xad: // lodsw
+		do {
+			AX = read16(SI);
+			if (DF) SI -= 2; else SI += 2;
+			if (prefix) CX--;
+		} while (prefix == 0xf3 && CX);
+		return true;
+	case 0xae: // scasb
+		do {
+			val = int8_t(AL) - int8_t(src = data[DI]);
+			setf8(val, AL < src);
+			if (DF) DI--; else DI++;
+			if (prefix) CX--;
+		} while (((prefix == 0xf2 && !ZF) || (prefix == 0xf3 && ZF)) && CX);
+		return true;
+	case 0xaf: // scasw
+		do {
+			val = int16_t(AX) - int16_t(src = read16(DI));
+			setf16(val, AX < src);
+			if (DF) DI -= 2; else DI += 2;
+			if (prefix) CX--;
+		} while (((prefix == 0xf2 && !ZF) || (prefix == 0xf3 && ZF)) && CX);
 		return true;
 	case 0xb0: // mov reg8, imm8
 	case 0xb1:
