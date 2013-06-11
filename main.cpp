@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <vector>
 
 uint16_t ip, r[8];
 uint8_t *r8[8];
@@ -985,22 +986,37 @@ static bool run1() {
 	return false;
 }
 
-static void run() {
+static void run(const std::vector<std::string> &args) {
 	init_table();
+	int arglen = 0;
+	for (int i = 0; i < args.size(); i++) {
+		arglen += args[i].size() + 1;
+	}
+	SP -= (arglen + 3) & ~3;
+	uint16_t ad1 = SP;
+	write16(SP -= 2, 0); // envp[0]
+	write16(SP -= 2, 0); // argv[argc]
+	SP -= 2 * args.size();
+	for (int i = 0; i < args.size(); i++) {
+		write16(SP + 2 * i, ad1);
+		strcpy((char *)data + ad1, args[i].c_str());
+		ad1 += args[i].size() + 1;
+	}
+	write16(SP -= 2, args.size()); // argc
 	fprintf(stderr, header);
 	while (run1());
 }
-	
+
 int main(int argc, char *argv[]) {
 	bool dis = false;
 	const char *file = NULL;
+	std::vector<std::string> args;
 	for (int i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-d")) {
+		if (!file && !strcmp(argv[i], "-d")) {
 			dis = true;
-		} else if (i + 1 == argc) {
-			file = argv[i];
 		} else {
-			break;
+			if (!file) file = argv[i];
+			args.push_back(argv[i]);
 		}
 	}
 	if (!file) {
@@ -1055,7 +1071,7 @@ int main(int argc, char *argv[]) {
 	if (dis) {
 		disasm(text, tsize);
 	} else {
-		run();
+		run(args);
 	}
 	return 0;
 }
