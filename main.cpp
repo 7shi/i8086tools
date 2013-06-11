@@ -662,6 +662,9 @@ static bool run1() {
 	case 0xc7: // mov r/m, imm16
 		set16(op.opr1, opr2);
 		return true;
+	case 0xd7: // xlat
+		AL = data[BX + AL];
+		return true;
 	case 0xe0: // loopnz/loopne
 		if (--CX > 0 && !ZF) ip = opr1;
 		return true;
