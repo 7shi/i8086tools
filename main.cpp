@@ -692,7 +692,7 @@ static bool run1() {
 		CF = !CF;
 		return true;
 	case 0xf6:
-		switch ((mem[1] >> 3) & 7) {
+		switch ((text[oldip + 1] >> 3) & 7) {
 		case 0: // test r/m, imm8
 			setf8(int8_t(get8(op.opr1) & opr2), false);
 			return true;
@@ -726,7 +726,7 @@ static bool run1() {
 		}}
 		break;
 	case 0xf7:
-		switch ((mem[1] >> 3) & 7) {
+		switch ((text[oldip + 1] >> 3) & 7) {
 		case 0: // test r/m, imm16
 			setf16(int16_t(get16(op.opr1) & opr2), false);
 			return true;
@@ -778,7 +778,7 @@ static bool run1() {
 		DF = true;
 		return true;
 	case 0xfe: // byte r/m
-		switch ((mem[1] >> 3) & 7) {
+		switch ((text[oldip + 1] >> 3) & 7) {
 		case 0: // inc
 			set8(op.opr1, setf8(int8_t(get8(op.opr1)) + 1, CF));
 			return true;
@@ -788,7 +788,7 @@ static bool run1() {
 		}
 		break;
 	case 0xff: // r/m
-		switch ((mem[1] >> 3) & 7) {
+		switch ((text[oldip + 1] >> 3) & 7) {
 		case 0: // inc
 			set16(op.opr1, setf16(int16_t(get16(op.opr1)) + 1, CF));
 			return true;
