@@ -142,7 +142,7 @@ inline int setf16(int value, bool cf) {
 	return value;
 }
 
-static int minix_syscall() {
+static bool minix_syscall() {
 	int type = read16(BX + 2);
 	switch (type) {
 	case 4: // write
