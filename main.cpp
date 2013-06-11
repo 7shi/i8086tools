@@ -662,6 +662,173 @@ static bool run1() {
 	case 0xc7: // mov r/m, imm16
 		set16(op.opr1, opr2);
 		return true;
+	case 0xd0: // byte r/m, 1
+		src = get8(op.opr1);
+		switch ((text[oldip + 1] >> 3) & 7) {
+		case 0: // rol
+			CF = src & 0x80;
+			set8(op.opr1, (src << 1) | CF);
+			OF = CF ^ bool(src & 0x40);
+			return true;
+		case 1: // ror
+			CF = src & 1;
+			set8(op.opr1, (src >> 1) | (CF ? 0x80 : 0));
+			OF = CF ^ bool(src & 0x80);
+			return true;
+		case 2: // rcl
+			set8(op.opr1, (src << 1) | CF);
+			CF = src & 0x80;
+			OF = CF ^ bool(src & 0x40);
+			return true;
+		case 3: // rcr
+			set8(op.opr1, (src >> 1) | (CF ? 0x80 : 0));
+			OF = CF ^ bool(src & 0x80);
+			CF = src & 1;
+			return true;
+		case 4: // shl/sal
+			set8(op.opr1, setf8(int8_t(src) << 1, src & 0x80));
+			return true;
+		case 5: // shr
+			set8(op.opr1, setf8(int8_t(src >> 1), src & 1));
+			OF = src & 0x80;
+			return true;
+		case 7: // sar
+			set8(op.opr1, setf8(int8_t(src) >> 1, src & 1));
+			OF = false;
+			return true;
+		}
+		break;
+	case 0xd1: // r/m, 1
+		src = get16(op.opr1);
+		switch ((text[oldip + 1] >> 3) & 7) {
+		case 0: // rol
+			CF = src & 0x8000;
+			set16(op.opr1, (src << 1) | CF);
+			OF = CF ^ bool(src & 0x4000);
+			return true;
+		case 1: // ror
+			CF = src & 1;
+			set16(op.opr1, (src >> 1) | (CF ? 0x8000 : 0));
+			OF = CF ^ bool(src & 0x8000);
+			return true;
+		case 2: // rcl
+			set16(op.opr1, (src << 1) | CF);
+			CF = src & 0x8000;
+			OF = CF ^ bool(src & 0x4000);
+			return true;
+		case 3: // rcr
+			set16(op.opr1, (src >> 1) | (CF ? 0x8000 : 0));
+			OF = CF ^ bool(src & 0x8000);
+			CF = src & 1;
+			return true;
+		case 4: // shl/sal
+			set16(op.opr1, setf16(int16_t(src) << 1, src & 0x8000));
+			return true;
+		case 5: // shr
+			set16(op.opr1, setf16(int16_t(src >> 1), src & 1));
+			OF = src & 0x8000;
+			return true;
+		case 7: // sar
+			set16(op.opr1, setf16(int16_t(src) >> 1, src & 1));
+			OF = false;
+			return true;
+		}
+		break;
+	case 0xd2: // byte r/m, cl
+		val = get8(op.opr1);
+		switch ((text[oldip + 1] >> 3) & 7) {
+		case 0: // rol
+			for (int i = 0; i < CL; i++)
+				val = (val << 1) | (CF = val & 0x80);
+			set8(op.opr1, val);
+			return true;
+		case 1: // ror
+			for (int i = 0; i < CL; i++)
+				val = (val >> 1) | ((CF = val & 1) ? 0x80 : 0);
+			set8(op.opr1, val);
+			return true;
+		case 2: // rcl
+			for (int i = 0; i < CL; i++) {
+				val = (val << 1) | CF;
+				CF = val & 0x100;
+			}
+			set8(op.opr1, val);
+			return true;
+		case 3: // rcr
+			for (int i = 0; i < CL; i++) {
+				bool f = val & 1;
+				val = (val >> 1) | (CF ? 0x80 : 0);
+				CF = f;
+			}
+			set8(op.opr1, val);
+			return true;
+		case 4: // shl/sal
+			if (CL > 0) {
+				val <<= CL;
+				set8(op.opr1, setf8(int8_t(val), val & 0x100));
+			}
+			return true;
+		case 5: // shr
+			if (CL > 0) {
+				val >>= CL - 1;
+				set8(op.opr1, setf8(int8_t(val >> 1), val & 1));
+			}
+			return true;
+		case 7: // sar
+			if (CL > 0) {
+				val = int8_t(val) >> (CL - 1);
+				set8(op.opr1, setf8(val >> 1, val & 1));
+			}
+			return true;
+		}
+		break;
+	case 0xd3: // r/m, cl
+		val = get16(op.opr1);
+		switch ((text[oldip + 1] >> 3) & 7) {
+		case 0: // rol
+			for (int i = 0; i < CL; i++) {
+				CF = val & 0x8000;
+				set16(op.opr1, val = (val << 1) | CF);
+			}
+			return true;
+		case 1: // ror
+			for (int i = 0; i < CL; i++) {
+				CF = val & 1;
+				set16(op.opr1, val = (val >> 1) | (CF ? 0x8000 : 0));
+			}
+			return true;
+		case 2: // rcl
+			for (int i = 0; i < CL; i++) {
+				set16(op.opr1, val = (val << 1) | CF);
+				CF = val & 0x8000;
+			}
+			return true;
+		case 3: // rcr
+			for (int i = 0; i < CL; i++) {
+				set16(op.opr1, val = (val >> 1) | (CF ? 0x8000 : 0));
+				CF = val & 1;
+			}
+			return true;
+		case 4: // shl/sal
+			if (CL > 0) {
+				val <<= CL;
+				set16(op.opr1, setf16(int16_t(val), val & 0x10000));
+			}
+			return true;
+		case 5: // shr
+			if (CL > 0) {
+				val >>= CL - 1;
+				set16(op.opr1, setf16(int16_t(val >> 1), val & 1));
+			}
+			return true;
+		case 7: // sar
+			if (CL > 0) {
+				val = int16_t(val) >> (CL - 1);
+				set16(op.opr1, setf16(val >> 1, val & 1));
+			}
+			return true;
+		}
+		break;
 	case 0xd7: // xlat
 		AL = data[BX + AL];
 		return true;
