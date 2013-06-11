@@ -12,6 +12,7 @@ size_t tsize;
 bool OF, DF, SF, ZF, PF, CF;
 bool ptable[256];
 bool verbose;
+uint16_t start_sp;
 
 #define AX r[0]
 #define CX r[1]
@@ -745,7 +746,7 @@ static bool run1(uint8_t prefix = 0) {
 		SP += 2 + opr1;
 		return true;
 	case 0xc3: // ret
-		if (SP == 0) return false;
+		if (SP == start_sp) return false;
 		ip = read16(SP);
 		SP += 2;
 		return true;
@@ -1102,6 +1103,7 @@ static void run(const std::vector<std::string> &args) {
 		ad1 += args[i].size() + 1;
 	}
 	write16(SP -= 2, args.size()); // argc
+	start_sp = SP;
 	if (verbose) fprintf(stderr, header);
 	while (run1());
 }
