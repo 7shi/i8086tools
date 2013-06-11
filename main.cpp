@@ -6,6 +6,7 @@
 uint16_t ip, r[8];
 uint8_t *r8[8];
 uint8_t text[65536], mem[65536], *data;
+size_t tsize;
 bool OF, DF, SF, ZF, PF, CF;
 bool ptable[256];
 
@@ -139,7 +140,11 @@ inline int setf16(int value, bool cf) {
 }
 
 static bool run1() {
-	OpCode op = disasm1(text + ip, ip);
+	OpCode op = disasm1(text + ip, ip, tsize);
+	if (ip + op.len > tsize) {
+		fprintf(stderr, "overrun\n");
+		return false;
+	}
 	int opr1 = op.opr1.value, opr2 = op.opr2.value;
 	std::string hex = hexdump(text + ip, op.len);
 	debug();
@@ -685,13 +690,13 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "can not stat: %s\n", file);
 		return 1;
 	}
-	size_t size = st.st_size;
+	tsize = st.st_size;
 	FILE *f = fopen(file, "rb");
 	if (!f) {
 		fprintf(stderr, "can not open: %s\n", file);
 		return 1;
 	}
-	if (size >= 0x20) {
+	if (tsize >= 0x20) {
 		uint8_t h[0x20];
 		if (fread(h, sizeof(h), 1, f) && h[0] == 1 && h[1] == 3
 			&& !fseek(f, h[4], SEEK_SET)) {
@@ -700,33 +705,33 @@ int main(int argc, char *argv[]) {
 				fclose(f);
 				return 1;
 			}
-			size = read32(h + 8);
+			tsize = read32(h + 8);
 			int dsize = read32(h + 12);
 			ip = read32(h + 20);
 			if (h[2] & 0x20) {
 				data = mem;
-				fread(text, 1,  size, f);
+				fread(text, 1, tsize, f);
 				fread(data, 1, dsize, f);
 			} else {
 				data = text;
-				fread(text, 1, size + dsize, f);
+				fread(text, 1, tsize + dsize, f);
 			}
 		} else {
 			fseek(f, 0, SEEK_SET);
 		}
 	}
 	if (!data) {
-		if (size > sizeof(text)) {
+		if (tsize > sizeof(text)) {
 			fprintf(stderr, "too long raw binary: %s\n", file);
 			fclose(f);
 			return 1;
 		}
 		data = text;
-		fread(text, 1, size, f);
+		fread(text, 1, tsize, f);
 	}
 	fclose(f);
 	if (dis) {
-		disasm(text, size);
+		disasm(text, tsize);
 	} else {
 		run();
 	}
