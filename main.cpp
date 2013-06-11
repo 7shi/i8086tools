@@ -6,7 +6,7 @@
 uint16_t ip, r[8];
 uint8_t *r8[8];
 uint8_t text[65536], mem[65536], *data;
-bool OF, SF, ZF, PF, CF;
+bool OF, DF, SF, ZF, PF, CF;
 bool ptable[256];
 
 #define AX r[0]
@@ -617,6 +617,18 @@ static bool run1() {
 			break;
 		}
 		break;
+	case 0xf8: // clc
+		CF = false;
+		return true;
+	case 0xf9: // stc
+		CF = true;
+		return true;
+	case 0xfc: // cld
+		DF = false;
+		return true;
+	case 0xfd: // std
+		DF = true;
+		return true;
 	case 0xff: // r/m
 		switch ((mem[1] >> 3) & 7) {
 		case 0: // inc
