@@ -328,6 +328,26 @@ static bool run1() {
 		val = int16_t(dst = AX) - int16_t(src = opr2);
 		setf16(val, dst < src);
 		return true;
+	case 0x40: // inc reg16
+	case 0x41:
+	case 0x42:
+	case 0x43:
+	case 0x44:
+	case 0x45:
+	case 0x46:
+	case 0x47:
+		r[opr1] = setf16(int16_t(r[opr1]) + 1, CF);
+		return true;
+	case 0x48: // dec reg16
+	case 0x49:
+	case 0x4a:
+	case 0x4b:
+	case 0x4c:
+	case 0x4d:
+	case 0x4e:
+	case 0x4f:
+		r[opr1] = setf16(int16_t(r[opr1]) - 1, CF);
+		return true;
 	case 0x50: // push reg16
 	case 0x51:
 	case 0x52:
@@ -638,12 +658,24 @@ static bool run1() {
 	case 0xfd: // std
 		DF = true;
 		return true;
+	case 0xfe: // byte r/m
+		switch ((mem[1] >> 3) & 7) {
+		case 0: // inc
+			set8(op.opr1, setf8(int8_t(get8(op.opr1)) + 1, CF));
+			return true;
+		case 1: // dec
+			set8(op.opr1, setf8(int8_t(get8(op.opr1)) - 1, CF));
+			return true;
+		}
+		break;
 	case 0xff: // r/m
 		switch ((mem[1] >> 3) & 7) {
 		case 0: // inc
-			break;
+			set16(op.opr1, setf16(int16_t(get16(op.opr1)) + 1, CF));
+			return true;
 		case 1: // dec
-			break;
+			set16(op.opr1, setf16(int16_t(get16(op.opr1)) - 1, CF));
+			return true;
 		case 2: // call
 			SP -= 2;
 			write16(SP, ip);
