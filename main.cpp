@@ -6,7 +6,8 @@
 uint16_t ip, r[8];
 uint8_t *r8[8];
 uint8_t text[65536], mem[65536], *data;
-bool OF, SF, ZF, CF;
+bool OF, SF, ZF, PF, CF;
+bool ptable[256];
 
 #define AX r[0]
 #define CX r[1]
@@ -25,16 +26,16 @@ bool OF, SF, ZF, CF;
 #define DH *r8[6]
 #define BH *r8[7]
 
-const char *header = " AX   CX   DX   BX   SP   BP   SI   DI  FLAGS IP\n";
+const char *header = " AX   CX   DX   BX   SP   BP   SI   DI  FLAGS  IP\n";
 
 static void debug() {
 	fprintf(stderr,
-		"%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x",
+		"%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c%c %04x",
 		r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7],
-		OF ? 'O' : '-', SF ? 'S' : '-', ZF ? 'Z' : '-', CF ? 'C' : '-', ip);
+		OF?'O':'-', SF?'S':'-', ZF?'Z':'-', PF?'P':'-', CF?'C':'-', ip);
 }
 
-static void init_r8() {
+static void init_table() {
 	uint16_t tmp = 0x1234;
 	uint8_t *p = (uint8_t *)r;
 	if (*(uint8_t *)&tmp == 0x34) {
@@ -47,6 +48,13 @@ static void init_r8() {
 			r8[i] = p + i * 2 + 1;
 			r8[i + 4] = r8[i] - 1;
 		}
+	}
+	for (int i = 0; i < 256; i++) {
+		int n = 0;
+		for (int j = 1; j < 256; j += j) {
+			if (i & j) n++;
+		}
+		ptable[i] = (n & 1) == 0;
 	}
 }
 
@@ -115,6 +123,7 @@ inline int setf8(int value, bool cf) {
 	OF = value != v;
 	SF = v < 0;
 	ZF = v == 0;
+	PF = ptable[uint8_t(value)];
 	CF = cf;
 	return value;
 }
@@ -124,6 +133,7 @@ inline int setf16(int value, bool cf) {
 	OF = value != v;
 	SF = v < 0;
 	ZF = v == 0;
+	PF = ptable[uint8_t(value)];
 	CF = cf;
 	return value;
 }
@@ -365,6 +375,12 @@ static bool run1() {
 	case 0x79: // jns
 		if (!SF) ip = opr1;
 		return true;
+	case 0x7a: // jp
+		if (PF) ip = opr1;
+		return true;
+	case 0x7b: // jnp
+		if (!PF) ip = opr1;
+		return true;
 	case 0x7c: // jl/jnge
 		if (SF != OF) ip = opr1;
 		return true;
@@ -593,7 +609,7 @@ static bool run1() {
 }
 
 static void run() {
-	init_r8();
+	init_table();
 	fprintf(stderr, header);
 	while (run1());
 }
