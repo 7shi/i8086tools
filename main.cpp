@@ -656,6 +656,18 @@ static bool run1() {
 	case 0xc7: // mov r/m, imm16
 		set16(op.opr1, opr2);
 		return true;
+	case 0xe0: // loopnz/loopne
+		if (--CX > 0 && !ZF) ip = opr1;
+		return true;
+	case 0xe1: // loopz/loope
+		if (--CX > 0 && ZF) ip = opr1;
+		return true;
+	case 0xe2: // loop
+		if (--CX > 0) ip = opr1;
+		return true;
+	case 0xe3: // jcxz
+		if (CX == 0) ip = opr1;
+		return true;
 	case 0xe8: // call disp
 		SP -= 2;
 		write16(SP, ip);
