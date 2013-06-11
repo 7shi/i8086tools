@@ -140,7 +140,7 @@ inline int setf16(int value, bool cf) {
 	return value;
 }
 
-static bool run1() {
+static bool run1(uint8_t prefix = 0) {
 	OpCode op = disasm1(text + ip, ip, tsize);
 	if (ip + op.len > tsize) {
 		fprintf(stderr, "overrun\n");
@@ -148,8 +148,10 @@ static bool run1() {
 	}
 	int opr1 = op.opr1.value, opr2 = op.opr2.value;
 	std::string hex = hexdump(text + ip, op.len);
-	debug();
-	fprintf(stderr, ":%-12s %s\n", hex.c_str(), op.str().c_str());
+	if (!prefix) {
+		debug();
+		fprintf(stderr, ":%-12s %s\n", hex.c_str(), op.str().c_str());
+	}
 	uint8_t b = text[ip];
 	uint16_t oldip = ip;
 	int dst, src, val;
@@ -856,6 +858,10 @@ static bool run1() {
 	case 0xeb: // jmp short
 		ip = opr1;
 		return true;
+	case 0xf2: // repnz/repne
+	case 0xf3: // repz/repe
+		ip = oldip + 1;
+		return run1(b);
 	case 0xf5: // cmc
 		CF = !CF;
 		return true;
