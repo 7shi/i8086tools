@@ -697,13 +697,33 @@ static bool run1() {
 			setf8(int8_t(get8(op.opr1) & opr2), false);
 			return true;
 		case 2: // not byte r/m
+			set8(op.opr1, ~get8(op.opr1));
+			return true;
 		case 3: // neg byte r/m
+			src = get8(op.opr1);
+			set8(op.opr1, setf8(-int8_t(src), src));
+			return true;
 		case 4: // mul byte r/m
+			AX = AL * get8(op.opr1);
+			OF = CF = AH;
+			return true;
 		case 5: // imul byte r/m
+			AX = int8_t(AL) * int8_t(get8(op.opr1));
+			OF = CF = AH;
+			return true;
 		case 6: // div byte r/m
-		case 7: // idiv byte r/m
-			break;
-		}
+			dst = AX;
+			src = get8(op.opr1);
+			AL = dst / src;
+			AH = dst % src;
+			return true;
+		case 7: { // idiv byte r/m
+			val = int16_t(AX);
+			int16_t y = int8_t(get8(op.opr1));
+			AL = val / y;
+			AH = val % y;
+			return true;
+		}}
 		break;
 	case 0xf7:
 		switch ((mem[1] >> 3) & 7) {
@@ -711,13 +731,39 @@ static bool run1() {
 			setf16(int16_t(get16(op.opr1) & opr2), false);
 			return true;
 		case 2: // not r/m
+			set16(op.opr1, ~get16(op.opr1));
+			return true;
 		case 3: // neg r/m
-		case 4: // mul r/m
-		case 5: // imul r/m
-		case 6: // div r/m
-		case 7: // idiv r/m
-			break;
+			src = get16(op.opr1);
+			set16(op.opr1, setf16(-int16_t(src), src));
+			return true;
+		case 4: { // mul r/m
+			uint32_t v = AX * get16(op.opr1);
+			DX = v >> 16;
+			AX = v;
+			OF = CF = DX;
+			return true;
 		}
+		case 5: // imul r/m
+			val = int16_t(AX) * int16_t(get16(op.opr1));
+			DX = val >> 16;
+			AX = val;
+			OF = CF = DX;
+			return true;
+		case 6: { // div r/m
+			uint32_t x = (DX << 16) | AX;
+			src = get16(op.opr1);
+			AX = x / src;
+			DX = x % src;
+			return true;
+		}
+		case 7: { // idiv r/m
+			int32_t x = (DX << 16) | AX;
+			int32_t y = int16_t(get16(op.opr1));
+			AX = x / y;
+			DX = x % y;
+			return true;
+		}}
 		break;
 	case 0xf8: // clc
 		CF = false;
