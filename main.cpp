@@ -1,6 +1,7 @@
 #include "disasm.h"
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <vector>
 
@@ -138,6 +139,20 @@ inline int setf16(int value, bool cf) {
 	PF = ptable[uint8_t(value)];
 	CF = cf;
 	return value;
+}
+
+static int minix_syscall() {
+	int type = read16(BX + 2);
+	switch (type) {
+	case 4: // write
+		type = write(read16(BX + 4), data + read16(BX + 10), read16(BX + 6));
+		break;
+	default:
+		return false;
+	}
+	AX = 0;
+	write16(BX + 2, type);
+	return true;
 }
 
 static bool run1(uint8_t prefix = 0) {
@@ -739,6 +754,9 @@ static bool run1(uint8_t prefix = 0) {
 	case 0xc7: // mov r/m, imm16
 		set16(op.opr1, opr2);
 		return true;
+	case 0xcd: // int imm8
+		if (opr1 == 0x20 && minix_syscall()) return true;
+		break;
 	case 0xd0: // byte r/m, 1
 		src = get8(op.opr1);
 		switch ((text[oldip + 1] >> 3) & 7) {
