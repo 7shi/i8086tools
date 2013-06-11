@@ -566,14 +566,28 @@ static bool run1() {
 	case 0xbf:
 		r[opr1] = opr2;
 		return true;
+	case 0xc2: // ret imm16
+		ip = read16(SP);
+		SP += 2 + opr1;
+		return true;
 	case 0xc3: // ret
 		if (SP == 0) return false;
-		break;
+		ip = read16(SP);
+		SP += 2;
+		return true;
 	case 0xc6: // mov r/m, imm8
 		set8(op.opr1, opr2);
 		return true;
 	case 0xc7: // mov r/m, imm16
 		set16(op.opr1, opr2);
+		return true;
+	case 0xe8: // call disp
+		SP -= 2;
+		write16(SP, ip);
+		ip = opr1;
+		return true;
+	case 0xe9: // jmp disp
+		ip = opr1;
 		return true;
 	case 0xf6:
 		switch ((mem[1] >> 3) & 7) {
@@ -601,6 +615,30 @@ static bool run1() {
 		case 6: // div r/m
 		case 7: // idiv r/m
 			break;
+		}
+		break;
+	case 0xff: // r/m
+		switch ((mem[1] >> 3) & 7) {
+		case 0: // inc
+			break;
+		case 1: // dec
+			break;
+		case 2: // call
+			SP -= 2;
+			write16(SP, ip);
+			ip = get16(op.opr1);
+			return true;
+		case 3: // callf
+			break;
+		case 4: // jmp
+			ip = get16(op.opr1);
+			return true;
+		case 5: // jmpf
+			break;
+		case 6: // push
+			SP -= 2;
+			write16(SP, get16(op.opr1));
+			return true;
 		}
 		break;
 	}
