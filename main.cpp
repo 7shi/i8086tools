@@ -538,6 +538,16 @@ static bool run1() {
 	case 0x85: // test r/m, reg16
 		setf16(int16_t(get16(op.opr1) & r[opr2]), false);
 		return true;
+	case 0x86: // xchg r/m, reg8
+		val = *r8[opr2];
+		*r8[opr2] = get8(op.opr1);
+		set8(op.opr1, val);
+		return true;
+	case 0x87: // xchg r/m, reg16
+		val = r[opr2];
+		r[opr2] = get16(op.opr1);
+		set16(op.opr1, val);
+		return true;
 	case 0x88: // mov r/m, reg8
 		set8(op.opr1, *r8[opr2]);
 		return true;
@@ -556,6 +566,19 @@ static bool run1() {
 	case 0x8f: // pop r/m
 		set16(op.opr1, read16(SP));
 		SP += 2;
+		return true;
+	case 0x90: // nop
+		return true;
+	case 0x91: // xchg reg, ax
+	case 0x92:
+	case 0x93:
+	case 0x94:
+	case 0x95:
+	case 0x96:
+	case 0x97:
+		val = AX;
+		AX = r[opr1];
+		r[opr1] = val;
 		return true;
 	case 0xa0: // mov al, [addr]
 		AL = get8(op.opr2);
