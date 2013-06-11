@@ -859,7 +859,7 @@ static bool run1(uint8_t prefix = 0) {
 		ip = opr1;
 		return true;
 	case 0xf2: // repnz/repne
-	case 0xf3: // repz/repe
+	case 0xf3: // rep/repz/repe
 		ip = oldip + 1;
 		return run1(b);
 	case 0xf5: // cmc

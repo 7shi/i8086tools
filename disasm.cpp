@@ -348,6 +348,8 @@ OpCode disasm1(uint8_t *mem, uint16_t addr, size_t last) {
 			op2.opr2.seg = op1.opr2.value;
 			return op2;
 		}
+	} else if (op1.mne == "repz" && op2.mne != "cmps" && op2.mne != "scas") {
+		op1.mne = "rep";
 	}
 	op2.mne = op1.mne + " " + op2.mne;
 	return op2;
