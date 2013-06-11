@@ -14,7 +14,7 @@ $(TEST): test.asm
 	nasm -o $@ $<
 
 test: $(TEST) $(TARGET)
-	./$(TARGET) $(TEST)
+	./$(TARGET) -v $(TEST)
 
 clean:
 	rm -f $(TARGET) *.o $(TEST)
