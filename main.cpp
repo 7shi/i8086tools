@@ -1091,7 +1091,7 @@ static void run(const std::vector<std::string> &args) {
 	for (int i = 0; i < args.size(); i++) {
 		arglen += args[i].size() + 1;
 	}
-	SP -= (arglen + 3) & ~3;
+	SP -= (arglen + 1) & ~1;
 	uint16_t ad1 = SP;
 	write16(SP -= 2, 0); // envp[0]
 	write16(SP -= 2, 0); // argv[argc]
