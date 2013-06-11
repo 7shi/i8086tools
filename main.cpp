@@ -580,6 +580,29 @@ static bool run1() {
 		AX = r[opr1];
 		r[opr1] = val;
 		return true;
+	case 0x9c: // pushf
+		SP -= 2;
+		write16(SP, (OF << 11) | (DF << 10) | (SF << 7) | (ZF << 6) | (PF << 2) | 2 | CF);
+		return true;
+	case 0x9d: // popf
+		val = read16(SP);
+		SP += 2;
+		OF = val & 2048;
+		DF = val & 1024;
+		SF = val & 128;
+		ZF = val & 64;
+		PF = val & 4;
+		CF = val & 1;
+		return true;
+	case 0x9e: // sahf
+		SF = AH & 128;
+		ZF = AH & 64;
+		PF = AH & 4;
+		CF = AH & 1;
+		return true;
+	case 0x9f: // lahf
+		AH = (SF << 7) | (ZF << 6) | (PF << 2) | 2 | CF;
+		return true;
 	case 0xa0: // mov al, [addr]
 		AL = get8(op.opr2);
 		return true;
