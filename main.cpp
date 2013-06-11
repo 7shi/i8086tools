@@ -664,6 +664,9 @@ static bool run1() {
 	case 0xe9: // jmp disp
 		ip = opr1;
 		return true;
+	case 0xeb: // jmp short
+		ip = opr1;
+		return true;
 	case 0xf5: // cmc
 		CF = !CF;
 		return true;
