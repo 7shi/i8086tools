@@ -11,6 +11,7 @@ uint8_t text[65536], mem[65536], *data;
 size_t tsize;
 bool OF, DF, SF, ZF, PF, CF;
 bool ptable[256];
+bool verbose;
 
 #define AX r[0]
 #define CX r[1]
@@ -163,7 +164,7 @@ static bool run1(uint8_t prefix = 0) {
 	}
 	int opr1 = op.opr1.value, opr2 = op.opr2.value;
 	std::string hex = hexdump(text + ip, op.len);
-	if (!prefix) {
+	if (verbose && !prefix) {
 		debug();
 		fprintf(stderr, ":%-12s %s\n", hex.c_str(), op.str().c_str());
 	}
@@ -1101,7 +1102,7 @@ static void run(const std::vector<std::string> &args) {
 		ad1 += args[i].size() + 1;
 	}
 	write16(SP -= 2, args.size()); // argc
-	fprintf(stderr, header);
+	if (verbose) fprintf(stderr, header);
 	while (run1());
 }
 
@@ -1110,15 +1111,19 @@ int main(int argc, char *argv[]) {
 	const char *file = NULL;
 	std::vector<std::string> args;
 	for (int i = 1; i < argc; i++) {
-		if (!file && !strcmp(argv[i], "-d")) {
+		if (!strcmp(argv[i], "-d")) {
 			dis = true;
+		} else if (!strcmp(argv[i], "-v")) {
+			verbose = true;
 		} else {
-			if (!file) file = argv[i];
-			args.push_back(argv[i]);
+			file = argv[i];
+			for (; i < argc; i++) {
+				args.push_back(argv[i]);
+			}
 		}
 	}
 	if (!file) {
-		fprintf(stderr, "usage: %s [-d] binary\n", argv[0]);
+		fprintf(stderr, "usage: %s [-d|-v] binary\n", argv[0]);
 		return 1;
 	}
 	struct stat st;
