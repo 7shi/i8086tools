@@ -580,6 +580,12 @@ static bool run1() {
 		AX = r[opr1];
 		r[opr1] = val;
 		return true;
+	case 0x98: // cbw
+		AX = (int16_t)(int8_t)AL;
+		return true;
+	case 0x99: // cwd
+		DX = int16_t(AX) < 0 ? 0xffff : 0;
+		return true;
 	case 0x9c: // pushf
 		SP -= 2;
 		write16(SP, (OF << 11) | (DF << 10) | (SF << 7) | (ZF << 6) | (PF << 2) | 2 | CF);
