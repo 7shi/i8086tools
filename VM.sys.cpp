@@ -173,6 +173,7 @@ void VM::_write() { // 4
 	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)\n", fd, buf, len);
 	int max = 0x10000 - buf;
 	if (len > max) len = max;
+	if (trace && fd < 3) { fflush(stdout); fflush(stderr); }
 	int result = write(fd, data + buf, len);
 	write16(BX + 2, result == -1 ? -errno : result);
 }
