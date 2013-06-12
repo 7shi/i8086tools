@@ -160,7 +160,8 @@ bool VM::load(const std::string &fn) {
 				fread(data, 1, dsize, f);
 			} else {
 				data = text;
-				fread(text, 1, tsize + dsize, f);
+				dsize += tsize;
+				fread(text, 1, dsize, f);
 			}
 			dsize += read32(h + 16); // bss
 		} else {
@@ -177,6 +178,7 @@ bool VM::load(const std::string &fn) {
 		fread(text, 1, tsize, f);
 	}
 	fclose(f);
+	brksize = dsize;
 	return true;
 }
 

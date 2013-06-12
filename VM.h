@@ -31,6 +31,7 @@ private:
 	uint8_t *r8[8];
 	uint8_t *text, *data;
 	size_t tsize, dsize;
+	int brksize;
 	bool OF, DF, SF, ZF, PF, CF;
 	uint16_t start_sp;
 	bool hasExited;
@@ -96,4 +97,5 @@ private:
 	void _write  (); //  4
 	void _open   (); //  5
 	void _close  (); //  6
+	void _brk    (); // 17
 };

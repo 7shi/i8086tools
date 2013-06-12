@@ -63,7 +63,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "mknod"  , NULL          }, // 14
 	{ "chmod"  , NULL          }, // 15
 	{ "chown"  , NULL          }, // 16
-	{ "brk"    , NULL          }, // 17
+	{ "brk"    , &VM::_brk     }, // 17
 	{ "stat"   , NULL          }, // 18
 	{ "lseek"  , NULL          }, // 19
 	{ "getpid" , NULL          }, // 20
@@ -185,4 +185,12 @@ void VM::_close() { // 6
 	int result = fileClose(this, fd);
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (result == -1) handles.remove(result);
+}
+
+void VM::_brk() { // 17
+	int nd = read16(BX + 10);
+	if (trace) fprintf(stderr, "(0x%04x)\n", nd);
+	int result = nd < (int)dsize || nd >= SP ? -1 : 0;
+	write16(BX + 2, result == -1 ? -errno : result);
+	if (result != -1) write16(BX + 18, nd);
 }
