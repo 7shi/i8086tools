@@ -4,7 +4,8 @@ CXX      = g++
 CXXFLAGS = -Wall -g #-O2
 LDFLAGS  =
 OBJECTS  = $(SOURCES:%.cpp=%.o)
-SOURCES  = main.cpp utils.cpp disasm.cpp VM.cpp
+SOURCES  = main.cpp utils.cpp disasm.cpp \
+	   VM.cpp VM.inst.cpp VM.sys.cpp
 
 all: $(TARGET)
 
