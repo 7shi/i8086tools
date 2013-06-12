@@ -1,15 +1,19 @@
-TARGET = i8086tools
-TEST   = test.bin
+TARGET   = i8086tools
+TEST     = test.bin
+CXX      = g++
+CXXFLAGS = -Wall -g #-O2
+LDFLAGS  =
+OBJECTS  = $(SOURCES:%.cpp=%.o)
+SOURCES  = main.cpp utils.cpp disasm.cpp VM.cpp
 
 all: $(TARGET)
 
-$(TARGET): utils.o disasm.o VM.o main.o
-	g++ -o $@ $^
+.SUFFIXES: .cpp .o
+.cpp.o:
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-utils.o: utils.cpp utils.h
-disasm.o: disasm.cpp disasm.h utils.h
-VM.o: VM.cpp VM.h disasm.h utils.h
-main.o: main.cpp VM.h disasm.h utils.h
+$(TARGET): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) $(LDFLAGS)
 
 $(TEST): test.asm
 	nasm -o $@ $<
@@ -18,4 +22,12 @@ test: $(TEST) $(TARGET)
 	./$(TARGET) -v $(TEST)
 
 clean:
-	rm -f $(TARGET) *.o $(TEST)
+	rm -f $(TARGET) $(TARGET).exe $(OBJECTS) *core $(TEST)
+
+depend:
+	rm -f dependencies
+	for cpp in $(SOURCES); do \
+		g++ -MM $(CXXFLAGS) $$cpp >> dependencies; \
+	done
+
+-include dependencies
