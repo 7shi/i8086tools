@@ -31,6 +31,7 @@ private:
 	size_t tsize;
 	bool OF, DF, SF, ZF, PF, CF;
 	uint16_t start_sp;
+	bool hasExited;
 public:
 	int exit_status;
 
@@ -76,6 +77,6 @@ private:
 	uint16_t get16(const Operand &opr);
 	void set8(const Operand &opr, uint8_t value);
 	void set16(const Operand &opr, uint16_t value);
-	bool minix_syscall();
-	bool run1(uint8_t prefix = 0);
+	void minix_syscall();
+	void run1(uint8_t prefix = 0);
 };

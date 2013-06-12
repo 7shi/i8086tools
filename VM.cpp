@@ -119,7 +119,8 @@ void VM::run(const std::vector<std::string> &args) {
 	write16(SP -= 2, args.size()); // argc
 	start_sp = SP;
 	if (verbose) fprintf(stderr, header);
-	while (run1());
+	hasExited = false;
+	while (!hasExited) run1();
 }
 
 bool VM::read(const char *file) {
