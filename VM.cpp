@@ -36,10 +36,15 @@ VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0), exitcode(0) {
 			r8[i + 4] = r8[i] - 1;
 		}
 	}
+	text = new uint8_t[0x10000];
+	memset(text, 0, 0x10000);
 	memset(r, 0, sizeof(r));
-	memset(text, 0, sizeof(text));
-	memset(mem, 0, sizeof(mem));
 	OF = DF = SF = ZF = PF = CF = false;
+}
+
+VM::~VM() {
+	if (data != text) delete[] data;
+	delete[] text;
 }
 
 void VM::debug(const OpCode &op) {
@@ -149,7 +154,8 @@ bool VM::load(const std::string &fn) {
 			int dsize = read32(h + 12);
 			ip = read32(h + 20);
 			if (h[2] & 0x20) {
-				data = mem;
+				data = new uint8_t[0x10000];
+				memset(data, 0, 0x10000);
 				fread(text, 1, tsize, f);
 				fread(data, 1, dsize, f);
 			} else {
