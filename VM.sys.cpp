@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -54,7 +55,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "wait"       , NULL              }, //  7
 	{ "creat"      , NULL              }, //  8
 	{ "link"       , NULL              }, //  9
-	{ "unlink"     , NULL              }, // 10
+	{ "unlink"     , &VM::_unlink      }, // 10
 	{ "waitpid"    , NULL              }, // 11
 	{ "chdir"      , NULL              }, // 12
 	{ "time"       , NULL              }, // 13
@@ -198,6 +199,31 @@ void VM::_close() { // 6
 	int result = fileClose(this, fd);
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (result == -1) handles.remove(result);
+}
+
+void VM::_unlink() { // 10
+	const char *path = (const char *)(data + read16(BX + 8));
+	if (trace) fprintf(stderr, "(\"%s\")\n", path);
+	std::string path2 = convpath(path);
+#ifdef WIN32
+	bool ok = DeleteFileA(path2.c_str());
+	int err = 0;
+	if (ok) {
+		struct stat st;
+		if (stat(path2.c_str(), &st) != -1) {
+			if (trace) {
+				fprintf(stderr, "register delayed: %s\n", path2.c_str());
+			}
+			unlinks.push_back(path2);
+		}
+	} else if (trace) {
+		showError(err = GetLastError());
+	}
+	write16(BX + 2, -err);
+#else
+	int result = unlink(path2.c_str());
+	write16(BX + 2, result == -1 ? -errno : result);
+#endif
 }
 
 void VM::_brk() { // 17
