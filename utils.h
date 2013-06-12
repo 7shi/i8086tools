@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <string>
 
+extern std::string rootpath;
+
 extern std::string regs8[];
 extern std::string regs16[];
 extern std::string sregs[];
@@ -16,6 +18,8 @@ inline uint32_t read32(uint8_t *mem) {
 
 extern std::string hex(int v, int len = 0);
 extern std::string hexdump(uint8_t *mem, int len);
+void setroot(std::string root);
+std::string convpath(const std::string &path);
 bool startsWith(const std::string &s, const std::string &prefix);
 bool endsWith(const std::string &s, const std::string &suffix);
 std::string replace(const std::string &src, const std::string &s1, const std::string &s2);

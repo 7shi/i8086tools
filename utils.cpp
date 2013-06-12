@@ -6,6 +6,8 @@
 #include <windows.h>
 #endif
 
+std::string rootpath;
+
 std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 std::string sregs [] = { "es", "cs", "ss", "ds" };
@@ -86,6 +88,26 @@ std::string Operand::str() const {
 		ret += hex(value);
 	}
 	return ret + "]";
+}
+
+void setroot(std::string root) {
+	while (endsWith(root, "/"))
+		root = root.substr(0, root.size() - 1);
+	rootpath = root;
+}
+
+std::string convpath(const std::string &path) {
+	if (path.empty() || path[0] != '/' || rootpath.empty()) return path;
+
+#ifdef WIN32
+	if (startsWith(path, "/tmp/"))
+		return getenv("TEMP") + path.substr(4);
+#endif
+	std::string path2 = rootpath + path;
+	struct stat st;
+	if (stat(path2.c_str(), &st) == 0) return path2;
+
+	return path;
 }
 
 bool startsWith(const std::string &s, const std::string &prefix) {

@@ -8,7 +8,10 @@ int main(int argc, char *argv[]) {
 	for (int i = 1; i < argc; i++)
 	{
 		std::string arg = argv[i];
-		if (arg == "-v") {
+		if (arg == "-r") {
+			i++;
+			if (i < argc) setroot(argv[i]);
+		} else if (arg == "-v") {
 			trace = 2;
 		} else if (arg == "-s" && trace == 0) {
 			trace = 1;

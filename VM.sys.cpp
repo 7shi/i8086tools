@@ -129,7 +129,7 @@ void VM::_open() {
 	int flag = read16(BX + 6);
 	const char *path = (const char *)(data + read16(BX + (flag & 64 ? 10 : 8)));
 	if (trace) fprintf(stderr, "(\"%s\", %d)\n", path, flag);
-	std::string path2 = path; // TODO:convpath
+	std::string path2 = convpath(path);
 #if WIN32
 	flag |= O_BINARY;
 #endif
