@@ -1,5 +1,5 @@
 #pragma once
-#include "utils.h"
+#include "OpCode.h"
 
 Operand modrm(uint8_t *mem, bool w);
 OpCode disasm1(uint8_t *mem, uint16_t addr);

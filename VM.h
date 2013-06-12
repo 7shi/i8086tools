@@ -1,5 +1,6 @@
 #pragma once
 #include "utils.h"
+#include "OpCode.h"
 #include <vector>
 #include <list>
 

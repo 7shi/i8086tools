@@ -1,6 +1,8 @@
-main.o: main.cpp VM.h utils.h
+main.o: main.cpp VM.h utils.h OpCode.h Operand.h
 utils.o: utils.cpp utils.h
-disasm.o: disasm.cpp disasm.h utils.h
-VM.o: VM.cpp VM.h utils.h disasm.h
-VM.inst.o: VM.inst.cpp VM.h utils.h disasm.h
-VM.sys.o: VM.sys.cpp VM.h utils.h disasm.h
+disasm.o: disasm.cpp disasm.h OpCode.h Operand.h utils.h
+OpCode.o: OpCode.cpp OpCode.h Operand.h utils.h
+Operand.o: Operand.cpp Operand.h utils.h
+VM.o: VM.cpp VM.h utils.h OpCode.h Operand.h disasm.h
+VM.inst.o: VM.inst.cpp VM.h utils.h OpCode.h Operand.h disasm.h
+VM.sys.o: VM.sys.cpp VM.h utils.h OpCode.h Operand.h disasm.h
