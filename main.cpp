@@ -13,6 +13,7 @@ bool OF, DF, SF, ZF, PF, CF;
 bool ptable[256];
 bool verbose;
 uint16_t start_sp;
+int exit_status;
 
 #define AX r[0]
 #define CX r[1]
@@ -152,6 +153,9 @@ static bool backtrace() {
 static bool minix_syscall() {
 	int type = read16(BX + 2);
 	switch (type) {
+	case 1: // exit
+		exit_status = read16(BX + 4);
+		return false;
 	case 4: // write
 		type = write(read16(BX + 4), data + read16(BX + 10), read16(BX + 6));
 		break;
@@ -1190,5 +1194,5 @@ int main(int argc, char *argv[]) {
 	} else {
 		run(args);
 	}
-	return 0;
+	return exit_status;
 }
