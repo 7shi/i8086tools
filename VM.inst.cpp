@@ -489,14 +489,14 @@ void VM::run1(uint8_t prefix) {
 			data[DI] = data[SI];
 			if (DF) { SI--; DI--; } else { SI++; DI++; }
 			if (prefix) CX--;
-		} while (prefix == 0xf3 && CX);
+		} while ((prefix == 0xf2 || prefix == 0xf3) && CX);
 		return;
 	case 0xa5: // movsw
 		do {
 			write16(DI, read16(SI));
 			if (DF) { SI -= 2; DI -= 2; } else { SI += 2; DI += 2; }
 			if (prefix) CX--;
-		} while (prefix == 0xf3 && CX);
+		} while ((prefix == 0xf2 || prefix == 0xf3) && CX);
 		return;
 	case 0xa6: // cmpsb
 		do {
@@ -525,28 +525,28 @@ void VM::run1(uint8_t prefix) {
 			data[DI] = AL;
 			if (DF) DI--; else DI++;
 			if (prefix) CX--;
-		} while (prefix == 0xf3 && CX);
+		} while ((prefix == 0xf2 || prefix == 0xf3) && CX);
 		return;
 	case 0xab: // stosw
 		do {
 			write16(DI, AX);
 			if (DF) DI -= 2; else DI += 2;
 			if (prefix) CX--;
-		} while (prefix == 0xf3 && CX);
+		} while ((prefix == 0xf2 || prefix == 0xf3) && CX);
 		return;
 	case 0xac: // lodsb
 		do {
 			AL = data[SI];
 			if (DF) SI--; else SI++;
 			if (prefix) CX--;
-		} while (prefix == 0xf3 && CX);
+		} while ((prefix == 0xf2 || prefix == 0xf3) && CX);
 		return;
 	case 0xad: // lodsw
 		do {
 			AX = read16(SI);
 			if (DF) SI -= 2; else SI += 2;
 			if (prefix) CX--;
-		} while (prefix == 0xf3 && CX);
+		} while ((prefix == 0xf2 || prefix == 0xf3) && CX);
 		return;
 	case 0xae: // scasb
 		do {
