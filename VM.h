@@ -33,7 +33,7 @@ private:
 	uint16_t start_sp;
 	bool hasExited;
 public:
-	int exit_status;
+	int exitcode;
 
 public:
 	VM();

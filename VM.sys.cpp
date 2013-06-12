@@ -80,6 +80,7 @@ void VM::minix_syscall() {
 			}
 			if (sh->f) {
 				(this->*sh->f)();
+				AX = 0;
 			} else {
 				fprintf(stderr, ": not implemented\n");
 				hasExited = true;
@@ -92,16 +93,17 @@ void VM::minix_syscall() {
 }
 
 void VM::_exit() {
-	int a[] = { read16(BX + 4) };
-	if (trace) vfprintf(stderr, "(%d)\n", (char *)a);
-	exit_status = read16(BX + 4);
+	exitcode = read16(BX + 4);
+	if (trace) fprintf(stderr, "(%d)\n", exitcode);
 	hasExited = true;
 }
 
 void VM::_write() {
-	int a[] = { read16(BX + 4), read16(BX + 10), read16(BX + 6) };
-	if (trace) vfprintf(stderr, "(%d, 0x%04x, %d)\n", (char *)a);
-	int result = write(a[0], data + a[1], a[2]);
-	AX = 0;
-	write16(BX + 2, result);
+	int fd = read16(BX + 4);
+	int buf = read16(BX + 10);
+	int len = read16(BX + 6);
+	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)\n", fd, buf, len);
+	int max = 0x10000 - buf;
+	if (len > max) len = max;
+	write16(BX + 2, write(fd, data + buf, len));
 }

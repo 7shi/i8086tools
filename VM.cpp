@@ -21,7 +21,7 @@ static void init_table() {
 	initialized = true;
 }
 
-VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0), exit_status(0) {
+VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0), exitcode(0) {
 	if (!initialized) init_table();
 	uint16_t tmp = 0x1234;
 	uint8_t *p = (uint8_t *)r;

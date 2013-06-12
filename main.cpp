@@ -33,5 +33,5 @@ int main(int argc, char *argv[]) {
 	} else {
 		vm.run(args);
 	}
-	return vm.exit_status;
+	return vm.exitcode;
 }
