@@ -229,9 +229,12 @@ void VM::_unlink() { // 10
 void VM::_brk() { // 17
 	int nd = read16(BX + 10);
 	if (trace) fprintf(stderr, "(0x%04x)\n", nd);
-	int result = nd < (int)dsize || nd >= SP ? -1 : 0;
-	write16(BX + 2, result == -1 ? -ENOMEM : result);
-	if (result != -1) write16(BX + 18, nd);
+	if (nd < (int)dsize || nd >= SP) {
+		write16(BX + 2, -ENOMEM);
+	} else {
+		write16(BX + 2, 0);
+		write16(BX + 18, nd);
+	}
 }
 
 void VM::_lseek() { // 19

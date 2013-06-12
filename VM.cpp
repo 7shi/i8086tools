@@ -178,7 +178,6 @@ bool VM::load(const std::string &fn) {
 		fread(text, 1, tsize, f);
 	}
 	fclose(f);
-	brksize = dsize;
 	return true;
 }
 
