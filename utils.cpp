@@ -1,6 +1,10 @@
 #include "utils.h"
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 std::string regs8 [] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 std::string regs16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
@@ -83,3 +87,52 @@ std::string Operand::str() const {
 	}
 	return ret + "]";
 }
+
+bool startsWith(const std::string &s, const std::string &prefix) {
+	if (s.size() < prefix.size()) return false;
+	return s.substr(0, prefix.size()) == prefix;
+}
+
+bool endsWith(const std::string &s, const std::string &suffix) {
+	if (s.size() < suffix.size()) return false;
+	return s.substr(s.size() - suffix.size(), suffix.size()) == suffix;
+}
+
+std::string replace(const std::string &src, const std::string &s1, const std::string &s2) {
+	if (s1.empty()) return src;
+	std::string ret;
+	int p = 0;
+	while (p < (int)src.size())
+	{
+		int pp = src.find(s1, p);
+		if (pp < 0)
+		{
+			ret += src.substr(p);
+			break;
+		}
+		ret += src.substr(p, pp - p) + s2;
+		p = pp + s1.size();
+	}
+	return ret;
+}
+
+#ifdef WIN32
+std::string getErrorMessage(int err) {
+	LPVOID lpMsgBuf;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL,
+		err,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR) &lpMsgBuf,
+		0,
+		NULL
+	);
+	std::string ret = replace((const char *)lpMsgBuf, "\r\n", "\n");
+	LocalFree(lpMsgBuf);
+	if (!endsWith(ret, "\n")) ret += "\n";
+	return ret;
+}
+#endif

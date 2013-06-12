@@ -16,6 +16,13 @@ inline uint32_t read32(uint8_t *mem) {
 
 extern std::string hex(int v, int len = 0);
 extern std::string hexdump(uint8_t *mem, int len);
+bool startsWith(const std::string &s, const std::string &prefix);
+bool endsWith(const std::string &s, const std::string &suffix);
+std::string replace(const std::string &src, const std::string &s1, const std::string &s2);
+
+#ifdef WIN32
+extern std::string getErrorMessage(int err);
+#endif
 
 enum OperandType { Reg, SReg, Imm, Addr, Far, Ptr, ModRM };
 
