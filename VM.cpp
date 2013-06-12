@@ -6,7 +6,7 @@
 
 const char *header = " AX   CX   DX   BX   SP   BP   SI   DI  FLAGS  IP\n";
 bool ptable[256];
-bool verbose;
+int trace;
 
 static bool initialized;
 
@@ -118,12 +118,13 @@ void VM::run(const std::vector<std::string> &args) {
 	}
 	write16(SP -= 2, args.size()); // argc
 	start_sp = SP;
-	if (verbose) fprintf(stderr, header);
+	if (trace == 2) fprintf(stderr, header);
 	hasExited = false;
 	while (!hasExited) run1();
 }
 
-bool VM::read(const char *file) {
+bool VM::read(const std::string &fn) {
+	const char *file = fn.c_str();
 	struct stat st;
 	if (stat(file, &st)) {
 		fprintf(stderr, "can not stat: %s\n", file);

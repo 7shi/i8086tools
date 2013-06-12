@@ -20,8 +20,8 @@
 #define BH *r8[7]
 
 extern const char *header;
-extern bool verbose;
 extern bool ptable[256];
+extern int trace;
 
 class VM {
 private:
@@ -37,7 +37,7 @@ public:
 
 public:
 	VM();
-	bool read(const char *file);
+	bool read(const std::string &fn);
 	void run(const std::vector<std::string> &args);
 	void disasm();
 

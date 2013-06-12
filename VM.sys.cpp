@@ -72,29 +72,36 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 
 void VM::minix_syscall() {
 	int type = read16(BX + 2);
-	if (type < nsyscalls && syscalls[type].f) {
-		(this->*syscalls[type].f)();
-		return;
+	if (type < nsyscalls) {
+		syshandler *sh = &syscalls[type];
+		if (sh->name) {
+			if (trace || !sh->f) {
+				fprintf(stderr, "system call %s", sh->name);
+			}
+			if (sh->f) {
+				(this->*sh->f)();
+			} else {
+				fprintf(stderr, ": not implemented\n");
+				hasExited = true;
+			}
+			return;
+		}
 	}
-	if (!verbose) {
-		fprintf(stderr, header);
-		debug(disasm1(text + ip - 2, ip - 2, tsize));
-	}
-	if (type < nsyscalls && syscalls[type].name) {
-		fprintf(stderr, "not implemented: %s\n", syscalls[type].name);
-	} else {
-		fprintf(stderr, "unknown system call: %d\n", type);
-	}
+	fprintf(stderr, "system call %d: unknown\n", type);
 	hasExited = true;
 }
 
 void VM::_exit() {
+	int a[] = { read16(BX + 4) };
+	if (trace) vfprintf(stderr, "(%d)\n", (char *)a);
 	exit_status = read16(BX + 4);
 	hasExited = true;
 }
 
 void VM::_write() {
-	int result = write(read16(BX + 4), data + read16(BX + 10), read16(BX + 6));
+	int a[] = { read16(BX + 4), read16(BX + 10), read16(BX + 6) };
+	if (trace) vfprintf(stderr, "(%d, 0x%04x, %d)\n", (char *)a);
+	int result = write(a[0], data + a[1], a[2]);
 	AX = 0;
 	write16(BX + 2, result);
 }

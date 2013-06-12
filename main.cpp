@@ -4,26 +4,30 @@
 
 int main(int argc, char *argv[]) {
 	bool dis = false;
-	const char *file = NULL;
 	std::vector<std::string> args;
-	for (int i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-d")) {
-			dis = true;
-		} else if (!strcmp(argv[i], "-v")) {
-			verbose = true;
+	for (int i = 1; i < argc; i++)
+	{
+		std::string arg = argv[i];
+		if (arg == "-v") {
+			trace = 2;
+		} else if (arg == "-s" && trace == 0) {
+			trace = 1;
 		} else {
-			file = argv[i];
 			for (; i < argc; i++) {
 				args.push_back(argv[i]);
 			}
 		}
 	}
-	if (!file) {
-		fprintf(stderr, "usage: %s [-d|-v] binary\n", argv[0]);
+	if (args.empty())
+	{
+		printf("usage: %s [-d|-v/-s] cmd [args ...]\n", argv[0]);
+		printf("    -d: disassemble mode (not run)\n");
+		printf("    -v: verbose mode (output syscall and disassemble)\n");
+		printf("    -s: syscall mode (output syscall)\n");
 		return 1;
 	}
 	VM vm;
-	if (!vm.read(file)) return 1;
+	if (!vm.read(args[0])) return 1;
 	if (dis) {
 		vm.disasm();
 	} else {
