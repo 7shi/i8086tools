@@ -134,24 +134,13 @@ void VM::minix_syscall() {
 	hasExited = true;
 }
 
-void VM::_exit() {
+void VM::_exit() { // 1
 	exitcode = read16(BX + 4);
 	if (trace) fprintf(stderr, "(%d)\n", exitcode);
 	hasExited = true;
 }
 
-void VM::_write() {
-	int fd = read16(BX + 4);
-	int buf = read16(BX + 10);
-	int len = read16(BX + 6);
-	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)\n", fd, buf, len);
-	int max = 0x10000 - buf;
-	if (len > max) len = max;
-	int result = write(fd, data + buf, len);
-	write16(BX + 2, result == -1 ? -errno : result);
-}
-
-void VM::_read() {
+void VM::_read() { // 3
 	int fd = read16(BX + 4);
 	int buf = read16(BX + 10);
 	int len = read16(BX + 6);
@@ -163,7 +152,18 @@ void VM::_read() {
 	write16(BX + 2, result == -1 ? -errno : result);
 }
 
-void VM::_open() {
+void VM::_write() { // 4
+	int fd = read16(BX + 4);
+	int buf = read16(BX + 10);
+	int len = read16(BX + 6);
+	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)\n", fd, buf, len);
+	int max = 0x10000 - buf;
+	if (len > max) len = max;
+	int result = write(fd, data + buf, len);
+	write16(BX + 2, result == -1 ? -errno : result);
+}
+
+void VM::_open() { // 5
 	int flag = read16(BX + 6);
 	const char *path = (const char *)(data + read16(BX + (flag & 64 ? 10 : 8)));
 	if (trace) fprintf(stderr, "(\"%s\", %d)\n", path, flag);
@@ -179,7 +179,7 @@ void VM::_open() {
 	}
 }
 
-void VM::_close() {
+void VM::_close() { // 6
 	int fd = read16(BX + 4);
 	if (trace) fprintf(stderr, "(%d)\n", fd);
 	int result = fileClose(this, fd);
