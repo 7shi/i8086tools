@@ -30,7 +30,7 @@ private:
 	uint16_t ip, r[8];
 	uint8_t *r8[8];
 	uint8_t *text, *data;
-	size_t tsize;
+	size_t tsize, dsize;
 	bool OF, DF, SF, ZF, PF, CF;
 	uint16_t start_sp;
 	bool hasExited;
