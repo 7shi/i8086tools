@@ -91,7 +91,7 @@ private:
 		const char *name;
 		void (VM::*f)();
 	};
-	static const int nsyscalls = 64;
+	static const int nsyscalls = 78;
 	static syshandler syscalls[nsyscalls];
 
 	void minix_syscall();
