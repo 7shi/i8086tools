@@ -23,7 +23,11 @@ static OpCode modrm(uint8_t *mem, std::string mne, bool w) {
 
 static OpCode regrm(uint8_t *mem, const std::string &mne, bool d, int w) {
 	OpCode op = modrm(mem, mne, w);
-	op.opr2 = Operand(0, w, Reg, (mem[1] >> 3) & (w == 2 ? 3 : 7));
+	if (w == 2) {
+		op.opr2 = Operand(0, w, SReg, (mem[1] >> 3) & 3);
+	} else {
+		op.opr2 = Operand(0, w,  Reg, (mem[1] >> 3) & 7);
+	}
 	if (d) op.swap();
 	return op;
 }
