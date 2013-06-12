@@ -150,9 +150,9 @@ bool VM::load(const std::string &fn) {
 				fclose(f);
 				return 1;
 			}
-			tsize = read32(h + 8);
-			dsize = read32(h + 12);
-			ip = read32(h + 20);
+			tsize = ::read32(h + 8);
+			dsize = ::read32(h + 12);
+			ip = ::read32(h + 20);
 			if (h[2] & 0x20) {
 				data = new uint8_t[0x10000];
 				memset(data, 0, 0x10000);
@@ -163,7 +163,7 @@ bool VM::load(const std::string &fn) {
 				dsize += tsize;
 				fread(text, 1, dsize, f);
 			}
-			dsize += read32(h + 16); // bss
+			dsize += ::read32(h + 16); // bss
 		} else {
 			fseek(f, 0, SEEK_SET);
 		}

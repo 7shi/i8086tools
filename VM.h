@@ -68,12 +68,15 @@ private:
 	}
 
 	inline uint16_t read16(uint16_t addr) {
-		return data[addr] | (data[addr + 1] << 8);
+		return ::read16(data + addr);
+	}
+
+	inline uint16_t read32(uint16_t addr) {
+		return ::read32(data + addr);
 	}
 
 	inline void write16(uint16_t addr, uint16_t value) {
-		data[addr] = value;
-		data[addr + 1] = value >> 8;
+		::write16(data + addr, value);
 	}
 
 	void debug(const OpCode &op);
