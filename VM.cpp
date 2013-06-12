@@ -148,7 +148,7 @@ bool VM::load(const std::string &fn) {
 			if (h[3] != 4) {
 				fprintf(stderr, "unknown cpu id: %d\n", h[3]);
 				fclose(f);
-				return 1;
+				return false;
 			}
 			tsize = ::read32(h + 8);
 			dsize = ::read32(h + 12);
@@ -169,10 +169,10 @@ bool VM::load(const std::string &fn) {
 		}
 	}
 	if (!data) {
-		if (tsize > sizeof(text)) {
+		if (tsize > 0xffff) {
 			fprintf(stderr, "too long raw binary: %s\n", file);
 			fclose(f);
-			return 1;
+			return false;
 		}
 		data = text;
 		fread(text, 1, tsize, f);
