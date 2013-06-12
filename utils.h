@@ -27,8 +27,8 @@ struct Operand {
 	Operand();
 	Operand(int len, bool w, int type, int value);
 
-	inline bool empty() { return len == -1; }
-	std::string str();
+	inline bool empty() const { return len == -1; }
+	std::string str() const;
 };
 
 extern Operand dx, cl, es, cs, ss, ds;
@@ -60,7 +60,7 @@ struct OpCode {
 		const Operand &opr2 = Operand());
 	OpCode(const std::string &mne, const Operand &opr = Operand());
 
-	inline bool empty() { return len == 0; }
-	std::string str();
+	inline bool empty() const { return len == 0; }
+	std::string str() const;
 	void swap();
 };

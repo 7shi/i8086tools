@@ -33,11 +33,12 @@ uint16_t start_sp;
 
 const char *header = " AX   CX   DX   BX   SP   BP   SI   DI  FLAGS  IP\n";
 
-static void debug() {
+static void debug(const OpCode &op) {
 	fprintf(stderr,
-		"%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c%c %04x",
+		"%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c%c %04x:%-12s %s\n",
 		r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7],
-		OF?'O':'-', SF?'S':'-', ZF?'Z':'-', PF?'P':'-', CF?'C':'-', ip);
+		OF?'O':'-', SF?'S':'-', ZF?'Z':'-', PF?'P':'-', CF?'C':'-', ip,
+		hexdump(text + ip, op.len).c_str(), op.str().c_str());
 }
 
 static void init_table() {
@@ -143,6 +144,11 @@ inline int setf16(int value, bool cf) {
 	return value;
 }
 
+static bool backtrace() {
+	fprintf(stderr, "backtrace:");
+	fprintf(stderr, header);
+}
+
 static bool minix_syscall() {
 	int type = read16(BX + 2);
 	switch (type) {
@@ -150,6 +156,11 @@ static bool minix_syscall() {
 		type = write(read16(BX + 4), data + read16(BX + 10), read16(BX + 6));
 		break;
 	default:
+		if (!verbose) {
+			fprintf(stderr, header);
+			debug(disasm1(text + ip - 2, ip - 2, tsize));
+		}
+		fprintf(stderr, "unknown system call: %d\n", type);
 		return false;
 	}
 	AX = 0;
@@ -165,10 +176,7 @@ static bool run1(uint8_t prefix = 0) {
 	}
 	int opr1 = op.opr1.value, opr2 = op.opr2.value;
 	std::string hex = hexdump(text + ip, op.len);
-	if (verbose && !prefix) {
-		debug();
-		fprintf(stderr, ":%-12s %s\n", hex.c_str(), op.str().c_str());
-	}
+	if (verbose && !prefix) debug(op);
 	uint8_t b = text[ip];
 	uint16_t oldip = ip;
 	int dst, src, val;
@@ -757,7 +765,7 @@ static bool run1(uint8_t prefix = 0) {
 		set16(op.opr1, opr2);
 		return true;
 	case 0xcd: // int imm8
-		if (opr1 == 0x20 && minix_syscall()) return true;
+		if (opr1 == 0x20) return minix_syscall();
 		break;
 	case 0xd0: // byte r/m, 1
 		src = get8(op.opr1);
@@ -1081,6 +1089,10 @@ static bool run1(uint8_t prefix = 0) {
 			return true;
 		}
 		break;
+	}
+	if (!verbose && !prefix) {
+		fprintf(stderr, header);
+		debug(op);
 	}
 	fprintf(stderr, "not implemented\n");
 	return false;

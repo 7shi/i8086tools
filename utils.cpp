@@ -43,7 +43,7 @@ OpCode::OpCode(
 OpCode::OpCode(const std::string &mne, const Operand &opr)
 	: prefix(true), len(1), mne(mne), opr2(opr) {}
 
-std::string OpCode::str() {
+std::string OpCode::str() const {
 	if (opr1.empty()) return mne;
 	std::string opr1s = opr1.str();
 	if (opr1.type >= Ptr && !opr1.w && (opr2.empty() || opr2.type == Imm))
@@ -63,7 +63,7 @@ Operand::Operand()
 Operand::Operand(int len, bool w, int type, int value)
 	: len(len), w(w), type(type), value(value), seg(-1) {}
 
-std::string Operand::str() {
+std::string Operand::str() const {
 	switch (type) {
 	case Reg : return (w ? regs16 : regs8)[value];
 	case SReg: return sregs[value];
