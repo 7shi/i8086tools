@@ -77,6 +77,16 @@ private:
 	uint16_t get16(const Operand &opr);
 	void set8(const Operand &opr, uint8_t value);
 	void set16(const Operand &opr, uint16_t value);
-	void minix_syscall();
 	void run1(uint8_t prefix = 0);
+
+	struct syshandler {
+		const char *name;
+		void (VM::*f)();
+	};
+	static const int nsyscalls = 64;
+	static syshandler syscalls[nsyscalls];
+
+	void minix_syscall();
+	void _exit   (); //  1
+	void _write  (); //  4
 };
