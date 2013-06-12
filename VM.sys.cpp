@@ -2,6 +2,10 @@
 #include "disasm.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <map>
+
+std::map<int, std::string> fd2name;
 
 VM::syshandler VM::syscalls[nsyscalls] = {
 	{ NULL     , NULL          }, //  0
@@ -9,7 +13,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "fork"   , NULL          }, //  2
 	{ "read"   , &VM::_read    }, //  3
 	{ "write"  , &VM::_write   }, //  4
-	{ "open"   , NULL          }, //  5
+	{ "open"   , &VM::_open    }, //  5
 	{ "close"  , NULL          }, //  6
 	{ "wait"   , NULL          }, //  7
 	{ "creat"  , NULL          }, //  8
@@ -119,4 +123,20 @@ void VM::_read() {
 	int result = read(fd, data + buf, len);
 	//fprintf(stderr, "result = %d\n", result);
 	write16(BX + 2, result == -1 ? -errno : result);
+}
+
+void VM::_open() {
+	int flag = read16(BX + 6);
+	const char *path = (const char *)(data + read16(BX + (flag & 64 ? 10 : 8)));
+	if (trace) fprintf(stderr, "(\"%s\", %d)\n", path, flag);
+	std::string path2 = path; // TODO:convpath
+#if WIN32
+	flag |= O_BINARY;
+#endif
+	int result = open(path2.c_str(), flag);
+	write16(BX + 2, result == -1 ? -errno : result);
+	if (result != -1) {
+		fd2name[result] = path2;
+		handles.push_back(result);
+	}
 }

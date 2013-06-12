@@ -1,6 +1,7 @@
 #pragma once
 #include "utils.h"
 #include <vector>
+#include <list>
 
 #define AX r[0]
 #define CX r[1]
@@ -32,6 +33,7 @@ private:
 	bool OF, DF, SF, ZF, PF, CF;
 	uint16_t start_sp;
 	bool hasExited;
+	std::list<int> handles;
 public:
 	int exitcode;
 
@@ -90,4 +92,5 @@ private:
 	void _exit   (); //  1
 	void _read   (); //  3
 	void _write  (); //  4
+	void _open   (); //  5
 };
