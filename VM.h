@@ -93,4 +93,5 @@ private:
 	void _read   (); //  3
 	void _write  (); //  4
 	void _open   (); //  5
+	void _close  (); //  6
 };

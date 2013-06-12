@@ -3,9 +3,47 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#ifdef WIN32
+#include <windows.h>
+#endif
 #include <map>
+#include <algorithm>
 
 std::map<int, std::string> fd2name;
+
+#ifdef WIN32
+std::list<std::string> unlinks;
+
+static void showError(int err)
+{
+	fprintf(stderr, "%s", getErrorMessage(err).c_str());
+}
+#endif
+
+static int fileClose(VM *vm, int fd)
+{
+	int ret = close(fd);
+	std::map<int, std::string>::iterator it = fd2name.find(fd);
+	if (it != fd2name.end())
+	{
+		std::string path = it->second;
+		fd2name.erase(it);
+#ifdef WIN32
+		std::list<std::string>::iterator it2 =
+			std::find(unlinks.begin(), unlinks.end(), path);
+		if (it2 != unlinks.end())
+		{
+			if (trace)
+				fprintf(stderr, "delayed unlink: %s\n", path.c_str());
+			if (DeleteFileA(path.c_str()))
+				unlinks.erase(it2);
+			else if (trace)
+				showError(GetLastError());
+		}
+#endif
+	}
+	return ret;
+}
 
 VM::syshandler VM::syscalls[nsyscalls] = {
 	{ NULL     , NULL          }, //  0
@@ -14,7 +52,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "read"   , &VM::_read    }, //  3
 	{ "write"  , &VM::_write   }, //  4
 	{ "open"   , &VM::_open    }, //  5
-	{ "close"  , NULL          }, //  6
+	{ "close"  , &VM::_close   }, //  6
 	{ "wait"   , NULL          }, //  7
 	{ "creat"  , NULL          }, //  8
 	{ "link"   , NULL          }, //  9
@@ -139,4 +177,12 @@ void VM::_open() {
 		fd2name[result] = path2;
 		handles.push_back(result);
 	}
+}
+
+void VM::_close() {
+	int fd = read16(BX + 4);
+	if (trace) fprintf(stderr, "(%d)\n", fd);
+	int result = fileClose(this, fd);
+	write16(BX + 2, result == -1 ? -errno : result);
+	if (result == -1) handles.remove(result);
 }
