@@ -357,14 +357,14 @@ OpCode disasm1(uint8_t *mem, uint16_t addr, size_t last) {
 
 void disasm(uint8_t *mem, size_t size) {
 	undefined = 0;
-	off_t index = 0;
-	while (index < size) {
+	int index = 0;
+	while (index < (int)size) {
 		OpCode op = disasm1(mem + index, index, size);
 		std::string ops = op.str();
 		if (index + op.len > size) {
 			op.len = size - index;
 			ops = "db ";
-			for (; index < size; index++) {
+			for (; index < (int)size; index++) {
 				if (ops.size() != 3) ops += ", ";
 				ops += hex(mem[index], 2);
 			}

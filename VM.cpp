@@ -103,7 +103,7 @@ void VM::set16(const Operand &opr, uint16_t value) {
 
 void VM::run(const std::vector<std::string> &args) {
 	int arglen = 0;
-	for (int i = 0; i < args.size(); i++) {
+	for (int i = 0; i < (int)args.size(); i++) {
 		arglen += args[i].size() + 1;
 	}
 	SP -= (arglen + 1) & ~1;
@@ -111,7 +111,7 @@ void VM::run(const std::vector<std::string> &args) {
 	write16(SP -= 2, 0); // envp[0]
 	write16(SP -= 2, 0); // argv[argc]
 	SP -= 2 * args.size();
-	for (int i = 0; i < args.size(); i++) {
+	for (int i = 0; i < (int)args.size(); i++) {
 		write16(SP + 2 * i, ad1);
 		strcpy((char *)data + ad1, args[i].c_str());
 		ad1 += args[i].size() + 1;
