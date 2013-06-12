@@ -14,14 +14,12 @@ std::map<int, std::string> fd2name;
 #ifdef WIN32
 std::list<std::string> unlinks;
 
-static void showError(int err)
-{
+static void showError(int err) {
 	fprintf(stderr, "%s", getErrorMessage(err).c_str());
 }
 #endif
 
-static int fileClose(VM *vm, int fd)
-{
+static int fileClose(VM *vm, int fd) {
 	int ret = close(fd);
 	std::map<int, std::string>::iterator it = fd2name.find(fd);
 	if (it != fd2name.end())
