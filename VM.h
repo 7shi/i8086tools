@@ -101,4 +101,5 @@ private:
 	void _open   (); //  5
 	void _close  (); //  6
 	void _brk    (); // 17
+	void _lseek  (); // 19
 };

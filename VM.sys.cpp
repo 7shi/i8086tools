@@ -65,7 +65,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "chown"  , NULL          }, // 16
 	{ "brk"    , &VM::_brk     }, // 17
 	{ "stat"   , NULL          }, // 18
-	{ "lseek"  , NULL          }, // 19
+	{ "lseek"  , &VM::_lseek   }, // 19
 	{ "getpid" , NULL          }, // 20
 	{ "mount"  , NULL          }, // 21
 	{ "umount" , NULL          }, // 22
@@ -193,4 +193,13 @@ void VM::_brk() { // 17
 	int result = nd < (int)dsize || nd >= SP ? -1 : 0;
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (result != -1) write16(BX + 18, nd);
+}
+
+void VM::_lseek() { // 19
+	int fd = read16(BX + 4);
+	off_t o = read32(BX + 10);
+	int w = read16(BX + 6);
+	if (trace) fprintf(stderr, "(%d, %ld, %d)\n", fd, o, w);
+	int result = lseek(fd, o, w);
+	write16(BX + 2, result == -1 ? -errno : result);
 }
