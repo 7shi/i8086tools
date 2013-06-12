@@ -803,8 +803,11 @@ void VM::run1(uint8_t prefix) {
 		return;
 	case 0xf2: // repnz/repne
 	case 0xf3: // rep/repz/repe
-		ip = oldip + 1;
-		return run1(b);
+		if (CX) {
+			ip = oldip + 1;
+			run1(b);
+		}
+		return;
 	case 0xf5: // cmc
 		CF = !CF;
 		return;
