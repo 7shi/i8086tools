@@ -15,6 +15,8 @@ int main(int argc, char *argv[]) {
 			trace = 2;
 		} else if (arg == "-s" && trace == 0) {
 			trace = 1;
+		} else if (arg == "-d") {
+			dis = true;
 		} else {
 			for (; i < argc; i++) {
 				args.push_back(argv[i]);
