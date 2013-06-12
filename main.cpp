@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	VM vm;
-	if (!vm.read(args[0])) return 1;
+	if (!vm.load(args[0])) return 1;
 	if (dis) {
 		vm.disasm();
 	} else {

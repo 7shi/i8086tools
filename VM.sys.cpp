@@ -7,7 +7,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ NULL     , NULL          }, //  0
 	{ "exit"   , &VM::_exit    }, //  1
 	{ "fork"   , NULL          }, //  2
-	{ "read"   , NULL          }, //  3
+	{ "read"   , &VM::_read    }, //  3
 	{ "write"  , &VM::_write   }, //  4
 	{ "open"   , NULL          }, //  5
 	{ "close"  , NULL          }, //  6
@@ -105,5 +105,18 @@ void VM::_write() {
 	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)\n", fd, buf, len);
 	int max = 0x10000 - buf;
 	if (len > max) len = max;
-	write16(BX + 2, write(fd, data + buf, len));
+	int result = write(fd, data + buf, len);
+	write16(BX + 2, result == -1 ? -errno : result);
+}
+
+void VM::_read() {
+	int fd = read16(BX + 4);
+	int buf = read16(BX + 10);
+	int len = read16(BX + 6);
+	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)\n", fd, buf, len);
+	int max = 0x10000 - buf;
+	if (len > max) len = max;
+	int result = read(fd, data + buf, len);
+	//fprintf(stderr, "result = %d\n", result);
+	write16(BX + 2, result == -1 ? -errno : result);
 }

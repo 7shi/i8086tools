@@ -123,7 +123,7 @@ void VM::run(const std::vector<std::string> &args) {
 	while (!hasExited) run1();
 }
 
-bool VM::read(const std::string &fn) {
+bool VM::load(const std::string &fn) {
 	const char *file = fn.c_str();
 	struct stat st;
 	if (stat(file, &st)) {

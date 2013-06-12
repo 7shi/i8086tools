@@ -37,7 +37,7 @@ public:
 
 public:
 	VM();
-	bool read(const std::string &fn);
+	bool load(const std::string &fn);
 	void run(const std::vector<std::string> &args);
 	void disasm();
 
@@ -88,5 +88,6 @@ private:
 
 	void minix_syscall();
 	void _exit   (); //  1
+	void _read   (); //  3
 	void _write  (); //  4
 };
