@@ -224,7 +224,8 @@ void VM::_unlink() { // 10
 #ifdef WIN32
 	bool ok = DeleteFileA(path2.c_str());
 	int err = 0;
-	if (ok) {
+	if (!ok) {
+		if (trace) showError(err = GetLastError());
 		struct stat st;
 		if (stat(path2.c_str(), &st) != -1) {
 			if (trace) {
@@ -232,8 +233,6 @@ void VM::_unlink() { // 10
 			}
 			unlinks.push_back(path2);
 		}
-	} else if (trace) {
-		showError(err = GetLastError());
 	}
 	write16(BX + 2, -err);
 #else
