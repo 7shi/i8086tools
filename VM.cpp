@@ -23,7 +23,7 @@ static void init_table() {
 
 VM *VM::current;
 
-VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0), exitcode(0) {
+void VM::init() {
 	if (!initialized) init_table();
 	uint16_t tmp = 0x1234;
 	uint8_t *p = (uint8_t *)r;
@@ -39,10 +39,37 @@ VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0), exitcode(0) {
 		}
 	}
 	text = new uint8_t[0x10000];
+	exitcode = 0;
+}
+
+VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0) {
+	init();
 	memset(text, 0, 0x10000);
 	memset(r, 0, sizeof(r));
 	memset(sigacts, 0, sizeof(sigacts));
 	OF = DF = SF = ZF = PF = CF = false;
+}
+
+VM::VM(const VM &vm) {
+	init();
+	memcpy(text, vm.text, 0x10000);
+	memcpy(r, vm.r, sizeof(r));
+	memcpy(sigacts, vm.sigacts, sizeof(sigacts));
+	ip = vm.ip;
+	if (vm.data == vm.text) {
+		data = text;
+	} else {
+		data = new uint8_t[0x10000];
+		memcpy(data, vm.data, 0x10000);
+	}
+	tsize = vm.tsize;
+	start_sp = vm.start_sp;
+	OF = vm.OF;
+	DF = vm.DF;
+	SF = vm.SF;
+	ZF = vm.ZF;
+	PF = vm.PF;
+	CF = vm.CF;
 }
 
 VM::~VM() {

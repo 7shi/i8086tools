@@ -39,8 +39,11 @@ private:
 public:
 	int exitcode;
 
+private:
+	void init();
 public:
 	VM();
+	VM(const VM &vm);
 	~VM();
 	bool load(const std::string &fn);
 	void run(const std::vector<std::string> &args);
