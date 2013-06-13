@@ -17,7 +17,7 @@ void VM::sighandler(int sig) {
 void VM::_signal() { // 48
 	int sig = read16(BX + 4);
 	int sgh = read16(BX + 14);
-	if (trace) fprintf(stderr, "(%d, %04x)\n", sig, sgh);
+	if (trace) fprintf(stderr, "(%d, 0x%04x)\n", sig, sgh);
 	switch (sig) {
 	case MX_SIGINT : sig = SIGINT ; break;
 	case MX_SIGILL : sig = SIGILL ; break;
@@ -42,7 +42,7 @@ void VM::_sigaction() { // 71
 	int sig  = read16(BX + 6);
 	int act  = read16(BX + 10);
 	int oact = read16(BX + 12);
-	if (trace) fprintf(stderr, "(%d, %04x, %04x)\n", sig, act, oact);
+	if (trace) fprintf(stderr, "(%d, 0x%04x, 0x%04x)\n", sig, act, oact);
 	switch (sig) {
 	case MX_SIGINT : sig = SIGINT ; break;
 	case MX_SIGILL : sig = SIGILL ; break;
