@@ -93,7 +93,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ NULL         , NULL              }, // 45
 	{ "setgid"     , NULL              }, // 46
 	{ "getgid"     , NULL              }, // 47
-	{ "signal"     , NULL              }, // 48
+	{ "signal"     , &VM::_signal      }, // 48
 	{ NULL         , NULL              }, // 49
 	{ NULL         , NULL              }, // 50
 	{ NULL         , NULL              }, // 51
