@@ -21,6 +21,13 @@ inline void write16(uint8_t *mem, uint16_t v) {
 	mem[1] = v >> 8;
 }
 
+inline void write32(uint8_t *mem, uint32_t v) {
+	mem[0] = v;
+	mem[1] = v >>  8;
+	mem[2] = v >> 16;
+	mem[3] = v >> 24;
+}
+
 extern std::string hex(int v, int len = 0);
 extern std::string hexdump(uint8_t *mem, int len);
 void setroot(std::string root);

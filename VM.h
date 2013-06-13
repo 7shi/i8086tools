@@ -82,6 +82,10 @@ private:
 		::write16(data + addr, value);
 	}
 
+	inline void write32(uint16_t addr, uint32_t value) {
+		::write32(data + addr, value);
+	}
+
 	void debug(const OpCode &op);
 	int addr(const Operand &opr);
 	uint8_t get8(const Operand &opr);
