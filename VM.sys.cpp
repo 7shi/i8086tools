@@ -6,10 +6,15 @@
 #include <sys/stat.h>
 #ifdef WIN32
 #include <windows.h>
+#define NO_FORK
 #endif
+#include <stack>
 #include <map>
 #include <algorithm>
 
+#ifdef NO_FORK
+static std::stack<uint16_t> exitcodes;
+#endif
 std::map<int, std::string> fd2name;
 
 #ifdef WIN32
@@ -47,7 +52,7 @@ static int fileClose(VM *vm, int fd) {
 VM::syshandler VM::syscalls[nsyscalls] = {
 	{ NULL         , NULL              }, //  0
 	{ "exit"       , &VM::_exit        }, //  1
-	{ "fork"       , NULL              }, //  2
+	{ "fork"       , &VM::_fork        }, //  2
 	{ "read"       , &VM::_read        }, //  3
 	{ "write"      , &VM::_write       }, //  4
 	{ "open"       , &VM::_open        }, //  5
@@ -150,10 +155,27 @@ void VM::minix_syscall() {
 void VM::_exit() { // 1
 	exitcode = read16(BX + 4);
 	if (trace) fprintf(stderr, "(%d)\n", exitcode);
+#ifdef NO_FORK
+	exitcodes.push(exitcode);
+#endif
 	hasExited = true;
 	for (std::list<int>::iterator it = handles.begin(); it != handles.end(); ++it)
 		fileClose(this, *it);
 	handles.clear();
+}
+
+void VM::_fork() { // 2
+	if (trace) fprintf(stderr, "()\n");
+#ifdef NO_FORK
+	VM vm = *this;
+	vm.write16(BX + 2, 0);
+	vm.AX = 0;
+	vm.run();
+	write16(BX + 2, 1);
+#else
+	int result = fork();
+	write16(BX + 2, result == -1 ? -errno : result);
+#endif
 }
 
 void VM::_read() { // 3

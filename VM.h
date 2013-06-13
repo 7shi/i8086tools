@@ -24,6 +24,7 @@
 extern const char *header;
 extern bool ptable[256];
 extern int trace;
+extern int exitcode;
 
 class VM {
 private:
@@ -36,8 +37,6 @@ private:
 	uint16_t start_sp;
 	bool hasExited;
 	std::list<int> handles;
-public:
-	int exitcode;
 
 private:
 	void init();
@@ -100,6 +99,7 @@ private:
 
 	void minix_syscall();
 	void _exit     (); //  1
+	void _fork     (); //  2
 	void _read     (); //  3
 	void _write    (); //  4
 	void _open     (); //  5

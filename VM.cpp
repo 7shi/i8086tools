@@ -7,6 +7,7 @@
 const char *header = " AX   CX   DX   BX   SP   BP   SI   DI  FLAGS  IP\n";
 bool ptable[256];
 int trace;
+int exitcode;
 
 static bool initialized;
 
@@ -39,7 +40,6 @@ void VM::init() {
 		}
 	}
 	text = new uint8_t[0x10000];
-	exitcode = 0;
 }
 
 VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0) {
@@ -165,7 +165,8 @@ void VM::run() {
 }
 
 bool VM::load(const std::string &fn) {
-	const char *file = fn.c_str();
+	std::string fn2 = convpath(fn);
+	const char *file = fn2.c_str();
 	struct stat st;
 	if (stat(file, &st)) {
 		fprintf(stderr, "can not stat: %s\n", file);
