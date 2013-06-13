@@ -109,7 +109,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ NULL         , NULL              }, // 56
 	{ NULL         , NULL              }, // 57
 	{ NULL         , NULL              }, // 58
-	{ "exec"       , NULL              }, // 59
+	{ "exec"       , &VM::_exec        }, // 59
 	{ "umask"      , NULL              }, // 60
 	{ "chroot"     , NULL              }, // 61
 	{ "setsid"     , NULL              }, // 62
@@ -295,4 +295,44 @@ void VM::_access() { // 33
 	if (trace) fprintf(stderr, "(\"%s\", 0%03o)\n", path, mode);
 	int result = access(path, mode);
 	write16(BX + 2, result == -1 ? -errno : result);
+}
+
+void VM::_exec() { // 59
+	const char *path = (const char *)(data + read16(BX + 10));
+	int fsize = read16(BX + 6);
+	int frame = read16(BX + 12);
+#if 0
+	if (trace) fprintf(stderr, "(\"%s\", %d, 0x%04x)\n", path, fsize, frame);
+	FILE *f = fopen("core", "wb");
+	fwrite(data, 1, 0x10000, f);
+	fclose(f);
+#endif
+	int argc = read16(frame);
+	if (trace) {
+		fprintf(stderr, "(\"%s\"", path);
+		for (int i = 2; i <= argc; i++) {
+			fprintf(stderr, ", \"%s\"", data + frame + read16(frame + i * 2));
+		}
+		fprintf(stderr, ")\n");
+	}
+	uint8_t *t = text, *d = data;
+	text = new uint8_t[0x10000];
+	memset(text, 0, 0x10000);
+	data = NULL;
+	if (!load(path)) {
+		delete[] text;
+		text = t;
+		data = d;
+		write16(BX + 2, -EINVAL);
+		return;
+	}
+	start_sp = SP = 0x10000 - fsize;
+	memcpy(data + start_sp, d + frame, fsize);
+	if (d != t) delete[] d;
+	int ad = start_sp + 2, p;
+	for (int i = 0; i < 2; i++, ad += 2) {
+		for(; (p = read16(ad)); ad += 2) {
+			write16(ad, start_sp + p);
+		}
+	}
 }
