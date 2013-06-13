@@ -151,6 +151,9 @@ void VM::_exit() { // 1
 	exitcode = read16(BX + 4);
 	if (trace) fprintf(stderr, "(%d)\n", exitcode);
 	hasExited = true;
+	for (std::list<int>::iterator it = handles.begin(); it != handles.end(); ++it)
+		fileClose(this, *it);
+	handles.clear();
 }
 
 void VM::_read() { // 3
