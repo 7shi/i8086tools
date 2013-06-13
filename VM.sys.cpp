@@ -53,7 +53,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "open"       , &VM::_open        }, //  5
 	{ "close"      , &VM::_close       }, //  6
 	{ "wait"       , NULL              }, //  7
-	{ "creat"      , NULL              }, //  8
+	{ "creat"      , &VM::_creat       }, //  8
 	{ "link"       , NULL              }, //  9
 	{ "unlink"     , &VM::_unlink      }, // 10
 	{ "waitpid"    , NULL              }, // 11
@@ -202,6 +202,19 @@ void VM::_close() { // 6
 	int result = fileClose(this, fd);
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (result == -1) handles.remove(result);
+}
+
+void VM::_creat() { // 8
+	const char *path = (const char *)(data + read16(BX + 8));
+	int mode = read16(BX + 6);
+	if (trace) fprintf(stderr, "(\"%s\", 0%03o)\n", path, mode);
+	std::string path2 = convpath(path);
+	int result = creat(path2.c_str(), mode);
+	write16(BX + 2, result == -1 ? -errno : result);
+	if (result != -1) {
+		fd2name[result] = path2;
+		handles.push_back(result);
+	}
 }
 
 void VM::_unlink() { // 10

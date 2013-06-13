@@ -100,6 +100,7 @@ private:
 	void _write    (); //  4
 	void _open     (); //  5
 	void _close    (); //  6
+	void _creat    (); //  8
 	void _unlink   (); // 10
 	void _brk      (); // 17
 	void _lseek    (); // 19
