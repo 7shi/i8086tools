@@ -10,6 +10,16 @@
 #define MX_SIG_DFL  0
 #define MX_SIG_IGN  1
 
+static int convsig(int sig) {
+	switch (sig) {
+	case MX_SIGINT : return SIGINT ;
+	case MX_SIGILL : return SIGILL ;
+	case MX_SIGFPE : return SIGFPE ;
+	case MX_SIGSEGV: return SIGSEGV;
+	}
+	return -1;
+}
+
 void VM::sighandler(int sig) {
 	current->ip = current->sigacts[sig].sa_handler;
 }
@@ -26,13 +36,8 @@ void VM::_sigaction() { // 71
 	int act  = read16(BX + 10);
 	int oact = read16(BX + 12);
 	if (trace) fprintf(stderr, "(%d, 0x%04x, 0x%04x)\n", sig, act, oact);
-	int s;
-	switch (sig) {
-	case MX_SIGINT : s = SIGINT ; break;
-	case MX_SIGILL : s = SIGILL ; break;
-	case MX_SIGFPE : s = SIGFPE ; break;
-	case MX_SIGSEGV: s = SIGSEGV; break;
-	default:
+	int s = convsig(sig);
+	if (s < 0) {
 		write16(BX + 2, -EINVAL);
 		return;
 	}
@@ -47,4 +52,22 @@ void VM::_sigaction() { // 71
 	default: signal(s, &sighandler); break;
 	}
 	sigacts[sig] = sa;
+}
+
+void VM::swtch(VM *to) {
+	for (int i = 0; i < nsig; i++) {
+		int s = convsig(i);
+		if (s >= 0) {
+			if (!to) {
+				signal(s, SIG_DFL);
+			} else {
+				switch (to->sigacts[i].sa_handler) {
+				case MX_SIG_DFL: signal(s, SIG_DFL); break;
+				case MX_SIG_IGN: signal(s, SIG_IGN); break;
+				default: signal(s, &sighandler); break;
+				}
+			}
+		}
+	}
+	current = to;
 }

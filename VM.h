@@ -117,4 +117,6 @@ private:
 	};
 	static const int nsig = 12;
 	sigact sigacts[nsig];
+
+	void swtch(VM *to);
 };

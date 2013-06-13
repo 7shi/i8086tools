@@ -110,8 +110,6 @@ void VM::set16(const Operand &opr, uint16_t value) {
 }
 
 void VM::run(const std::vector<std::string> &args) {
-	VM *old = current;
-	current = this;
 	int arglen = 0;
 	for (int i = 0; i < (int)args.size(); i++) {
 		arglen += args[i].size() + 1;
@@ -128,10 +126,13 @@ void VM::run(const std::vector<std::string> &args) {
 	}
 	write16(SP -= 2, args.size()); // argc
 	start_sp = SP;
+
 	if (trace == 2) fprintf(stderr, header);
+	VM *from = current;
+	swtch(this);
 	hasExited = false;
 	while (!hasExited) run1();
-	current = old;
+	swtch(from);
 }
 
 bool VM::load(const std::string &fn) {
