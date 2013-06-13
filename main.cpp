@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
 	if (dis) {
 		vm.disasm();
 	} else {
+		if (trace == 2) fprintf(stderr, header);
 		vm.run(args);
 	}
 	return vm.exitcode;

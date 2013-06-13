@@ -153,8 +153,10 @@ void VM::run(const std::vector<std::string> &args) {
 	}
 	write16(SP -= 2, args.size()); // argc
 	start_sp = SP;
+	run();
+}
 
-	if (trace == 2) fprintf(stderr, header);
+void VM::run() {
 	VM *from = current;
 	swtch(this);
 	hasExited = false;
