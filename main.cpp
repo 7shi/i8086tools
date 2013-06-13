@@ -5,8 +5,7 @@
 int main(int argc, char *argv[]) {
 	bool dis = false;
 	std::vector<std::string> args;
-	for (int i = 1; i < argc; i++)
-	{
+	for (int i = 1; i < argc; i++) {
 		std::string arg = argv[i];
 		if (arg == "-r") {
 			i++;
@@ -23,8 +22,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
-	if (args.empty())
-	{
+	if (args.empty()) {
 		printf("usage: %s [-d|-v/-s] cmd [args ...]\n", argv[0]);
 		printf("    -d: disassemble mode (not run)\n");
 		printf("    -v: verbose mode (output syscall and disassemble)\n");
