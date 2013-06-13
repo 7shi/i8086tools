@@ -45,10 +45,17 @@ std::string convpath(const std::string &path) {
 	if (startsWith(path, "/tmp/"))
 		return getenv("TEMP") + path.substr(4);
 #endif
-	if (startsWith(path, "/") && !rootpath.empty()) {
-		std::string path2 = rootpath + path;
-		struct stat st;
-		if (!stat(path2.c_str(), &st)) return path2;
+	if (!rootpath.empty()) {
+		if (startsWith(path, "/")) {
+			std::string path2 = rootpath + path;
+			struct stat st;
+			if (!stat(path2.c_str(), &st)) return path2;
+		}
+		if (startsWith(path, "/usr/")) {
+			std::string path3 = rootpath + path.substr(4);
+			struct stat st;
+			if (!stat(path3.c_str(), &st)) return path3;
+		}
 	}
 	return path;
 }
