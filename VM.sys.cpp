@@ -65,7 +65,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "brk"        , &VM::_brk         }, // 17
 	{ "stat"       , NULL              }, // 18
 	{ "lseek"      , &VM::_lseek       }, // 19
-	{ "getpid"     , NULL              }, // 20
+	{ "getpid"     , &VM::_getpid      }, // 20
 	{ "mount"      , NULL              }, // 21
 	{ "umount"     , NULL              }, // 22
 	{ "setuid"     , NULL              }, // 23
@@ -246,5 +246,11 @@ void VM::_lseek() { // 19
 	int w = read16(BX + 6);
 	if (trace) fprintf(stderr, "(%d, %ld, %d)\n", fd, o, w);
 	int result = lseek(fd, o, w);
+	write16(BX + 2, result == -1 ? -errno : result);
+}
+
+void VM::_getpid() { // 20
+	if (trace) fprintf(stderr, "()\n");
+	int result = getpid();
 	write16(BX + 2, result == -1 ? -errno : result);
 }
