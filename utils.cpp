@@ -41,16 +41,15 @@ void setroot(std::string root) {
 }
 
 std::string convpath(const std::string &path) {
-	if (path.empty() || path[0] != '/' || rootpath.empty()) return path;
-
 #ifdef WIN32
 	if (startsWith(path, "/tmp/"))
 		return getenv("TEMP") + path.substr(4);
 #endif
-	std::string path2 = rootpath + path;
-	struct stat st;
-	if (stat(path2.c_str(), &st) == 0) return path2;
-
+	if (startsWith(path, "/") && !rootpath.empty()) {
+		std::string path2 = rootpath + path;
+		struct stat st;
+		if (!stat(path2.c_str(), &st)) return path2;
+	}
 	return path;
 }
 
