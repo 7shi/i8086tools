@@ -111,6 +111,7 @@ private:
 	void _wait     (); //  7
 	void _creat    (); //  8
 	void _unlink   (); // 10
+	void _time     (); // 13
 	void _brk      (); // 17
 	void _lseek    (); // 19
 	void _getpid   (); // 20

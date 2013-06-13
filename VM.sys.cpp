@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <time.h>
 #ifdef WIN32
 #include <windows.h>
 #define NO_FORK
@@ -63,7 +64,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "unlink"     , &VM::_unlink      }, // 10
 	{ "waitpid"    , NULL              }, // 11
 	{ "chdir"      , NULL              }, // 12
-	{ "time"       , NULL              }, // 13
+	{ "time"       , &VM::_time        }, // 13
 	{ "mknod"      , NULL              }, // 14
 	{ "chmod"      , NULL              }, // 15
 	{ "chown"      , NULL              }, // 16
@@ -279,6 +280,13 @@ void VM::_unlink() { // 10
 	int result = unlink(path2.c_str());
 	write16(BX + 2, result == -1 ? -errno : result);
 #endif
+}
+
+void VM::_time() { // 13
+	if (trace) fprintf(stderr, "()\n");
+	time_t result = time(NULL);
+	write16(BX + 2, result == -1 ? -errno : 0);
+	write32(BX + 10, result);
 }
 
 void VM::_brk() { // 17
