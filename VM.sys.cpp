@@ -78,7 +78,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "utime"      , NULL              }, // 30
 	{ NULL         , NULL              }, // 31
 	{ NULL         , NULL              }, // 32
-	{ "access"     , NULL              }, // 33
+	{ "access"     , &VM::_access      }, // 33
 	{ NULL         , NULL              }, // 34
 	{ NULL         , NULL              }, // 35
 	{ "sync"       , NULL              }, // 36
@@ -252,5 +252,13 @@ void VM::_lseek() { // 19
 void VM::_getpid() { // 20
 	if (trace) fprintf(stderr, "()\n");
 	int result = getpid();
+	write16(BX + 2, result == -1 ? -errno : result);
+}
+
+void VM::_access() { // 33
+	const char *path = (const char *)(data + read16(BX + 8));
+	int mode = read16(BX + 6);
+	if (trace) fprintf(stderr, "(\"%s\", 0%03o)\n", path, mode);
+	int result = access(path, mode);
 	write16(BX + 2, result == -1 ? -errno : result);
 }

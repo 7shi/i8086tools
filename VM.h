@@ -104,6 +104,7 @@ private:
 	void _brk      (); // 17
 	void _lseek    (); // 19
 	void _getpid   (); // 20
+	void _access   (); // 33
 	void _signal   (); // 48
 	void _sigaction(); // 71
 
