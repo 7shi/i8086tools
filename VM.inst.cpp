@@ -479,10 +479,10 @@ void VM::run1(uint8_t prefix) {
 		AX = get16(op.opr2);
 		return;
 	case 0xa2: // mov [addr], al
-		set8(op.opr2, AL);
+		set8(op.opr1, AL);
 		return;
 	case 0xa3: // mov [addr], ax
-		set16(op.opr2, AX);
+		set16(op.opr1, AX);
 		return;
 	case 0xa4: // movsb
 		do {
