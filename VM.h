@@ -113,7 +113,7 @@ private:
 	struct sigact {
 		uint16_t sa_handler;
 		uint16_t sa_mask;
-		int16_t sa_flags;
+		uint16_t sa_flags;
 	};
 	static const int nsig = 12;
 	sigact sigacts[nsig];

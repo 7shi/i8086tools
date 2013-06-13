@@ -18,24 +18,7 @@ void VM::_signal() { // 48
 	int sig = read16(BX + 4);
 	int sgh = read16(BX + 14);
 	if (trace) fprintf(stderr, "(%d, 0x%04x)\n", sig, sgh);
-	switch (sig) {
-	case MX_SIGINT : sig = SIGINT ; break;
-	case MX_SIGILL : sig = SIGILL ; break;
-	case MX_SIGFPE : sig = SIGFPE ; break;
-	case MX_SIGSEGV: sig = SIGSEGV; break;
-	default:
-		write16(BX + 2, -EINVAL);
-		return;
-	}
-	write16(BX + 2, sigacts[sig].sa_handler);
-	sigacts[sig].sa_handler = sgh;
-	sigacts[sig].sa_mask    = 0;
-	sigacts[sig].sa_flags   = 0;
-	switch (sgh) {
-	case MX_SIG_DFL: signal(sig, SIG_DFL); break;
-	case MX_SIG_IGN: signal(sig, SIG_IGN); break;
-	default: signal(sig, &sighandler); break;
-	}
+	write16(BX + 2, -EINVAL);
 }
 
 void VM::_sigaction() { // 71
@@ -43,21 +26,25 @@ void VM::_sigaction() { // 71
 	int act  = read16(BX + 10);
 	int oact = read16(BX + 12);
 	if (trace) fprintf(stderr, "(%d, 0x%04x, 0x%04x)\n", sig, act, oact);
+	int s;
 	switch (sig) {
-	case MX_SIGINT : sig = SIGINT ; break;
-	case MX_SIGILL : sig = SIGILL ; break;
-	case MX_SIGFPE : sig = SIGFPE ; break;
-	case MX_SIGSEGV: sig = SIGSEGV; break;
+	case MX_SIGINT : s = SIGINT ; break;
+	case MX_SIGILL : s = SIGILL ; break;
+	case MX_SIGFPE : s = SIGFPE ; break;
+	case MX_SIGSEGV: s = SIGSEGV; break;
 	default:
 		write16(BX + 2, -EINVAL);
 		return;
 	}
-	*(sigact *)(data + oact) = sigacts[sig];
-	sigacts[sig] = *(sigact *)(data + act);
-	switch (sigacts[sig].sa_handler) {
-	case MX_SIG_DFL: signal(sig, SIG_DFL); break;
-	case MX_SIG_IGN: signal(sig, SIG_IGN); break;
-	default: signal(sig, &sighandler); break;
-	}
 	write16(BX + 2, 0);
+	write16(oact    , sigacts[sig].sa_handler);
+	write16(oact + 2, sigacts[sig].sa_mask   );
+	write16(oact + 4, sigacts[sig].sa_flags  );
+	sigact sa = { read16(act), read16(act + 2), read16(act + 4) };
+	switch (sa.sa_handler) {
+	case MX_SIG_DFL: signal(s, SIG_DFL); break;
+	case MX_SIG_IGN: signal(s, SIG_IGN); break;
+	default: signal(s, &sighandler); break;
+	}
+	sigacts[sig] = sa;
 }
