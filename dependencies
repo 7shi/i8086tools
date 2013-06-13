@@ -6,3 +6,4 @@ Operand.o: Operand.cpp Operand.h utils.h
 VM.o: VM.cpp VM.h utils.h OpCode.h Operand.h disasm.h
 VM.inst.o: VM.inst.cpp VM.h utils.h OpCode.h Operand.h disasm.h
 VM.sys.o: VM.sys.cpp VM.h utils.h OpCode.h Operand.h disasm.h
+VM.signal.o: VM.signal.cpp VM.h utils.h OpCode.h Operand.h

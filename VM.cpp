@@ -21,6 +21,8 @@ static void init_table() {
 	initialized = true;
 }
 
+VM *VM::current;
+
 VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0), exitcode(0) {
 	if (!initialized) init_table();
 	uint16_t tmp = 0x1234;
@@ -39,6 +41,7 @@ VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0), exitcode(0) {
 	text = new uint8_t[0x10000];
 	memset(text, 0, 0x10000);
 	memset(r, 0, sizeof(r));
+	memset(sigacts, 0, sizeof(sigacts));
 	OF = DF = SF = ZF = PF = CF = false;
 }
 
@@ -107,6 +110,8 @@ void VM::set16(const Operand &opr, uint16_t value) {
 }
 
 void VM::run(const std::vector<std::string> &args) {
+	VM *old = current;
+	current = this;
 	int arglen = 0;
 	for (int i = 0; i < (int)args.size(); i++) {
 		arglen += args[i].size() + 1;
@@ -126,6 +131,7 @@ void VM::run(const std::vector<std::string> &args) {
 	if (trace == 2) fprintf(stderr, header);
 	hasExited = false;
 	while (!hasExited) run1();
+	current = old;
 }
 
 bool VM::load(const std::string &fn) {

@@ -27,6 +27,7 @@ extern int trace;
 
 class VM {
 private:
+	static VM *current;
 	uint16_t ip, r[8];
 	uint8_t *r8[8];
 	uint8_t *text, *data;
@@ -94,12 +95,22 @@ private:
 	static syshandler syscalls[nsyscalls];
 
 	void minix_syscall();
-	void _exit   (); //  1
-	void _read   (); //  3
-	void _write  (); //  4
-	void _open   (); //  5
-	void _close  (); //  6
-	void _unlink (); // 10
-	void _brk    (); // 17
-	void _lseek  (); // 19
+	void _exit     (); //  1
+	void _read     (); //  3
+	void _write    (); //  4
+	void _open     (); //  5
+	void _close    (); //  6
+	void _unlink   (); // 10
+	void _brk      (); // 17
+	void _lseek    (); // 19
+	void _sigaction(); // 71
+
+	static void sighandler(int sig);
+	struct sigact {
+		uint16_t sa_handler;
+		uint16_t sa_mask;
+		int16_t sa_flags;
+	};
+	static const int nsig = 12;
+	sigact sigacts[nsig];
 };

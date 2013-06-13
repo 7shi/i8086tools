@@ -116,7 +116,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "task_reply" , NULL              }, // 68
 	{ NULL         , NULL              }, // 69
 	{ NULL         , NULL              }, // 70
-	{ "sigaction"  , NULL              }, // 71
+	{ "sigaction"  , &VM::_sigaction   }, // 71
 	{ "sigsuspend" , NULL              }, // 72
 	{ "sigpending" , NULL              }, // 73
 	{ "sigprocmask", NULL              }, // 74

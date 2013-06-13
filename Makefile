@@ -6,7 +6,7 @@ LDFLAGS  =
 OBJECTS  = $(SOURCES:%.cpp=%.o)
 SOURCES  = main.cpp utils.cpp disasm.cpp \
 	   OpCode.cpp Operand.cpp \
-	   VM.cpp VM.inst.cpp VM.sys.cpp
+	   VM.cpp VM.inst.cpp VM.sys.cpp VM.signal.cpp
 
 all: $(TARGET)
 
