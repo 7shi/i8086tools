@@ -57,7 +57,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "write"      , &VM::_write       }, //  4
 	{ "open"       , &VM::_open        }, //  5
 	{ "close"      , &VM::_close       }, //  6
-	{ "wait"       , NULL              }, //  7
+	{ "wait"       , &VM::_wait        }, //  7
 	{ "creat"      , &VM::_creat       }, //  8
 	{ "link"       , NULL              }, //  9
 	{ "unlink"     , &VM::_unlink      }, // 10
@@ -224,6 +224,24 @@ void VM::_close() { // 6
 	int result = fileClose(this, fd);
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (result == -1) handles.remove(result);
+}
+
+void VM::_wait() { // 7
+	if (trace) fprintf(stderr, "()\n");
+#ifdef NO_FORK
+	if (!exitcodes.empty()) {
+		write16(BX + 2, 1);
+		write16(BX + 4, exitcodes.top() << 8);
+		exitcodes.pop();
+	} else {
+		write16(BX + 2, -EINVAL);
+	}
+#else
+	int status;
+	int result = wait(&status);
+	write16(BX + 2, result == -1 ? -errno : result);
+	write16(BX + 4, status);
+#endif
 }
 
 void VM::_creat() { // 8
