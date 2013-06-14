@@ -368,9 +368,9 @@ void disasm(uint8_t *mem, size_t size) {
 		if (index + op.len > size) {
 			op.len = size - index;
 			ops = "db ";
-			for (; index < (int)size; index++) {
+			for (int i = index; i < (int)size; i++) {
 				if (ops.size() != 3) ops += ", ";
-				ops += hex(mem[index], 2);
+				ops += hex(mem[i], 2);
 			}
 		}
 		std::string hex = hexdump(mem + index, op.len);
