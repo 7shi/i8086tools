@@ -40,13 +40,14 @@ void VM::init() {
 		}
 	}
 	text = new uint8_t[0x10000];
+	hasExited = false;
+	memset(sigacts, 0, sizeof(sigacts));
 }
 
 VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0) {
 	init();
 	memset(text, 0, 0x10000);
 	memset(r, 0, sizeof(r));
-	memset(sigacts, 0, sizeof(sigacts));
 	OF = DF = SF = ZF = PF = CF = false;
 }
 
@@ -54,7 +55,7 @@ VM::VM(const VM &vm) {
 	init();
 	memcpy(text, vm.text, 0x10000);
 	memcpy(r, vm.r, sizeof(r));
-	memcpy(sigacts, vm.sigacts, sizeof(sigacts));
+	//memcpy(sigacts, vm.sigacts, sizeof(sigacts));
 	ip = vm.ip;
 	if (vm.data == vm.text) {
 		data = text;
@@ -64,13 +65,13 @@ VM::VM(const VM &vm) {
 	}
 	tsize = vm.tsize;
 	dsize = vm.dsize;
-	start_sp = vm.start_sp;
 	OF = vm.OF;
 	DF = vm.DF;
 	SF = vm.SF;
 	ZF = vm.ZF;
 	PF = vm.PF;
 	CF = vm.CF;
+	start_sp = vm.start_sp;
 }
 
 VM::~VM() {
