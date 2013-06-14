@@ -21,10 +21,10 @@
 #define DH *r8[6]
 #define BH *r8[7]
 
-extern const char *header;
 extern bool ptable[256];
 extern int trace;
 extern int exitcode;
+extern const char *header;
 
 class VM {
 private:
