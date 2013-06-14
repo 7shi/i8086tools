@@ -14,7 +14,7 @@
 #include <algorithm>
 
 #ifdef NO_FORK
-static std::stack<uint16_t> exitcodes;
+static std::stack<int> exitcodes;
 #endif
 std::map<int, std::string> fd2name;
 
@@ -154,7 +154,7 @@ void VM::minix_syscall() {
 }
 
 void VM::_exit() { // 1
-	exitcode = read16(BX + 4);
+	exitcode = (int16_t)read16(BX + 4);
 	if (trace) fprintf(stderr, "(%d)>\n", exitcode);
 #ifdef NO_FORK
 	exitcodes.push(exitcode);
@@ -237,7 +237,7 @@ void VM::_wait() { // 7
 		exitcodes.pop();
 		write16(BX + 2, 1);
 		write16(BX + 4, status << 8);
-		if (trace) fprintf(stderr, " => 0x%04x>\n", status);
+		if (trace) fprintf(stderr, " => %d>\n", status);
 	} else {
 		write16(BX + 2, -EINVAL);
 		if (trace) fprintf(stderr, " => EINVAL>\n");
