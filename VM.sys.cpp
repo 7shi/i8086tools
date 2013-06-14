@@ -205,13 +205,21 @@ void VM::_write() { // 4
 
 void VM::_open() { // 5
 	int flag = read16(BX + 6);
-	const char *path = (const char *)(data + read16(BX + (flag & 64 ? 10 : 8)));
-	if (trace) fprintf(stderr, "(\"%s\", %d)", path, flag);
+	const char *path;
+	mode_t mode;
+	if (flag & 64 /*O_CREAT*/) {
+		path = (const char *)(data + read16(BX + 10));
+		mode = read16(BX + 8);
+		if (trace) fprintf(stderr, "(\"%s\", %d, 0%03o)", path, flag, mode);
+	} else {
+		path = (const char *)(data + read16(BX + 8));
+		if (trace) fprintf(stderr, "(\"%s\", %d)", path, flag);
+	}
 	std::string path2 = convpath(path);
-#if WIN32
+#ifdef WIN32
 	flag |= O_BINARY;
 #endif
-	int result = open(path2.c_str(), flag);
+	int result = open(path2.c_str(), flag, mode);
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (result != -1) {
 		fd2name[result] = path2;
@@ -256,7 +264,11 @@ void VM::_creat() { // 8
 	int mode = read16(BX + 6);
 	if (trace) fprintf(stderr, "(\"%s\", 0%03o)", path, mode);
 	std::string path2 = convpath(path);
+#ifdef WIN32
+	int result = open(path2.c_str(), O_CREAT | O_TRUNC | O_WRONLY | O_BINARY, 0777);
+#else
 	int result = creat(path2.c_str(), mode);
+#endif
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (result != -1) {
 		fd2name[result] = path2;
