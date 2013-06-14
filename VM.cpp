@@ -8,14 +8,14 @@ bool ptable[256];
 int trace;
 int exitcode;
 
-const char *header = " AX   CX   DX   BX   SP   BP   SI   DI  FLAGS  IP\n";
+const char *header = " AX   CX   DX   BX   SP   BP   SI   DI  FLAGS IP\n";
 
 void VM::debug(uint16_t ip, const OpCode &op) {
 	fprintf(stderr,
-		"%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c%c %04x:%-12s %s\n",
+		"%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-12s %s\n",
 		r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7],
-		OF?'O':'-', SF?'S':'-', ZF?'Z':'-', PF?'P':'-', CF?'C':'-', ip,
-		hexdump(text + ip, op.len).c_str(), op.str().c_str());
+		OF ? 'O' : '-', SF ? 'S' : '-', ZF ? 'Z' : '-', CF ? 'C' : '-',
+		ip, hexdump(text + ip, op.len).c_str(), op.str().c_str());
 }
 
 static bool initialized;
