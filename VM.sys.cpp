@@ -14,7 +14,7 @@
 #include <algorithm>
 
 #ifdef NO_FORK
-static std::stack<int> exitcodes;
+static std::stack<std::pair<int, int> > exitcodes;
 #endif
 std::map<int, std::string> fd2name;
 
@@ -157,7 +157,7 @@ void VM::_exit() { // 1
 	exitcode = (int16_t)read16(BX + 4);
 	if (trace) fprintf(stderr, "(%d)>\n", exitcode);
 #ifdef NO_FORK
-	exitcodes.push(exitcode);
+	exitcodes.push(std::pair<int, int>(pid, exitcode));
 #endif
 	hasExited = true;
 	for (std::list<int>::iterator it = handles.begin(); it != handles.end(); ++it)
@@ -172,7 +172,7 @@ void VM::_fork() { // 2
 	vm.write16(BX + 2, 0);
 	vm.AX = 0;
 	vm.run();
-	write16(BX + 2, 1);
+	write16(BX + 2, vm.pid);
 #else
 	int result = fork();
 	write16(BX + 2, result == -1 ? -errno : result);
@@ -241,9 +241,10 @@ void VM::_wait() { // 7
 	if (trace) fprintf(stderr, "()");
 #ifdef NO_FORK
 	if (!exitcodes.empty()) {
-		int status = exitcodes.top();
+		std::pair<int, int> ec = exitcodes.top();
 		exitcodes.pop();
-		write16(BX + 2, 1);
+		int status = ec.second;
+		write16(BX + 2, ec.first);
 		write16(BX + 4, status << 8);
 		if (trace) fprintf(stderr, " => %d>\n", status);
 	} else {
@@ -336,7 +337,11 @@ void VM::_lseek() { // 19
 
 void VM::_getpid() { // 20
 	if (trace) fprintf(stderr, "()");
+#ifdef NO_FORK
+	int result = pid;
+#else
 	int result = getpid();
+#endif
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (trace) fprintf(stderr, " => %d>\n", result);
 }

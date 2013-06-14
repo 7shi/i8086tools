@@ -8,6 +8,8 @@ bool ptable[256];
 int trace;
 int exitcode;
 
+static int pid_max;
+
 const char *header = " AX   CX   DX   BX   SP   BP   SI   DI  FLAGS IP\n";
 
 void VM::debug(uint16_t ip, const OpCode &op) {
@@ -51,6 +53,7 @@ void VM::init() {
 	text = new uint8_t[0x10000];
 	hasExited = false;
 	memset(sigacts, 0, sizeof(sigacts));
+	pid = ++pid_max;
 }
 
 VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0) {

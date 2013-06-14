@@ -37,6 +37,7 @@ private:
 	uint16_t start_sp;
 	bool hasExited;
 	std::list<int> handles;
+	int pid;
 
 private:
 	void init();
