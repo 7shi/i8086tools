@@ -183,12 +183,13 @@ void VM::_read() { // 3
 	int fd = read16(BX + 4);
 	int buf = read16(BX + 10);
 	int len = read16(BX + 6);
-	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)\n", fd, buf, len);
+	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)", fd, buf, len);
 	int max = 0x10000 - buf;
 	if (len > max) len = max;
 	int result = read(fd, data + buf, len);
 	//fprintf(stderr, "result = %d\n", result);
 	write16(BX + 2, result == -1 ? -errno : result);
+	if (trace) fprintf(stderr, " => %d\n", result);
 }
 
 void VM::_write() { // 4
@@ -206,7 +207,7 @@ void VM::_write() { // 4
 void VM::_open() { // 5
 	int flag = read16(BX + 6);
 	const char *path = (const char *)(data + read16(BX + (flag & 64 ? 10 : 8)));
-	if (trace) fprintf(stderr, "(\"%s\", %d)\n", path, flag);
+	if (trace) fprintf(stderr, "(\"%s\", %d)", path, flag);
 	std::string path2 = convpath(path);
 #if WIN32
 	flag |= O_BINARY;
@@ -217,38 +218,44 @@ void VM::_open() { // 5
 		fd2name[result] = path2;
 		handles.push_back(result);
 	}
+	if (trace) fprintf(stderr, " => %d\n", result);
 }
 
 void VM::_close() { // 6
 	int fd = read16(BX + 4);
-	if (trace) fprintf(stderr, "(%d)\n", fd);
+	if (trace) fprintf(stderr, "(%d)", fd);
 	int result = fileClose(this, fd);
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (result == -1) handles.remove(result);
+	if (trace) fprintf(stderr, " => %d\n", result);
 }
 
 void VM::_wait() { // 7
-	if (trace) fprintf(stderr, "()\n");
+	if (trace) fprintf(stderr, "()");
 #ifdef NO_FORK
 	if (!exitcodes.empty()) {
-		write16(BX + 2, 1);
-		write16(BX + 4, exitcodes.top() << 8);
+		int status = exitcodes.top();
 		exitcodes.pop();
+		write16(BX + 2, 1);
+		write16(BX + 4, status << 8);
+		if (trace) fprintf(stderr, " => 0x%04x\n", status);
 	} else {
 		write16(BX + 2, -EINVAL);
+		if (trace) fprintf(stderr, " => EINVAL\n");
 	}
 #else
 	int status;
 	int result = wait(&status);
 	write16(BX + 2, result == -1 ? -errno : result);
 	write16(BX + 4, status);
+	if (trace) fprintf(stderr, " => 0x%04x\n", status);
 #endif
 }
 
 void VM::_creat() { // 8
 	const char *path = (const char *)(data + read16(BX + 8));
 	int mode = read16(BX + 6);
-	if (trace) fprintf(stderr, "(\"%s\", 0%03o)\n", path, mode);
+	if (trace) fprintf(stderr, "(\"%s\", 0%03o)", path, mode);
 	std::string path2 = convpath(path);
 	int result = creat(path2.c_str(), mode);
 	write16(BX + 2, result == -1 ? -errno : result);
@@ -256,11 +263,12 @@ void VM::_creat() { // 8
 		fd2name[result] = path2;
 		handles.push_back(result);
 	}
+	if (trace) fprintf(stderr, " => %d\n", result);
 }
 
 void VM::_unlink() { // 10
 	const char *path = (const char *)(data + read16(BX + 8));
-	if (trace) fprintf(stderr, "(\"%s\")\n", path);
+	if (trace) fprintf(stderr, "(\"%s\")", path);
 	std::string path2 = convpath(path);
 #ifdef WIN32
 	bool ok = DeleteFileA(path2.c_str());
@@ -276,27 +284,32 @@ void VM::_unlink() { // 10
 		}
 	}
 	write16(BX + 2, -err);
+	if (trace) fprintf(stderr, " => %d\n", -err);
 #else
 	int result = unlink(path2.c_str());
 	write16(BX + 2, result == -1 ? -errno : result);
+	if (trace) fprintf(stderr, " => %d\n", result);
 #endif
 }
 
 void VM::_time() { // 13
-	if (trace) fprintf(stderr, "()\n");
+	if (trace) fprintf(stderr, "()");
 	time_t result = time(NULL);
 	write16(BX + 2, result == -1 ? -errno : 0);
 	write32(BX + 10, result);
+	if (trace) fprintf(stderr, " => %ld\n", result);
 }
 
 void VM::_brk() { // 17
 	int nd = read16(BX + 10);
-	if (trace) fprintf(stderr, "(0x%04x)\n", nd);
+	if (trace) fprintf(stderr, "(0x%04x)", nd);
 	if (nd < (int)dsize || nd >= SP) {
 		write16(BX + 2, -ENOMEM);
+		if (trace) fprintf(stderr, " => ENOMEM\n");
 	} else {
 		write16(BX + 2, 0);
 		write16(BX + 18, nd);
+		if (trace) fprintf(stderr, " => 0\n");
 	}
 }
 
@@ -304,23 +317,26 @@ void VM::_lseek() { // 19
 	int fd = read16(BX + 4);
 	off_t o = read32(BX + 10);
 	int w = read16(BX + 6);
-	if (trace) fprintf(stderr, "(%d, %ld, %d)\n", fd, o, w);
+	if (trace) fprintf(stderr, "(%d, %ld, %d)", fd, o, w);
 	int result = lseek(fd, o, w);
 	write16(BX + 2, result == -1 ? -errno : result);
+	if (trace) fprintf(stderr, " => %d\n", result);
 }
 
 void VM::_getpid() { // 20
-	if (trace) fprintf(stderr, "()\n");
+	if (trace) fprintf(stderr, "()");
 	int result = getpid();
 	write16(BX + 2, result == -1 ? -errno : result);
+	if (trace) fprintf(stderr, " => %d\n", result);
 }
 
 void VM::_access() { // 33
 	const char *path = (const char *)(data + read16(BX + 8));
 	int mode = read16(BX + 6);
-	if (trace) fprintf(stderr, "(\"%s\", 0%03o)\n", path, mode);
+	if (trace) fprintf(stderr, "(\"%s\", 0%03o)", path, mode);
 	int result = access(path, mode);
 	write16(BX + 2, result == -1 ? -errno : result);
+	if (trace) fprintf(stderr, " => %d\n", result);
 }
 
 void VM::_exec() { // 59
