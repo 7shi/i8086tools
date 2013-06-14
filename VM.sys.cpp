@@ -334,7 +334,8 @@ void VM::_access() { // 33
 	const char *path = (const char *)(data + read16(BX + 8));
 	int mode = read16(BX + 6);
 	if (trace) fprintf(stderr, "(\"%s\", 0%03o)", path, mode);
-	int result = access(path, mode);
+	std::string path2 = convpath(path);
+	int result = access(path2.c_str(), mode);
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (trace) fprintf(stderr, " => %d\n", result);
 }
