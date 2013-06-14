@@ -137,25 +137,25 @@ void VM::minix_syscall() {
 		syshandler *sh = &syscalls[type];
 		if (sh->name) {
 			if (trace || !sh->f) {
-				fprintf(stderr, "system call %s", sh->name);
+				fprintf(stderr, "<%s", sh->name);
 			}
 			if (sh->f) {
 				(this->*sh->f)();
 				AX = 0;
 			} else {
-				fprintf(stderr, ": not implemented\n");
+				fprintf(stderr, ": not implemented>\n");
 				hasExited = true;
 			}
 			return;
 		}
 	}
-	fprintf(stderr, "system call %d: unknown\n", type);
+	fprintf(stderr, "<%d: unknown syscall>\n", type);
 	hasExited = true;
 }
 
 void VM::_exit() { // 1
 	exitcode = read16(BX + 4);
-	if (trace) fprintf(stderr, "(%d)\n", exitcode);
+	if (trace) fprintf(stderr, "(%d)>\n", exitcode);
 #ifdef NO_FORK
 	exitcodes.push(exitcode);
 #endif
@@ -166,7 +166,7 @@ void VM::_exit() { // 1
 }
 
 void VM::_fork() { // 2
-	if (trace) fprintf(stderr, "()\n");
+	if (trace) fprintf(stderr, "()>\n");
 #ifdef NO_FORK
 	VM vm = *this;
 	vm.write16(BX + 2, 0);
@@ -187,16 +187,15 @@ void VM::_read() { // 3
 	int max = 0x10000 - buf;
 	if (len > max) len = max;
 	int result = read(fd, data + buf, len);
-	//fprintf(stderr, "result = %d\n", result);
 	write16(BX + 2, result == -1 ? -errno : result);
-	if (trace) fprintf(stderr, " => %d\n", result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 
 void VM::_write() { // 4
 	int fd = read16(BX + 4);
 	int buf = read16(BX + 10);
 	int len = read16(BX + 6);
-	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)\n", fd, buf, len);
+	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)>\n", fd, buf, len);
 	int max = 0x10000 - buf;
 	if (len > max) len = max;
 	if (trace && fd < 3) { fflush(stdout); fflush(stderr); }
@@ -218,7 +217,7 @@ void VM::_open() { // 5
 		fd2name[result] = path2;
 		handles.push_back(result);
 	}
-	if (trace) fprintf(stderr, " => %d\n", result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 
 void VM::_close() { // 6
@@ -227,7 +226,7 @@ void VM::_close() { // 6
 	int result = fileClose(this, fd);
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (result == -1) handles.remove(result);
-	if (trace) fprintf(stderr, " => %d\n", result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 
 void VM::_wait() { // 7
@@ -238,17 +237,17 @@ void VM::_wait() { // 7
 		exitcodes.pop();
 		write16(BX + 2, 1);
 		write16(BX + 4, status << 8);
-		if (trace) fprintf(stderr, " => 0x%04x\n", status);
+		if (trace) fprintf(stderr, " => 0x%04x>\n", status);
 	} else {
 		write16(BX + 2, -EINVAL);
-		if (trace) fprintf(stderr, " => EINVAL\n");
+		if (trace) fprintf(stderr, " => EINVAL>\n");
 	}
 #else
 	int status;
 	int result = wait(&status);
 	write16(BX + 2, result == -1 ? -errno : result);
 	write16(BX + 4, status);
-	if (trace) fprintf(stderr, " => 0x%04x\n", status);
+	if (trace) fprintf(stderr, " => 0x%04x>\n", status);
 #endif
 }
 
@@ -263,7 +262,7 @@ void VM::_creat() { // 8
 		fd2name[result] = path2;
 		handles.push_back(result);
 	}
-	if (trace) fprintf(stderr, " => %d\n", result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 
 void VM::_unlink() { // 10
@@ -273,13 +272,13 @@ void VM::_unlink() { // 10
 #ifdef WIN32
 	bool ok = DeleteFileA(path2.c_str());
 	int err = ok ? 0 : GetLastError();
-	if (trace) fprintf(stderr, " => %d\n", -err);
+	if (trace) fprintf(stderr, " => %d>\n", -err);
 	if (!ok) {
 		if (trace) showError(err);
 		struct stat st;
 		if (stat(path2.c_str(), &st) != -1) {
 			if (trace) {
-				fprintf(stderr, "register delayed: %s\n", path2.c_str());
+				fprintf(stderr, "<register delayed: %s>\n", path2.c_str());
 			}
 			unlinks.push_back(path2);
 		}
@@ -288,7 +287,7 @@ void VM::_unlink() { // 10
 #else
 	int result = unlink(path2.c_str());
 	write16(BX + 2, result == -1 ? -errno : result);
-	if (trace) fprintf(stderr, " => %d\n", result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
 #endif
 }
 
@@ -297,7 +296,7 @@ void VM::_time() { // 13
 	time_t result = time(NULL);
 	write16(BX + 2, result == -1 ? -errno : 0);
 	write32(BX + 10, result);
-	if (trace) fprintf(stderr, " => %ld\n", result);
+	if (trace) fprintf(stderr, " => %ld>\n", result);
 }
 
 void VM::_brk() { // 17
@@ -305,11 +304,11 @@ void VM::_brk() { // 17
 	if (trace) fprintf(stderr, "(0x%04x)", nd);
 	if (nd < (int)dsize || nd >= SP) {
 		write16(BX + 2, -ENOMEM);
-		if (trace) fprintf(stderr, " => ENOMEM\n");
+		if (trace) fprintf(stderr, " => ENOMEM>\n");
 	} else {
 		write16(BX + 2, 0);
 		write16(BX + 18, nd);
-		if (trace) fprintf(stderr, " => 0\n");
+		if (trace) fprintf(stderr, " => 0>\n");
 	}
 }
 
@@ -320,14 +319,14 @@ void VM::_lseek() { // 19
 	if (trace) fprintf(stderr, "(%d, %ld, %d)", fd, o, w);
 	int result = lseek(fd, o, w);
 	write16(BX + 2, result == -1 ? -errno : result);
-	if (trace) fprintf(stderr, " => %d\n", result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 
 void VM::_getpid() { // 20
 	if (trace) fprintf(stderr, "()");
 	int result = getpid();
 	write16(BX + 2, result == -1 ? -errno : result);
-	if (trace) fprintf(stderr, " => %d\n", result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 
 void VM::_access() { // 33
@@ -337,7 +336,7 @@ void VM::_access() { // 33
 	std::string path2 = convpath(path);
 	int result = access(path2.c_str(), mode);
 	write16(BX + 2, result == -1 ? -errno : result);
-	if (trace) fprintf(stderr, " => %d\n", result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 
 void VM::_exec() { // 59
@@ -345,7 +344,7 @@ void VM::_exec() { // 59
 	int fsize = read16(BX + 6);
 	int frame = read16(BX + 12);
 #if 0
-	if (trace) fprintf(stderr, "(\"%s\", %d, 0x%04x)\n", path, fsize, frame);
+	if (trace) fprintf(stderr, "(\"%s\", %d, 0x%04x)>\n", path, fsize, frame);
 	FILE *f = fopen("core", "wb");
 	fwrite(data, 1, 0x10000, f);
 	fclose(f);
@@ -356,7 +355,7 @@ void VM::_exec() { // 59
 		for (int i = 2; i <= argc; i++) {
 			fprintf(stderr, ", \"%s\"", data + frame + read16(frame + i * 2));
 		}
-		fprintf(stderr, ")\n");
+		fprintf(stderr, ")>\n");
 	}
 	uint8_t *t = text, *d = data;
 	text = new uint8_t[0x10000];
