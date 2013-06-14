@@ -63,6 +63,7 @@ VM::VM(const VM &vm) {
 		memcpy(data, vm.data, 0x10000);
 	}
 	tsize = vm.tsize;
+	dsize = vm.dsize;
 	start_sp = vm.start_sp;
 	OF = vm.OF;
 	DF = vm.DF;
