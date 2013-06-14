@@ -11,7 +11,7 @@ void VM::run1(uint8_t prefix) {
 	}
 	int opr1 = op.opr1.value, opr2 = op.opr2.value;
 	std::string hex = hexdump(text + ip, op.len);
-	if (trace == 2 && !prefix) debug(op);
+	if (trace == 2 && !prefix) debug(ip, op);
 	uint8_t b = text[ip];
 	uint16_t oldip = ip;
 	int dst, src, val;
@@ -936,7 +936,7 @@ void VM::run1(uint8_t prefix) {
 	}
 	if (trace != 2 && !prefix) {
 		fprintf(stderr, header);
-		debug(op);
+		debug(oldip, op);
 	}
 	fprintf(stderr, "not implemented\n");
 	hasExited = true;
