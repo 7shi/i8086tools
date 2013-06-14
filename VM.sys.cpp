@@ -105,7 +105,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ NULL         , NULL              }, // 51
 	{ NULL         , NULL              }, // 52
 	{ NULL         , NULL              }, // 53
-	{ "ioctl"      , NULL              }, // 54
+	{ "ioctl"      , &VM::_ioctl       }, // 54
 	{ "fcntl"      , NULL              }, // 55
 	{ NULL         , NULL              }, // 56
 	{ NULL         , NULL              }, // 57
@@ -337,6 +337,14 @@ void VM::_access() { // 33
 	int result = access(path2.c_str(), mode);
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (trace) fprintf(stderr, " => %d>\n", result);
+}
+
+void VM::_ioctl() { // 54
+	int fd = read16(BX +  4);
+	int rq = read16(BX +  8);
+	int d  = read16(BX + 18);
+	if (trace) fprintf(stderr, "(%d, 0x%04x, 0x%04x)>\n", fd, rq, d);
+	write16(BX + 2, -EINVAL);
 }
 
 void VM::_exec() { // 59

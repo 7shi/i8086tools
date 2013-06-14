@@ -117,6 +117,7 @@ private:
 	void _getpid   (); // 20
 	void _access   (); // 33
 	void _signal   (); // 48
+	void _ioctl    (); // 54
 	void _exec     (); // 59
 	void _sigaction(); // 71
 
