@@ -272,9 +272,10 @@ void VM::_unlink() { // 10
 	std::string path2 = convpath(path);
 #ifdef WIN32
 	bool ok = DeleteFileA(path2.c_str());
-	int err = 0;
+	int err = ok ? 0 : GetLastError();
+	if (trace) fprintf(stderr, " => %d\n", -err);
 	if (!ok) {
-		if (trace) showError(err = GetLastError());
+		if (trace) showError(err);
 		struct stat st;
 		if (stat(path2.c_str(), &st) != -1) {
 			if (trace) {
@@ -284,7 +285,6 @@ void VM::_unlink() { // 10
 		}
 	}
 	write16(BX + 2, -err);
-	if (trace) fprintf(stderr, " => %d\n", -err);
 #else
 	int result = unlink(path2.c_str());
 	write16(BX + 2, result == -1 ? -errno : result);
