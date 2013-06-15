@@ -375,15 +375,15 @@ void VM::run1(uint8_t prefix) {
 		switch ((text[oldip + 1] >> 3) & 7) {
 		case 0: // add
 			val = int16_t(dst = get16(op.opr1)) + int8_t(opr2);
-			set16(op.opr1, setf16(val, dst > uint8_t(val)));
+			set16(op.opr1, setf16(val, dst > uint16_t(val)));
 			return;
 		case 2: // adc
 			val = int16_t(dst = get16(op.opr1)) + int8_t(opr2) + int(CF);
-			set16(op.opr1, setf16(val, dst > uint8_t(val)));
+			set16(op.opr1, setf16(val, dst > uint16_t(val)));
 			return;
 		case 3: // sbb
 			val = int8_t(dst = get8(op.opr1)) - int8_t(src = opr2 + int(CF));
-			set8(op.opr1, setf8(val, dst < uint8_t(src)));
+			set8(op.opr1, setf8(val, dst < uint16_t(src)));
 			return;
 		case 5: // sub
 			val = int16_t(dst = get16(op.opr1)) - int8_t(src = opr2);
