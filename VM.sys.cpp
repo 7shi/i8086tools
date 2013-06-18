@@ -16,7 +16,6 @@
 #ifdef NO_FORK
 static std::stack<std::pair<int, int> > exitcodes;
 #endif
-std::map<int, std::string> fd2name;
 
 #ifdef WIN32
 std::list<std::string> unlinks;
@@ -26,28 +25,31 @@ static void showError(int err) {
 }
 #endif
 
-static int fileClose(VM *vm, int fd) {
-	int ret = close(fd);
-	std::map<int, std::string>::iterator it = fd2name.find(fd);
-	if (it != fd2name.end())
-	{
-		std::string path = it->second;
-		fd2name.erase(it);
+int VM::close(int fd) {
+	if (fd < 0 || fd >= (int)files.size()) return -1;
+
+	FileBase *f = files[fd];
+	if (!f) return -1;
+
+	files[fd] = NULL;
+	if (--f->count) return 0;
+
+	std::string path = f->path;
+	delete f;
+
 #ifdef WIN32
-		std::list<std::string>::iterator it2 =
-			std::find(unlinks.begin(), unlinks.end(), path);
-		if (it2 != unlinks.end())
-		{
-			if (trace)
-				fprintf(stderr, "delayed unlink: %s\n", path.c_str());
-			if (DeleteFileA(path.c_str()))
-				unlinks.erase(it2);
-			else if (trace)
-				showError(GetLastError());
-		}
-#endif
+	std::list<std::string>::iterator it2 =
+		std::find(unlinks.begin(), unlinks.end(), path);
+	if (it2 != unlinks.end()) {
+		if (trace)
+			fprintf(stderr, "delayed unlink: %s\n", path.c_str());
+		if (DeleteFileA(path.c_str()))
+			unlinks.erase(it2);
+		else if (trace)
+			showError(GetLastError());
 	}
-	return ret;
+#endif
+	return 0;
 }
 
 VM::syshandler VM::syscalls[nsyscalls] = {
@@ -160,9 +162,6 @@ void VM::_exit() { // 1
 	exitcodes.push(std::pair<int, int>(pid, exitcode));
 #endif
 	hasExited = true;
-	for (std::list<int>::iterator it = handles.begin(); it != handles.end(); ++it)
-		fileClose(this, *it);
-	handles.clear();
 }
 
 void VM::_fork() { // 2
@@ -186,7 +185,11 @@ void VM::_read() { // 3
 	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)", fd, buf, len);
 	int max = 0x10000 - buf;
 	if (len > max) len = max;
-	int result = read(fd, data + buf, len);
+	int result = -1;
+	if (0 <= fd && fd < (int)files.size()) {
+		FileBase *f = files[fd];
+		if (f) result = f->read(data + buf, len);
+	}
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (trace) fprintf(stderr, " => %d>\n", result);
 }
@@ -198,15 +201,21 @@ void VM::_write() { // 4
 	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)>\n", fd, buf, len);
 	int max = 0x10000 - buf;
 	if (len > max) len = max;
-	if (trace && fd < 3) { fflush(stdout); fflush(stderr); }
-	int result = write(fd, data + buf, len);
+	int result = -1;
+	if (0 <= fd && fd < (int)files.size()) {
+		FileBase *f = files[fd];
+		if (f) {
+			if (trace && f->fd < 3) { fflush(stdout); fflush(stderr); }
+			result = f->write(data + buf, len);
+		}
+	}
 	write16(BX + 2, result == -1 ? -errno : result);
 }
 
 void VM::_open() { // 5
 	int flag = read16(BX + 6);
 	const char *path;
-	mode_t mode;
+	mode_t mode = 0;
 	if (flag & 64 /*O_CREAT*/) {
 		path = (const char *)(data + read16(BX + 10));
 		mode = read16(BX + 8);
@@ -216,24 +225,16 @@ void VM::_open() { // 5
 		if (trace) fprintf(stderr, "(\"%s\", %d)", path, flag);
 	}
 	std::string path2 = convpath(path);
-#ifdef WIN32
-	flag |= O_BINARY;
-#endif
-	int result = open(path2.c_str(), flag, mode);
+	int result = open(path2, flag, mode);
 	write16(BX + 2, result == -1 ? -errno : result);
-	if (result != -1) {
-		fd2name[result] = path2;
-		handles.push_back(result);
-	}
 	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 
 void VM::_close() { // 6
 	int fd = read16(BX + 4);
 	if (trace) fprintf(stderr, "(%d)", fd);
-	int result = fileClose(this, fd);
+	int result = close(fd);
 	write16(BX + 2, result == -1 ? -errno : result);
-	if (result == -1) handles.remove(result);
 	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 
@@ -266,15 +267,11 @@ void VM::_creat() { // 8
 	if (trace) fprintf(stderr, "(\"%s\", 0%03o)", path, mode);
 	std::string path2 = convpath(path);
 #ifdef WIN32
-	int result = open(path2.c_str(), O_CREAT | O_TRUNC | O_WRONLY | O_BINARY, 0777);
+	int result = open(path2, O_CREAT | O_TRUNC | O_WRONLY | O_BINARY, 0777);
 #else
-	int result = creat(path2.c_str(), mode);
+	int result = open(path2, O_CREAT | O_TRUNC | O_WRONLY, mode);
 #endif
 	write16(BX + 2, result == -1 ? -errno : result);
-	if (result != -1) {
-		fd2name[result] = path2;
-		handles.push_back(result);
-	}
 	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 

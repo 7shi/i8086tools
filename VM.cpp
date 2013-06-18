@@ -2,6 +2,7 @@
 #include "disasm.h"
 #include <stdio.h>
 #include <string.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 
 bool ptable[256];
@@ -61,6 +62,9 @@ VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0) {
 	memset(text, 0, 0x10000);
 	memset(r, 0, sizeof(r));
 	OF = DF = SF = ZF = PF = CF = false;
+	files.push_back(new File(0, "stdin"));
+	files.push_back(new File(1, "stdout"));
+	files.push_back(new File(2, "stderr"));
 }
 
 VM::VM(const VM &vm) {
@@ -84,11 +88,19 @@ VM::VM(const VM &vm) {
 	PF = vm.PF;
 	CF = vm.CF;
 	start_sp = vm.start_sp;
+	files = vm.files;
+	for (int i = 0; i < (int)files.size(); i++) {
+		FileBase *f = files[i];
+		if (f) ++f->count;
+	}
 }
 
 VM::~VM() {
 	if (data != text) delete[] data;
 	delete[] text;
+	for (int i = 0; i <= (int)files.size(); i++) {
+		close(i);
+	}
 }
 
 int VM::addr(const Operand &opr) {
@@ -226,4 +238,27 @@ bool VM::load(const std::string &fn) {
 
 void VM::disasm() {
 	::disasm(text, tsize);
+}
+
+int VM::getfd() {
+	int len = files.size();
+	for (int i = 0; i < len; i++) {
+		if (!files[i]) return i;
+	}
+	files.push_back(NULL);
+	return len;
+}
+
+int VM::open(const std::string &path, int flag, int mode) {
+#ifdef WIN32
+	flag |= O_BINARY;
+#endif
+	File *f = new File(path, flag, mode);
+	if (f->fd == -1) {
+		delete f;
+		return -1;
+	}
+	int fd = getfd();
+	files[fd] = f;
+	return fd;
 }

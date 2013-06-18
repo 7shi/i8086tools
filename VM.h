@@ -1,6 +1,7 @@
 #pragma once
 #include "utils.h"
 #include "OpCode.h"
+#include "File.h"
 #include <vector>
 #include <list>
 
@@ -36,8 +37,8 @@ private:
 	bool OF, DF, SF, ZF, PF, CF;
 	uint16_t start_sp;
 	bool hasExited;
-	std::list<int> handles;
 	int pid;
+	std::vector<FileBase *> files;
 
 private:
 	void init();
@@ -94,6 +95,9 @@ private:
 	void set8(const Operand &opr, uint8_t value);
 	void set16(const Operand &opr, uint16_t value);
 	void run1(uint8_t prefix = 0);
+	int getfd();
+	int open(const std::string &path, int flag, int mode);
+	int close(int fd);
 
 	struct syshandler {
 		const char *name;
