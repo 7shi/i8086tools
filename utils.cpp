@@ -51,11 +51,6 @@ std::string convpath(const std::string &path) {
 			struct stat st;
 			if (!stat(path2.c_str(), &st)) return path2;
 		}
-		if (startsWith(path, "/usr/")) {
-			std::string path3 = rootpath + path.substr(4);
-			struct stat st;
-			if (!stat(path3.c_str(), &st)) return path3;
-		}
 	}
 	return path;
 }
