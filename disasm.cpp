@@ -180,9 +180,9 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
 		return op;
 	}
 	case 0x84:
-	case 0x85: return regrm(mem, "test", true, b & 1);
+	case 0x85: return regrm(mem, "test", false, b & 1);
 	case 0x86:
-	case 0x87: return regrm(mem, "xchg", true, b & 1);
+	case 0x87: return regrm(mem, "xchg", false, b & 1);
 	case 0x88:
 	case 0x89:
 	case 0x8a:
