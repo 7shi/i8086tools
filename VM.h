@@ -100,6 +100,7 @@ private:
 	int open(const std::string &path, int flag, int mode);
 	int close(int fd);
 	FileBase *file(int fd);
+	void setstat(uint16_t addr, struct stat *st);
 
 	struct syshandler {
 		const char *name;
@@ -122,6 +123,7 @@ private:
 	void _time     (); // 13
 	void _chmod    (); // 15
 	void _brk      (); // 17
+	void _stat     (); // 18
 	void _lseek    (); // 19
 	void _getpid   (); // 20
 	void _fstat    (); // 28

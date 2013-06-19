@@ -58,6 +58,20 @@ static int convpid(int pid) {
 #endif
 }
 
+void VM::setstat(uint16_t addr, struct stat *st) {
+	write16(addr     , st->st_dev);
+	write16(addr +  2, st->st_ino);
+	write16(addr +  4, st->st_mode);
+	write16(addr +  6, st->st_nlink);
+	write16(addr +  8, st->st_uid);
+	write16(addr + 10, st->st_gid);
+	write16(addr + 12, st->st_rdev);
+	write32(addr + 14, st->st_size);
+	write32(addr + 18, st->st_atime);
+	write32(addr + 22, st->st_mtime);
+	write32(addr + 26, st->st_ctime);
+}
+
 VM::syshandler VM::syscalls[nsyscalls] = {
 	{ NULL         , NULL              }, //  0
 	{ "exit"       , &VM::_exit        }, //  1
@@ -77,7 +91,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "chmod"      , &VM::_chmod       }, // 15
 	{ "chown"      , NULL              }, // 16
 	{ "brk"        , &VM::_brk         }, // 17
-	{ "stat"       , NULL              }, // 18
+	{ "stat"       , &VM::_stat        }, // 18
 	{ "lseek"      , &VM::_lseek       }, // 19
 	{ "getpid"     , &VM::_getpid      }, // 20
 	{ "mount"      , NULL              }, // 21
@@ -351,6 +365,19 @@ void VM::_brk() { // 17
 	}
 }
 
+void VM::_stat() { // 18
+	const char *path = (const char *)(data + read16(BX + 10));
+	int p = read16(BX + 12);
+	if (trace) fprintf(stderr, "(\"%s\", 0x%04x)", path, p);
+	struct stat st;
+	int result;
+	if (!(result = stat(path, &st))) {
+		setstat(p, &st);
+	}
+	write16(BX + 2, result == -1 ? -errno : 0);
+	if (trace) fprintf(stderr, " => %d>\n", result);
+}
+
 void VM::_lseek() { // 19
 	int fd = read16(BX + 4);
 	off_t o = read32(BX + 10);
@@ -381,17 +408,7 @@ void VM::_fstat() { // 28
 	FileBase *f = file(fd);
 	int result = -1;
 	if (f && f->fd > 2 && !(result = fstat(f->fd, &st))) {
-		write16(p     , st.st_dev);
-		write16(p +  2, st.st_ino);
-		write16(p +  4, st.st_mode);
-		write16(p +  6, st.st_nlink);
-		write16(p +  8, st.st_uid);
-		write16(p + 10, st.st_gid);
-		write16(p + 12, st.st_rdev);
-		write32(p + 14, st.st_size);
-		write32(p + 18, st.st_atime);
-		write32(p + 22, st.st_mtime);
-		write32(p + 26, st.st_ctime);
+		setstat(p, &st);
 	}
 	write16(BX + 2, result == -1 ? -errno : 0);
 	if (trace) fprintf(stderr, " => %d>\n", result);
