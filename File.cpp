@@ -22,6 +22,6 @@ int File::write(void *buf, int len) {
 	return ::write(fd, buf, len);
 }
 
-int File::lseek(off_t o, int w) {
+off_t File::lseek(off_t o, int w) {
 	return ::lseek(fd, o, w);
 }

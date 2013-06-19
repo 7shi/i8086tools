@@ -12,7 +12,7 @@ struct FileBase {
 
 	virtual int read(void *buf, int len) = 0;
 	virtual int write(void *buf, int len) = 0;
-	virtual int lseek(off_t o, int w) = 0;
+	virtual off_t lseek(off_t o, int w) = 0;
 };
 
 struct File: public FileBase {
@@ -22,5 +22,5 @@ struct File: public FileBase {
 
 	virtual int read(void *buf, int len);
 	virtual int write(void *buf, int len);
-	virtual int lseek(off_t o, int w);
+	virtual off_t lseek(off_t o, int w);
 };
