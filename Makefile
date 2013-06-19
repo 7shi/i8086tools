@@ -1,7 +1,7 @@
 TARGET   = i8086tools
 TEST     = test.bin
 CXX      = g++
-CXXFLAGS = -Wall -g #-O2
+CXXFLAGS = -Wall -g -O2
 LDFLAGS  =
 OBJECTS  = $(SOURCES:%.cpp=%.o)
 SOURCES  = main.cpp utils.cpp disasm.cpp \
