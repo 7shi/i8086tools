@@ -76,7 +76,7 @@ private:
 		return ::read16(data + addr);
 	}
 
-	inline uint16_t read32(uint16_t addr) {
+	inline uint32_t read32(uint16_t addr) {
 		return ::read32(data + addr);
 	}
 
