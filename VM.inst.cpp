@@ -3,7 +3,16 @@
 #include <stdio.h>
 
 void VM::run1(uint8_t prefix) {
-	OpCode op = disasm1(text + ip, ip, tsize);
+	OpCode op;
+	if (cache.empty()) {
+		op = disasm1(text + ip, ip, tsize);
+	} else {
+		if (cache[ip].len > 0) {
+			op = cache[ip];
+		} else {
+			cache[ip] = op = disasm1(text + ip, ip, tsize);
+		}
+	}
 	if (ip + op.len > tsize) {
 		fprintf(stderr, "overrun\n");
 		hasExited = true;

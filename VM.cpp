@@ -93,6 +93,7 @@ VM::VM(const VM &vm) {
 		FileBase *f = files[i];
 		if (f) ++f->count;
 	}
+	cache = vm.cache;
 }
 
 VM::~VM() {
@@ -209,11 +210,14 @@ bool VM::load(const std::string &fn) {
 			dsize = ::read32(h + 12);
 			ip = ::read32(h + 20);
 			if (h[2] & 0x20) {
+				cache.clear();
+				cache.resize(0x10000);
 				data = new uint8_t[0x10000];
 				memset(data, 0, 0x10000);
 				fread(text, 1, tsize, f);
 				fread(data, 1, dsize, f);
 			} else {
+				cache.clear();
 				data = text;
 				dsize += tsize;
 				fread(text, 1, dsize, f);
@@ -229,6 +233,7 @@ bool VM::load(const std::string &fn) {
 			fclose(f);
 			return false;
 		}
+		cache.clear();
 		data = text;
 		fread(text, 1, tsize, f);
 	}

@@ -39,6 +39,7 @@ private:
 	bool hasExited;
 	int pid;
 	std::vector<FileBase *> files;
+	std::vector<OpCode> cache;
 
 private:
 	void init();
