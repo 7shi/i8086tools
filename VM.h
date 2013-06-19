@@ -99,6 +99,7 @@ private:
 	int getfd();
 	int open(const std::string &path, int flag, int mode);
 	int close(int fd);
+	FileBase *file(int fd);
 
 	struct syshandler {
 		const char *name;

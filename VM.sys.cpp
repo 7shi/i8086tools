@@ -26,9 +26,7 @@ static void showError(int err) {
 #endif
 
 int VM::close(int fd) {
-	if (fd < 0 || fd >= (int)files.size()) return -1;
-
-	FileBase *f = files[fd];
+	FileBase *f = file(fd);
 	if (!f) return -1;
 
 	files[fd] = NULL;
@@ -185,11 +183,8 @@ void VM::_read() { // 3
 	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)", fd, buf, len);
 	int max = 0x10000 - buf;
 	if (len > max) len = max;
-	int result = -1;
-	if (0 <= fd && fd < (int)files.size()) {
-		FileBase *f = files[fd];
-		if (f) result = f->read(data + buf, len);
-	}
+	FileBase *f = file(fd);
+	int result = f ? f->read(data + buf, len) : -1;
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (trace) fprintf(stderr, " => %d>\n", result);
 }
@@ -201,13 +196,11 @@ void VM::_write() { // 4
 	if (trace) fprintf(stderr, "(%d, 0x%04x, %d)>\n", fd, buf, len);
 	int max = 0x10000 - buf;
 	if (len > max) len = max;
+	FileBase *f = file(fd);
 	int result = -1;
-	if (0 <= fd && fd < (int)files.size()) {
-		FileBase *f = files[fd];
-		if (f) {
-			if (trace && f->fd < 3) { fflush(stdout); fflush(stderr); }
-			result = f->write(data + buf, len);
-		}
+	if (f) {
+		if (trace && f->fd < 3) { fflush(stdout); fflush(stderr); }
+		result = f->write(data + buf, len);
 	}
 	write16(BX + 2, result == -1 ? -errno : result);
 }
@@ -336,13 +329,11 @@ void VM::_lseek() { // 19
 	off_t o = read32(BX + 10);
 	int w = read16(BX + 6);
 	if (trace) fprintf(stderr, "(%d, %ld, %d)", fd, o, w);
+	FileBase *f = file(fd);
 	off_t result = -1;
-	if (0 <= fd && fd < (int)files.size()) {
-		FileBase *f = files[fd];
-		if (f) {
-			result = f->lseek(o, w);
-			if (result != -1) write32(BX + 10, result);
-		}
+	if (f) {
+		result = f->lseek(o, w);
+		if (result != -1) write32(BX + 10, result);
 	}
 	write16(BX + 2, result == -1 ? -errno : 0);
 	if (trace) fprintf(stderr, " => %ld>\n", result);
@@ -364,22 +355,20 @@ void VM::_fstat() { // 28
 	int p  = read16(BX + 10);
 	if (trace) fprintf(stderr, "(%d, 0x%04x)", fd, p);
 	struct stat st;
+	FileBase *f = file(fd);
 	int result = -1;
-	if (0 <= fd && fd < (int)files.size()) {
-		FileBase *f = files[fd];
-		if (f && f->fd > 2 && !(result = fstat(f->fd, &st))) {
-			write16(p     , st.st_dev);
-			write16(p +  2, st.st_ino);
-			write16(p +  4, st.st_mode);
-			write16(p +  6, st.st_nlink);
-			write16(p +  8, st.st_uid);
-			write16(p + 10, st.st_gid);
-			write16(p + 12, st.st_rdev);
-			write32(p + 14, st.st_size);
-			write32(p + 18, st.st_atime);
-			write32(p + 22, st.st_mtime);
-			write32(p + 26, st.st_ctime);
-		}
+	if (f && f->fd > 2 && !(result = fstat(f->fd, &st))) {
+		write16(p     , st.st_dev);
+		write16(p +  2, st.st_ino);
+		write16(p +  4, st.st_mode);
+		write16(p +  6, st.st_nlink);
+		write16(p +  8, st.st_uid);
+		write16(p + 10, st.st_gid);
+		write16(p + 12, st.st_rdev);
+		write32(p + 14, st.st_size);
+		write32(p + 18, st.st_atime);
+		write32(p + 22, st.st_mtime);
+		write32(p + 26, st.st_ctime);
 	}
 	write16(BX + 2, result == -1 ? -errno : 0);
 	if (trace) fprintf(stderr, " => %d>\n", result);

@@ -267,3 +267,11 @@ int VM::open(const std::string &path, int flag, int mode) {
 	files[fd] = f;
 	return fd;
 }
+
+FileBase *VM::file(int fd) {
+	if (fd < 0 || fd >= (int)files.size() || !files[fd]) {
+		errno = 9; // EBADF
+		return NULL;
+	}
+	return files[fd];
+}
