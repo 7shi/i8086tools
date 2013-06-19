@@ -68,7 +68,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "chdir"      , NULL              }, // 12
 	{ "time"       , &VM::_time        }, // 13
 	{ "mknod"      , NULL              }, // 14
-	{ "chmod"      , NULL              }, // 15
+	{ "chmod"      , &VM::_chmod       }, // 15
 	{ "chown"      , NULL              }, // 16
 	{ "brk"        , &VM::_brk         }, // 17
 	{ "stat"       , NULL              }, // 18
@@ -307,6 +307,15 @@ void VM::_time() { // 13
 	write16(BX + 2, result == -1 ? -errno : 0);
 	write32(BX + 10, result);
 	if (trace) fprintf(stderr, " => %ld>\n", result);
+}
+
+void VM::_chmod() { // 15
+	const char *path = (const char *)(data + read16(BX + 8));
+	int mode = read16(BX + 6);
+	if (trace) fprintf(stderr, "(\"%s\", 0%03o)", path, mode);
+	int result = chmod(convpath(path).c_str(), mode);
+	write16(BX + 2, result == -1 ? -errno : result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 
 void VM::_brk() { // 17
