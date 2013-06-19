@@ -8,7 +8,8 @@ OBJECTS  = $(SOURCES:%.cpp=%.o)
 SOURCES  = main.cpp utils.cpp disasm.cpp \
 	   OpCode.cpp Operand.cpp File.cpp \
 	   VM.cpp VM.inst.cpp VM.sys.cpp VM.signal.cpp
-COMMANDS = bin/ar lib/as bin/cc lib/ld bin/nm bin/strip bin/crc
+COMMANDS = bin/ar bin/cc bin/nm bin/strip bin/crc \
+	   lib/as lib/ld lib/cv
 
 all: $(TARGET)
 
