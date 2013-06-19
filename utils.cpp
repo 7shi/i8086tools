@@ -44,6 +44,11 @@ std::string convpath(const std::string &path) {
 #ifdef WIN32
 	if (startsWith(path, "/tmp/"))
 		return getenv("TEMP") + path.substr(4);
+	if (startsWith(path, "/usr/tmp/"))
+		return getenv("TEMP") + path.substr(8);
+#else
+	if (startsWith(path, "/usr/tmp/"))
+		return path.substr(4);
 #endif
 	if (!rootpath.empty()) {
 		if (startsWith(path, "/")) {
