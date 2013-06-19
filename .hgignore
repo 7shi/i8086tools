@@ -2,4 +2,5 @@ syntax: glob
 *.o
 *.exe
 *.bin
+*.out
 *core
