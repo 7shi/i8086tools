@@ -327,13 +327,16 @@ void VM::_lseek() { // 19
 	off_t o = read32(BX + 10);
 	int w = read16(BX + 6);
 	if (trace) fprintf(stderr, "(%d, %ld, %d)", fd, o, w);
-	int result = -1;
+	off_t result = -1;
 	if (0 <= fd && fd < (int)files.size()) {
 		FileBase *f = files[fd];
-		if (f) result = f->lseek(o, w);
+		if (f) {
+			result = f->lseek(o, w);
+			if (result != -1) write32(BX + 10, result);
+		}
 	}
-	write16(BX + 2, result == -1 ? -errno : result);
-	if (trace) fprintf(stderr, " => %d>\n", result);
+	write16(BX + 2, result == -1 ? -errno : 0);
+	if (trace) fprintf(stderr, " => %ld>\n", result);
 }
 
 void VM::_getpid() { // 20
