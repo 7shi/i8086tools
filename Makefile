@@ -1,4 +1,4 @@
-TARGET   = i8086tools
+TARGET   = m2run
 TEST     = test.bin
 CXX      = g++
 CXXFLAGS = -Wall -g -O2
