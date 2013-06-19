@@ -23,6 +23,7 @@ $(TARGET): $(OBJECTS)
 clean:
 	rm -f $(TARGET) $(TARGET).exe $(OBJECTS) *core
 	$(MAKE) $@ -C tests
+	$(MAKE) $@ -C tools
 	$(MAKE) $@ -C Ack-5.5
 
 install: $(TARGET)
