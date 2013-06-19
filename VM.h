@@ -126,6 +126,7 @@ private:
 	void _stat     (); // 18
 	void _lseek    (); // 19
 	void _getpid   (); // 20
+	void _getuid   (); // 24
 	void _fstat    (); // 28
 	void _access   (); // 33
 	void _signal   (); // 48

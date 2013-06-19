@@ -97,7 +97,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "mount"      , NULL              }, // 21
 	{ "umount"     , NULL              }, // 22
 	{ "setuid"     , NULL              }, // 23
-	{ "getuid"     , NULL              }, // 24
+	{ "getuid"     , &VM::_getuid      }, // 24
 	{ "stime"      , NULL              }, // 25
 	{ "ptrace"     , NULL              }, // 26
 	{ "alarm"      , NULL              }, // 27
@@ -396,6 +396,18 @@ void VM::_lseek() { // 19
 void VM::_getpid() { // 20
 	if (trace) fprintf(stderr, "()");
 	int result = convpid(pid);
+	write16(BX + 2, result == -1 ? -errno : result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
+}
+
+void VM::_getuid() { // 24
+	if (trace) fprintf(stderr, "()");
+#ifdef WIN32
+	int result = -1;
+	errno = EINVAL;
+#else
+	int result = getuid();
+#endif
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (trace) fprintf(stderr, " => %d>\n", result);
 }
