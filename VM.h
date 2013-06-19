@@ -117,6 +117,7 @@ private:
 	void _close    (); //  6
 	void _wait     (); //  7
 	void _creat    (); //  8
+	void _link     (); //  9
 	void _unlink   (); // 10
 	void _time     (); // 13
 	void _chmod    (); // 15

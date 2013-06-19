@@ -60,7 +60,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "close"      , &VM::_close       }, //  6
 	{ "wait"       , &VM::_wait        }, //  7
 	{ "creat"      , &VM::_creat       }, //  8
-	{ "link"       , NULL              }, //  9
+	{ "link"       , &VM::_link        }, //  9
 	{ "unlink"     , &VM::_unlink      }, // 10
 	{ "waitpid"    , NULL              }, // 11
 	{ "chdir"      , NULL              }, // 12
@@ -266,6 +266,25 @@ void VM::_creat() { // 8
 #endif
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (trace) fprintf(stderr, " => %d>\n", result);
+}
+
+void VM::_link() { // 9
+	const char *src = (const char *)(data + read16(BX + 10));
+	const char *dst = (const char *)(data + read16(BX + 12));
+	if (trace) fprintf(stderr, "(\"%s\", \"%s\")", src, dst);
+#ifdef WIN32
+	bool ok = CopyFileA(src, dst, TRUE);
+	int err = ok ? 0 : GetLastError();
+	if (trace) {
+		fprintf(stderr, " => %d>\n", -err);
+		if (!ok) showError(err);
+	}
+	write16(BX + 2, -err);
+#else
+	int result = link(convpath(src).c_str(), convpath(dst).c_str());
+	write16(BX + 2, result == -1 ? -errno : result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
+#endif
 }
 
 void VM::_unlink() { // 10
