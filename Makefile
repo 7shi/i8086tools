@@ -1,7 +1,6 @@
 TARGET   = m2run
 PREFIX   = /usr/local
 M2ROOT   = $(PREFIX)/minix2
-TEST     = test.bin
 CXX      = g++
 CXXFLAGS = -Wall -O2 -g
 LDFLAGS  =
@@ -19,14 +18,9 @@ all: $(TARGET)
 $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) $(LDFLAGS)
 
-$(TEST): test.asm
-	nasm -o $@ $<
-
-test: $(TEST) $(TARGET)
-	./$(TARGET) -v $(TEST)
-
 clean:
-	rm -f $(TARGET) $(TARGET).exe $(OBJECTS) *core $(TEST)
+	rm -f $(TARGET) $(TARGET).exe $(OBJECTS) *core
+	$(MAKE) $@ -C tests
 
 install: $(TARGET)
 	mkdir -p $(PREFIX)/bin
