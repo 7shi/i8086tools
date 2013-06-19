@@ -312,7 +312,7 @@ void VM::_time() { // 13
 void VM::_brk() { // 17
 	int nd = read16(BX + 10);
 	if (trace) fprintf(stderr, "(0x%04x)", nd);
-	if (nd < (int)dsize || nd >= SP) {
+	if (nd < (int)dsize || nd >= ((SP - 0x1000) & ~0xfff)) {
 		write16(BX + 2, -ENOMEM);
 		if (trace) fprintf(stderr, " => ENOMEM>\n");
 	} else {
