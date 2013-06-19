@@ -8,6 +8,7 @@ OBJECTS  = $(SOURCES:%.cpp=%.o)
 SOURCES  = main.cpp utils.cpp disasm.cpp \
 	   OpCode.cpp Operand.cpp File.cpp \
 	   VM.cpp VM.inst.cpp VM.sys.cpp VM.signal.cpp
+COMMANDS = bin/ar lib/as bin/cc lib/ld bin/nm bin/strip bin/crc
 
 all: $(TARGET)
 
@@ -25,11 +26,13 @@ clean:
 install: $(TARGET)
 	mkdir -p $(PREFIX)/bin
 	install -cs $(TARGET) $(PREFIX)/bin
-	for cmd in bin/ar lib/as bin/cc lib/ld bin/nm bin/strip; do \
+	for cmd in $(COMMANDS); do \
 	  sh mkwrap.sh $(PREFIX)/bin/$(TARGET) $(M2ROOT) $(PREFIX)/bin/m2 $$cmd; done
 
 uninstall:
-	cd $(PREFIX)/bin && rm -f $(TARGET) $(TARGET).exe v6ar v6as v6cc v6ld v6nm v6strip
+	cd $(PREFIX)/bin && rm -f $(TARGET) $(TARGET).exe
+	for cmd in $(COMMANDS); do \
+		rm -f $(PREFIX)/bin/m2`basename $$cmd`; done
 
 depend:
 	rm -f dependencies
