@@ -81,7 +81,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ "stime"      , NULL              }, // 25
 	{ "ptrace"     , NULL              }, // 26
 	{ "alarm"      , NULL              }, // 27
-	{ "fstat"      , NULL              }, // 28
+	{ "fstat"      , &VM::_fstat       }, // 28
 	{ "pause"      , NULL              }, // 29
 	{ "utime"      , NULL              }, // 30
 	{ NULL         , NULL              }, // 31
@@ -356,6 +356,32 @@ void VM::_getpid() { // 20
 	int result = getpid();
 #endif
 	write16(BX + 2, result == -1 ? -errno : result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
+}
+
+void VM::_fstat() { // 28
+	int fd = read16(BX +  4);
+	int p  = read16(BX + 10);
+	if (trace) fprintf(stderr, "(%d, 0x%04x)", fd, p);
+	struct stat st;
+	int result = -1;
+	if (0 <= fd && fd < (int)files.size()) {
+		FileBase *f = files[fd];
+		if (f && f->fd > 2 && !(result = fstat(f->fd, &st))) {
+			write16(p     , st.st_dev);
+			write16(p +  2, st.st_ino);
+			write16(p +  4, st.st_mode);
+			write16(p +  6, st.st_nlink);
+			write16(p +  8, st.st_uid);
+			write16(p + 10, st.st_gid);
+			write16(p + 12, st.st_rdev);
+			write32(p + 14, st.st_size);
+			write32(p + 18, st.st_atime);
+			write32(p + 22, st.st_mtime);
+			write32(p + 26, st.st_ctime);
+		}
+	}
+	write16(BX + 2, result == -1 ? -errno : 0);
 	if (trace) fprintf(stderr, " => %d>\n", result);
 }
 
