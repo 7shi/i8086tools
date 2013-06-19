@@ -129,6 +129,7 @@ private:
 	void _getuid   (); // 24
 	void _fstat    (); // 28
 	void _access   (); // 33
+	void _getgid   (); // 47
 	void _signal   (); // 48
 	void _ioctl    (); // 54
 	void _exec     (); // 59

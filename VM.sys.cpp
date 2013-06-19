@@ -120,7 +120,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ NULL         , NULL              }, // 44
 	{ NULL         , NULL              }, // 45
 	{ "setgid"     , NULL              }, // 46
-	{ "getgid"     , NULL              }, // 47
+	{ "getgid"     , &VM::_getgid      }, // 47
 	{ "signal"     , &VM::_signal      }, // 48
 	{ NULL         , NULL              }, // 49
 	{ NULL         , NULL              }, // 50
@@ -432,6 +432,18 @@ void VM::_access() { // 33
 	if (trace) fprintf(stderr, "(\"%s\", 0%03o)", path, mode);
 	std::string path2 = convpath(path);
 	int result = access(path2.c_str(), mode);
+	write16(BX + 2, result == -1 ? -errno : result);
+	if (trace) fprintf(stderr, " => %d>\n", result);
+}
+
+void VM::_getgid() { // 47
+	if (trace) fprintf(stderr, "()");
+#ifdef WIN32
+	int result = -1;
+	errno = EINVAL;
+#else
+	int result = getgid();
+#endif
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (trace) fprintf(stderr, " => %d>\n", result);
 }
