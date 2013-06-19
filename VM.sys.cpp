@@ -50,6 +50,14 @@ int VM::close(int fd) {
 	return 0;
 }
 
+static int convpid(int pid) {
+#ifdef NO_FORK
+	return (getpid() + pid) % 30000;
+#else
+	return getpid() % 30000;
+#endif
+}
+
 VM::syshandler VM::syscalls[nsyscalls] = {
 	{ NULL         , NULL              }, //  0
 	{ "exit"       , &VM::_exit        }, //  1
@@ -157,7 +165,7 @@ void VM::_exit() { // 1
 	exitcode = (int16_t)read16(BX + 4);
 	if (trace) fprintf(stderr, "(%d)>\n", exitcode);
 #ifdef NO_FORK
-	exitcodes.push(std::pair<int, int>(pid, exitcode));
+	exitcodes.push(std::pair<int, int>(convpid(pid), exitcode));
 #endif
 	hasExited = true;
 }
@@ -169,10 +177,10 @@ void VM::_fork() { // 2
 	vm.write16(BX + 2, 0);
 	vm.AX = 0;
 	vm.run();
-	write16(BX + 2, vm.pid);
+	write16(BX + 2, convpid(vm.pid));
 #else
 	int result = fork();
-	write16(BX + 2, result == -1 ? -errno : result);
+	write16(BX + 2, result == -1 ? -errno : result % 30000);
 #endif
 }
 
@@ -360,11 +368,7 @@ void VM::_lseek() { // 19
 
 void VM::_getpid() { // 20
 	if (trace) fprintf(stderr, "()");
-#ifdef NO_FORK
-	int result = pid;
-#else
-	int result = getpid();
-#endif
+	int result = convpid(pid);
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (trace) fprintf(stderr, " => %d>\n", result);
 }
