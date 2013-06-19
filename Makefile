@@ -22,6 +22,7 @@ $(TARGET): $(OBJECTS)
 clean:
 	rm -f $(TARGET) $(TARGET).exe $(OBJECTS) *core
 	$(MAKE) $@ -C tests
+	$(MAKE) $@ -C Ack-5.5
 
 install: $(TARGET)
 	mkdir -p $(PREFIX)/bin
