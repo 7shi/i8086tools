@@ -377,5 +377,5 @@ void disasm(uint8_t *mem, size_t size) {
 		printf("%04x: %-12s %s\n", index, hex.c_str(), ops.c_str());
 		index += op.len;
 	}
-	printf("undefined: %d\n", undefined);
+	if (undefined) printf("undefined: %d\n", undefined);
 }
