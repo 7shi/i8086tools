@@ -1,7 +1,9 @@
 TARGET   = m2run
+PREFIX   = /usr/local
+M2ROOT   = $(PREFIX)/minix2
 TEST     = test.bin
 CXX      = g++
-CXXFLAGS = -Wall -g -O2
+CXXFLAGS = -Wall -O2 -g
 LDFLAGS  =
 OBJECTS  = $(SOURCES:%.cpp=%.o)
 SOURCES  = main.cpp utils.cpp disasm.cpp \
@@ -25,6 +27,15 @@ test: $(TEST) $(TARGET)
 
 clean:
 	rm -f $(TARGET) $(TARGET).exe $(OBJECTS) *core $(TEST)
+
+install: $(TARGET)
+	mkdir -p $(PREFIX)/bin
+	install -cs $(TARGET) $(PREFIX)/bin
+	for cmd in bin/ar lib/as bin/cc lib/ld bin/nm bin/strip; do \
+	  sh mkwrap.sh $(PREFIX)/bin/$(TARGET) $(M2ROOT) $(PREFIX)/bin/m2 $$cmd; done
+
+uninstall:
+	cd $(PREFIX)/bin && rm -f $(TARGET) $(TARGET).exe v6ar v6as v6cc v6ld v6nm v6strip
 
 depend:
 	rm -f dependencies
