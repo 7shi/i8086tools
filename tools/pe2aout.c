@@ -22,7 +22,7 @@ void init_aout(struct aout *a)
 	memset(a, 0, sizeof(*a));
 	a->header.a_magic[0] = A_MAGIC0;
 	a->header.a_magic[1] = A_MAGIC1;
-	a->header.a_flags  = cpu == A_I80386 ? A_NSYM : 0;
+	a->header.a_flags  = cpu == A_I80386 ? A_NSYM : A_EXEC;
 	a->header.a_cpu    = cpu;
 	a->header.a_hdrlen = cpu == A_I80386 ? sizeof(a->header) : 32;
 	a->header.a_total  = cpu == A_I80386 ? 0x500000 : 0x10000;
