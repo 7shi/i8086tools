@@ -28,8 +28,8 @@ write-libc.o: write-libc.s
 
 test: $(TARGET)
 	m2run a.out
-	m2run write-libc
-	m2run -v write
+	m2run write-libc.out
+	m2run -v write.out
 	m2run -v test.bin
 	m2run -v idiv.bin
 	m2run -v xchg.bin
