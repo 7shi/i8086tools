@@ -34,9 +34,10 @@ write-16.o: write-16.s
 
 install: $(TARGET)
 	install -cs $(TARGET) $(PREFIX)/bin
+	install -c extract-text.py $(PREFIX)/bin/extract-text
 
 uninstall:
-	cd $(PREFIX)/bin && rm -f $(TARGET)
+	cd $(PREFIX)/bin && rm -f $(TARGET) extract-text
 
 clean:
 	rm -f $(TARGET) *.exe *.o *.out
