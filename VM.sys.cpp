@@ -133,7 +133,7 @@ VM::syshandler VM::syscalls[nsyscalls] = {
 	{ NULL         , NULL              }, // 57
 	{ NULL         , NULL              }, // 58
 	{ "exec"       , &VM::_exec        }, // 59
-	{ "umask"      , NULL              }, // 60
+	{ "umask"      , &VM::_umask       }, // 60
 	{ "chroot"     , NULL              }, // 61
 	{ "setsid"     , NULL              }, // 62
 	{ "getpgrp"    , NULL              }, // 63
@@ -234,7 +234,7 @@ void VM::_open() { // 5
 	if (flag & 64 /*O_CREAT*/) {
 		path = (const char *)(data + read16(BX + 10));
 		mode = read16(BX + 8);
-		if (trace) fprintf(stderr, "(\"%s\", %d, 0%03o)", path, flag, mode);
+		if (trace) fprintf(stderr, "(\"%s\", %d, 0%03o)", path, flag, mode & ~umask);
 	} else {
 		path = (const char *)(data + read16(BX + 8));
 		if (trace) fprintf(stderr, "(\"%s\", %d)", path, flag);
@@ -284,7 +284,7 @@ void VM::_creat() { // 8
 #ifdef WIN32
 	int result = open(path2, O_CREAT | O_TRUNC | O_WRONLY | O_BINARY, 0777);
 #else
-	int result = open(path2, O_CREAT | O_TRUNC | O_WRONLY, mode);
+	int result = open(path2, O_CREAT | O_TRUNC | O_WRONLY, mode & ~umask);
 #endif
 	write16(BX + 2, result == -1 ? -errno : result);
 	if (trace) fprintf(stderr, " => %d>\n", result);
@@ -492,4 +492,11 @@ void VM::_exec() { // 59
 			write16(ad, start_sp + p);
 		}
 	}
+}
+
+void VM::_umask() { // 60
+	int result = umask;
+	umask = read16(BX + 4);
+	if (trace) fprintf(stderr, "(0%03o) => 0%03o\n", umask, result);
+	write16(BX + 2, result);
 }

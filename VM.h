@@ -35,7 +35,7 @@ private:
 	uint8_t *text, *data;
 	size_t tsize, dsize;
 	bool OF, DF, SF, ZF, PF, CF;
-	uint16_t start_sp;
+	uint16_t start_sp, umask;
 	bool hasExited;
 	int pid;
 	std::vector<FileBase *> files;
@@ -133,6 +133,7 @@ private:
 	void _signal   (); // 48
 	void _ioctl    (); // 54
 	void _exec     (); // 59
+	void _umask    (); // 60
 	void _sigaction(); // 71
 
 	static void sighandler(int sig);

@@ -57,7 +57,7 @@ void VM::init() {
 	pid = ++pid_max;
 }
 
-VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0) {
+VM::VM(): ip(0), data(NULL), tsize(0), start_sp(0), umask(0) {
 	init();
 	memset(text, 0, 0x10000);
 	memset(r, 0, sizeof(r));
@@ -88,6 +88,7 @@ VM::VM(const VM &vm) {
 	PF = vm.PF;
 	CF = vm.CF;
 	start_sp = vm.start_sp;
+	umask = vm.umask;
 	files = vm.files;
 	for (int i = 0; i < (int)files.size(); i++) {
 		FileBase *f = files[i];
