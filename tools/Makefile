@@ -1,6 +1,5 @@
+include ../Makefile.inc
 TARGET = pe2aout aout-tool
-PREFIX = /usr/local
-MINGW  = #i686-mingw32-
 CFLAGS = -g
 CROSSLDFLAGS = -s -Ttext=0 --image-base=0 --section-alignment=0 --file-alignment=0
 
@@ -35,6 +34,9 @@ write-16.o: write-16.s
 
 install: $(TARGET)
 	install -cs $(TARGET) $(PREFIX)/bin
+
+uninstall:
+	cd $(PREFIX)/bin && rm -f $(TARGET)
 
 clean:
 	rm -f $(TARGET) *.exe *.o *.out

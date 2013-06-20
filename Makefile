@@ -1,6 +1,5 @@
+include Makefile.inc
 TARGET   = m2run
-PREFIX   = /usr/local
-M2ROOT   = $(PREFIX)/minix2
 CXX      = g++
 CXXFLAGS = -Wall -O2 -g
 LDFLAGS  =
@@ -12,6 +11,7 @@ COMMANDS = bin/ar bin/cc bin/nm bin/strip bin/crc \
 	   lib/as lib/ld lib/cv
 
 all: $(TARGET)
+	$(MAKE) $@ -C tools
 
 .SUFFIXES: .cpp .o
 .cpp.o:
@@ -31,11 +31,13 @@ install: $(TARGET)
 	install -cs $(TARGET) $(PREFIX)/bin
 	for cmd in $(COMMANDS); do \
 	  sh mkwrap.sh $(PREFIX)/bin/$(TARGET) $(M2ROOT) $(PREFIX)/bin/m2 $$cmd; done
+	$(MAKE) $@ -C tools
 
 uninstall:
 	cd $(PREFIX)/bin && rm -f $(TARGET) $(TARGET).exe
 	for cmd in $(COMMANDS); do \
 		rm -f $(PREFIX)/bin/m2`basename $$cmd`; done
+	$(MAKE) $@ -C tools
 
 depend:
 	rm -f dependencies
