@@ -27,16 +27,21 @@ clean:
 	$(MAKE) $@ -C Ack-5.5
 
 install: $(TARGET)
-	mkdir -p $(PREFIX)/bin
+	mkdir -p $(PREFIX)/bin $(M2ROOT)/m2bin
 	install -cs $(TARGET) $(PREFIX)/bin
 	for cmd in $(COMMANDS); do \
-	  sh mkwrap.sh $(PREFIX)/bin/$(TARGET) $(M2ROOT) $(PREFIX)/bin/m2 $$cmd; done
+	  sh mkwrap.sh $(PREFIX)/bin/$(TARGET) $(M2ROOT) $(PREFIX)/bin/m2 $$cmd; \
+	  cp $(PREFIX)/bin/m2`basename $$cmd` $(M2ROOT)/m2bin/`basename $$cmd`; \
+	done
 	$(MAKE) $@ -C tools
 
 uninstall:
 	cd $(PREFIX)/bin && rm -f $(TARGET) $(TARGET).exe
 	for cmd in $(COMMANDS); do \
-		rm -f $(PREFIX)/bin/m2`basename $$cmd`; done
+	  rm -f $(PREFIX)/bin/m2`basename $$cmd`; \
+	  rm -f $(M2ROOT)/m2bin/`basename $$cmd`; \
+	done
+	-rmdir $(M2ROOT)/m2bin
 	$(MAKE) $@ -C tools
 
 depend:
