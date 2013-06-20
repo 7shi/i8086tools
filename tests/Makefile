@@ -1,4 +1,5 @@
-TARGET = a.out write write-libc $(ASMBIN)
+include ../Makefile.inc
+TARGET = a.out write.out write-libc.out $(ASMBIN)
 ASMBIN = $(ASMSRC:%.asm=%.bin)
 ASMSRC = test.asm idiv.asm xchg.asm write-nasm.asm
 
@@ -11,15 +12,19 @@ a.out: a.c
 .asm.bin:
 	nasm -o $@ $<
 
-write: write.out
+.SUFFIXES: .tmp .out
+.tmp.out:
 	m2cv $< $@
-write.out: write.o
+
+write.tmp: write.o
 	m2ld -o $@ $<
 write.o: write.s
 	m2as -o $@ $<
 
-write-libc: write-libc.s
-	m2cc -o $@ $<
+write-libc.tmp: write-libc.o
+	m2ld -o $@ $< $(M2LIB)/libc.a $(M2LIB)/libe.a
+write-libc.o: write-libc.s
+	m2as - -o $@ $<
 
 test: $(TARGET)
 	m2run a.out
@@ -31,4 +36,4 @@ test: $(TARGET)
 	m2run -v write-nasm.bin
 
 clean:
-	rm -f $(TARGET) *.out *.o
+	rm -f $(TARGET) *.o *.tmp

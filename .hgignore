@@ -3,4 +3,5 @@ syntax: glob
 *.exe
 *.bin
 *.out
+*.tmp
 *core
