@@ -258,9 +258,10 @@ void write_aout(struct aout *a, const char *buf, int len, const char *src)
 		printf("INVALID FILE NAME: %s\n", src);
 		return;
 	}
-	
-	file = strdup(src);
-	*strrchr(file, '.') = '\0';
+
+	file = (char *)malloc(p - src + 8);
+	memcpy(file, src, p - src);
+	strcpy(&file[p - src], ".out");
 	printf("convert PE to a.out: %s => %s\n", src, file);
 	
 	f = fopen(file, "wb");

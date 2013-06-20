@@ -12,13 +12,13 @@ pe2aout: pe2aout.c pe.h a.out.h
 aout-tool: aout-tool.c a.out.h
 	$(CC) $(CFLAGS) -o $@ -s $<
 
-test: exit-32 write-16
+test: exit-32.out write-16.out
 	./aout-tool $^
 
-exit-32: exit-32.exe $(TARGET)
+exit-32.out: exit-32.exe $(TARGET)
 	./pe2aout $<
 
-write-16: write-16.exe $(TARGET)
+write-16.out: write-16.exe $(TARGET)
 	./pe2aout -16 $<
 
 exit-32.exe: exit-32.o
@@ -37,4 +37,4 @@ install: $(TARGET)
 	install -cs $(TARGET) $(PREFIX)/bin
 
 clean:
-	rm -f $(TARGET) *.exe *.o exit-32 write-16
+	rm -f $(TARGET) *.exe *.o *.out
