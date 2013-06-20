@@ -9,6 +9,8 @@
 #define OFFSET(a, b) (((char *)(&a->b)) - ((char *)a))
 #define INFO(a, b, c, d, e) printf("%08x: "c"%*.s%s\n", a + OFFSET(b, e), b->e, 9 - d, "", #e)
 
+static int cpu = A_I80386;
+
 struct aout
 {
 	struct exec header;
@@ -20,10 +22,10 @@ void init_aout(struct aout *a)
 	memset(a, 0, sizeof(*a));
 	a->header.a_magic[0] = A_MAGIC0;
 	a->header.a_magic[1] = A_MAGIC1;
-	a->header.a_flags = A_NSYM;
-	a->header.a_cpu = A_I80386;
-	a->header.a_hdrlen = sizeof(a->header);
-	a->header.a_total = 0x500000;
+	a->header.a_flags  = cpu == A_I80386 ? A_NSYM : 0;
+	a->header.a_cpu    = cpu;
+	a->header.a_hdrlen = cpu == A_I80386 ? sizeof(a->header) : 32;
+	a->header.a_total  = cpu == A_I80386 ? 0x500000 : 0x10000;
 }
 
 int align16(int v)
@@ -230,7 +232,8 @@ void parse_pe(struct aout *a, const char *buf, int len)
 #endif
 		ad += sizeof(*sh);
 	}
-	a->header.a_total += A_SYMPOS(a->header) - a->header.a_hdrlen;
+	if (cpu == A_I80386)
+		a->header.a_total += A_SYMPOS(a->header) - a->header.a_hdrlen;
 }
 
 void write_zero(FILE *f, int count)
@@ -267,7 +270,7 @@ void write_aout(struct aout *a, const char *buf, int len, const char *src)
 	{
 		int entry = a->header.a_entry;
 		if (a->textvad > 10) a->header.a_entry = 0;
-		fwrite(&a->header, sizeof(a->header), 1, f);
+		fwrite(&a->header, a->header.a_hdrlen, 1, f);
 		if (a->textvad > 10)
 		{
 			char jmp[10];
@@ -340,13 +343,15 @@ int main(int argc, char *argv[])
 	int i, parse = 0;
 	if (argc <= 1)
 	{
-		fprintf(stderr, "usage: %s [-p] pe.exe [...]\n", argv[0]);
+		fprintf(stderr, "usage: %s [-p|-16] pe.exe [...]\n", argv[0]);
 		return 1;
 	}
 	for (i = 1; i < argc; i++)
 	{
 		if (strcmp(argv[i], "-p") == 0)
 			parse = 1;
+		else if (strcmp(argv[i], "-16") == 0)
+			cpu = A_I8086;
 		else
 		{
 			if (parse)
