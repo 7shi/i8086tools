@@ -403,8 +403,7 @@ void VM::_getpid() { // 20
 void VM::_getuid() { // 24
 	if (trace) fprintf(stderr, "()");
 #ifdef WIN32
-	int result = -1;
-	errno = EINVAL;
+	int result = 0;
 #else
 	int result = getuid();
 #endif
@@ -439,8 +438,7 @@ void VM::_access() { // 33
 void VM::_getgid() { // 47
 	if (trace) fprintf(stderr, "()");
 #ifdef WIN32
-	int result = -1;
-	errno = EINVAL;
+	int result = 0;
 #else
 	int result = getgid();
 #endif
