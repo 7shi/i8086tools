@@ -24,7 +24,7 @@ void VM::run1(uint8_t prefix) {
         return;
     }
     int opr1 = op.opr1.value, opr2 = op.opr2.value;
-    if (trace == 2 && !prefix) debug(ip, op);
+    if (trace >= 2 && !prefix) debug(ip, op);
     uint8_t b = text[ip];
     uint16_t oldip = ip;
     int dst, src, val;
@@ -983,7 +983,7 @@ void VM::run1(uint8_t prefix) {
             }
             break;
     }
-    if (trace != 2 && !prefix) {
+    if (trace < 2 && !prefix) {
         fprintf(stderr, header);
         debug(oldip, op);
     }

@@ -15,10 +15,27 @@ const char *header = " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n";
 
 void VM::debug(uint16_t ip, const OpCode &op) {
     fprintf(stderr,
-            "%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-12s %s\n",
+            "%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-12s %s",
             r[0], r[3], r[1], r[2], r[4], r[5], r[6], r[7],
             OF ? 'O' : '-', SF ? 'S' : '-', ZF ? 'Z' : '-', CF ? 'C' : '-',
             ip, hexdump(text + ip, op.len).c_str(), op.str().c_str());
+    if (trace >= 3) {
+        int ad1 = addr(op.opr1);
+        int ad2 = addr(op.opr2);
+        if (ad1 >= 0) {
+            if (op.opr1.w)
+                fprintf(stderr, " ;[%04x]%04x", ad1, read16(ad1));
+            else
+                fprintf(stderr, " ;[%04x]%02x", ad1, data[ad1]);
+        }
+        if (ad2 >= 0) {
+            if (op.opr2.w)
+                fprintf(stderr, " ;[%04x]%04x", ad2, read16(ad2));
+            else
+                fprintf(stderr, " ;[%04x]%02x", ad2, data[ad2]);
+        }
+    }
+    fprintf(stderr, "\n");
 }
 
 static bool initialized;

@@ -10,6 +10,8 @@ int main(int argc, char *argv[]) {
         if (arg == "-r") {
             i++;
             if (i < argc) setroot(argv[i]);
+        } else if (arg == "-m") {
+            trace = 3;
         } else if (arg == "-v") {
             trace = 2;
         } else if (arg == "-s" && trace == 0) {
@@ -25,6 +27,7 @@ int main(int argc, char *argv[]) {
     if (args.empty()) {
         printf("usage: %s [-d|-v/-s] cmd [args ...]\n", argv[0]);
         printf("    -d: disassemble mode (not run)\n");
+        printf("    -m: verbose mode with memory dump\n");
         printf("    -v: verbose mode (output syscall and disassemble)\n");
         printf("    -s: syscall mode (output syscall)\n");
         return 1;
