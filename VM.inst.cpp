@@ -14,7 +14,7 @@ void VM::run1(uint8_t prefix) {
         }
     }
     if (ip + op.len > tsize) {
-        fprintf(stderr, "overrun\n");
+        fprintf(stderr, "overrun: %04x\n", ip);
         hasExited = true;
         return;
     }
