@@ -29,121 +29,123 @@ extern const char *header;
 
 class VM {
 private:
-	static VM *current;
-	uint16_t ip, r[8];
-	uint8_t *r8[8];
-	uint8_t *text, *data;
-	size_t tsize, dsize;
-	bool OF, DF, SF, ZF, PF, CF;
-	uint16_t start_sp, umask;
-	bool hasExited;
-	int pid;
-	std::vector<FileBase *> files;
-	std::vector<OpCode> cache;
+    static VM *current;
+    uint16_t ip, r[8];
+    uint8_t *r8[8];
+    uint8_t *text, *data;
+    size_t tsize, dsize;
+    bool OF, DF, SF, ZF, PF, CF;
+    uint16_t start_sp, umask;
+    bool hasExited;
+    int pid;
+    std::vector<FileBase *> files;
+    std::vector<OpCode> cache;
 
 private:
-	void init();
+    void init();
 public:
-	VM();
-	VM(const VM &vm);
-	~VM();
-	bool load(const std::string &fn);
-	void run(const std::vector<std::string> &args);
-	void run();
-	void disasm();
+    VM();
+    VM(const VM &vm);
+    ~VM();
+    bool load(const std::string &fn);
+    void run(const std::vector<std::string> &args);
+    void run();
+    void disasm();
 
 private:
-	inline int setf8(int value, bool cf) {
-		int8_t v = value;
-		OF = value != v;
-		SF = v < 0;
-		ZF = v == 0;
-		PF = ptable[uint8_t(value)];
-		CF = cf;
-		return value;
-	}
 
-	inline int setf16(int value, bool cf) {
-		int16_t v = value;
-		OF = value != v;
-		SF = v < 0;
-		ZF = v == 0;
-		PF = ptable[uint8_t(value)];
-		CF = cf;
-		return value;
-	}
+    inline int setf8(int value, bool cf) {
+        int8_t v = value;
+        OF = value != v;
+        SF = v < 0;
+        ZF = v == 0;
+        PF = ptable[uint8_t(value)];
+        CF = cf;
+        return value;
+    }
 
-	inline uint16_t read16(uint16_t addr) {
-		return ::read16(data + addr);
-	}
+    inline int setf16(int value, bool cf) {
+        int16_t v = value;
+        OF = value != v;
+        SF = v < 0;
+        ZF = v == 0;
+        PF = ptable[uint8_t(value)];
+        CF = cf;
+        return value;
+    }
 
-	inline uint32_t read32(uint16_t addr) {
-		return ::read32(data + addr);
-	}
+    inline uint16_t read16(uint16_t addr) {
+        return ::read16(data + addr);
+    }
 
-	inline void write16(uint16_t addr, uint16_t value) {
-		::write16(data + addr, value);
-	}
+    inline uint32_t read32(uint16_t addr) {
+        return ::read32(data + addr);
+    }
 
-	inline void write32(uint16_t addr, uint32_t value) {
-		::write32(data + addr, value);
-	}
+    inline void write16(uint16_t addr, uint16_t value) {
+        ::write16(data + addr, value);
+    }
 
-	void debug(uint16_t ip, const OpCode &op);
-	int addr(const Operand &opr);
-	uint8_t get8(const Operand &opr);
-	uint16_t get16(const Operand &opr);
-	void set8(const Operand &opr, uint8_t value);
-	void set16(const Operand &opr, uint16_t value);
-	void run1(uint8_t prefix = 0);
-	int getfd();
-	int open(const std::string &path, int flag, int mode);
-	int close(int fd);
-	FileBase *file(int fd);
-	void setstat(uint16_t addr, struct stat *st);
+    inline void write32(uint16_t addr, uint32_t value) {
+        ::write32(data + addr, value);
+    }
 
-	struct syshandler {
-		const char *name;
-		void (VM::*f)();
-	};
-	static const int nsyscalls = 78;
-	static syshandler syscalls[nsyscalls];
+    void debug(uint16_t ip, const OpCode &op);
+    int addr(const Operand &opr);
+    uint8_t get8(const Operand &opr);
+    uint16_t get16(const Operand &opr);
+    void set8(const Operand &opr, uint8_t value);
+    void set16(const Operand &opr, uint16_t value);
+    void run1(uint8_t prefix = 0);
+    int getfd();
+    int open(const std::string &path, int flag, int mode);
+    int close(int fd);
+    FileBase *file(int fd);
+    void setstat(uint16_t addr, struct stat *st);
 
-	void minix_syscall();
-	void _exit     (); //  1
-	void _fork     (); //  2
-	void _read     (); //  3
-	void _write    (); //  4
-	void _open     (); //  5
-	void _close    (); //  6
-	void _wait     (); //  7
-	void _creat    (); //  8
-	void _link     (); //  9
-	void _unlink   (); // 10
-	void _time     (); // 13
-	void _chmod    (); // 15
-	void _brk      (); // 17
-	void _stat     (); // 18
-	void _lseek    (); // 19
-	void _getpid   (); // 20
-	void _getuid   (); // 24
-	void _fstat    (); // 28
-	void _access   (); // 33
-	void _getgid   (); // 47
-	void _signal   (); // 48
-	void _ioctl    (); // 54
-	void _exec     (); // 59
-	void _umask    (); // 60
-	void _sigaction(); // 71
+    struct syshandler {
+        const char *name;
+        void (VM::*f)();
+    };
+    static const int nsyscalls = 78;
+    static syshandler syscalls[nsyscalls];
 
-	static void sighandler(int sig);
-	struct sigact {
-		uint16_t sa_handler;
-		uint16_t sa_mask;
-		uint16_t sa_flags;
-	};
-	static const int nsig = 12;
-	sigact sigacts[nsig];
+    void minix_syscall();
+    void _exit(); //  1
+    void _fork(); //  2
+    void _read(); //  3
+    void _write(); //  4
+    void _open(); //  5
+    void _close(); //  6
+    void _wait(); //  7
+    void _creat(); //  8
+    void _link(); //  9
+    void _unlink(); // 10
+    void _time(); // 13
+    void _chmod(); // 15
+    void _brk(); // 17
+    void _stat(); // 18
+    void _lseek(); // 19
+    void _getpid(); // 20
+    void _getuid(); // 24
+    void _fstat(); // 28
+    void _access(); // 33
+    void _getgid(); // 47
+    void _signal(); // 48
+    void _ioctl(); // 54
+    void _exec(); // 59
+    void _umask(); // 60
+    void _sigaction(); // 71
 
-	void swtch(VM *to);
+    static void sighandler(int sig);
+
+    struct sigact {
+        uint16_t sa_handler;
+        uint16_t sa_mask;
+        uint16_t sa_flags;
+    };
+    static const int nsig = 12;
+    sigact sigacts[nsig];
+
+    void swtch(VM *to);
 };
