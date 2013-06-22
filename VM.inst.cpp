@@ -395,8 +395,8 @@ void VM::run1(uint8_t prefix) {
                     set16(op.opr1, setf16(val, dst > uint16_t(val)));
                     return;
                 case 3: // sbb
-                    val = int8_t(dst = get8(op.opr1)) - int8_t(src = opr2 + int(CF));
-                    set8(op.opr1, setf8(val, dst < uint16_t(src)));
+                    val = int16_t(dst = get16(op.opr1)) - int8_t(src = opr2 + int(CF));
+                    set16(op.opr1, setf16(val, dst < uint16_t(src)));
                     return;
                 case 5: // sub
                     val = int16_t(dst = get16(op.opr1)) - int8_t(src = opr2);
