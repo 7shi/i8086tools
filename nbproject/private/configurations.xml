@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="89">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="i8086tools">
+      <df name="Ack-5.5">
+        <df name="ar">
+          <in>archiver.c</in>
+        </df>
+        <df name="dis88">
+          <in>dis.h</in>
+          <in>disfp.c</in>
+          <in>dishand.c</in>
+          <in>dismain.c</in>
+          <in>disrel.c</in>
+          <in>distabs.c</in>
+        </df>
+        <df name="include">
+          <in>a.out.h</in>
+          <in>ansi.h</in>
+          <in>arch.h</in>
+          <in>local.h</in>
+          <in>out.h</in>
+          <in>ranlib.h</in>
+        </df>
+        <df name="ld">
+          <in>archive.c</in>
+          <in>assert.h</in>
+          <in>const.h</in>
+          <in>debug.h</in>
+          <in>defs.h</in>
+          <in>error.c</in>
+          <in>extract.c</in>
+          <in>finish.c</in>
+          <in>mach.c</in>
+          <in>main.c</in>
+          <in>memory.c</in>
+          <in>memory.h</in>
+          <in>orig.h</in>
+          <in>output.c</in>
+          <in>read.c</in>
+          <in>relocate.c</in>
+          <in>save.c</in>
+          <in>scan.c</in>
+          <in>scan.h</in>
+          <in>sym.c</in>
+          <in>write.c</in>
+        </df>
+        <df name="lib">
+          <in>obj.h</in>
+          <in>object.h</in>
+          <in>rd.c</in>
+          <in>rd_arhdr.c</in>
+          <in>rd_bytes.c</in>
+          <in>rd_int2.c</in>
+          <in>rd_long.c</in>
+          <in>rd_ranlib.c</in>
+          <in>rd_unsig2.c</in>
+          <in>wr.c</in>
+          <in>wr_arhdr.c</in>
+          <in>wr_bytes.c</in>
+          <in>wr_int2.c</in>
+          <in>wr_long.c</in>
+          <in>wr_putc.c</in>
+          <in>wr_ranlib.c</in>
+        </df>
+        <in>mylib.c</in>
+      </df>
+      <df name="tests">
+        <in>a.c</in>
+        <in>idiv.asm</in>
+        <in>test.asm</in>
+        <in>write-libc.s</in>
+        <in>write-nasm.asm</in>
+        <in>write.s</in>
+        <in>xchg.asm</in>
+      </df>
+      <df name="tools">
+        <in>a.out.h</in>
+        <in>aout-tool.c</in>
+        <in>exit-32.c</in>
+        <in>pe.h</in>
+        <in>pe2aout.c</in>
+        <in>write-16.s</in>
+      </df>
+      <in>File.cpp</in>
+      <in>File.h</in>
+      <in>OpCode.cpp</in>
+      <in>OpCode.h</in>
+      <in>Operand.cpp</in>
+      <in>Operand.h</in>
+      <in>VM.cpp</in>
+      <in>VM.h</in>
+      <in>VM.inst.cpp</in>
+      <in>VM.signal.cpp</in>
+      <in>VM.sys.cpp</in>
+      <in>disasm.cpp</in>
+      <in>disasm.h</in>
+      <in>main.cpp</in>
+      <in>utils.cpp</in>
+      <in>utils.h</in>
+    </df>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>3</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>.</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>
