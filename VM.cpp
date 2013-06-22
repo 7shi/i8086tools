@@ -224,6 +224,7 @@ bool VM::load(const std::string &fn) {
                 fread(text, 1, dsize, f);
             }
             dsize += ::read32(h + 16); // bss
+            brksize = dsize;
         } else {
             fseek(f, 0, SEEK_SET);
         }
@@ -237,6 +238,7 @@ bool VM::load(const std::string &fn) {
         cache.clear();
         data = text;
         fread(text, 1, tsize, f);
+        brksize = dsize = tsize;
     }
     fclose(f);
     return true;

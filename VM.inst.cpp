@@ -18,6 +18,11 @@ void VM::run1(uint8_t prefix) {
         hasExited = true;
         return;
     }
+    if (SP < brksize) {
+        fprintf(stderr, "stack overflow: %04x\n", SP);
+        hasExited = true;
+        return;
+    }
     int opr1 = op.opr1.value, opr2 = op.opr2.value;
     if (trace == 2 && !prefix) debug(ip, op);
     uint8_t b = text[ip];

@@ -358,12 +358,12 @@ void VM::_chmod() { // 15
 void VM::_brk() { // 17
     int nd = read16(BX + 10);
     if (trace) fprintf(stderr, "(0x%04x)", nd);
-    if (nd < (int) dsize || nd >= ((SP - 0x1000) & ~0xfff)) {
+    if (nd < (int) dsize || nd >= SP) {
         write16(BX + 2, -ENOMEM);
         if (trace) fprintf(stderr, " => ENOMEM>\n");
     } else {
         write16(BX + 2, 0);
-        write16(BX + 18, nd);
+        write16(BX + 18, brksize = nd);
         if (trace) fprintf(stderr, " => 0>\n");
     }
 }

@@ -35,7 +35,7 @@ private:
     uint8_t *text, *data;
     size_t tsize, dsize;
     bool OF, DF, SF, ZF, PF, CF;
-    uint16_t start_sp, umask;
+    uint16_t start_sp, umask, brksize;
     bool hasExited;
     int pid;
     std::vector<FileBase *> files;
