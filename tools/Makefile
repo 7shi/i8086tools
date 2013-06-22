@@ -6,10 +6,10 @@ CROSSLDFLAGS = -s -Ttext=0 --image-base=0 --section-alignment=0 --file-alignment
 all: $(TARGET)
 
 pe2aout: pe2aout.c pe.h a.out.h
-	$(CC) $(CFLAGS) -o $@ -s $<
+	$(CC) $(CFLAGS) -o $@ $<
 
 aout-tool: aout-tool.c a.out.h
-	$(CC) $(CFLAGS) -o $@ -s $<
+	$(CC) $(CFLAGS) -o $@ $<
 
 test: exit-32.out write-16.out
 	./aout-tool $^
