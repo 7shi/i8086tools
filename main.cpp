@@ -39,7 +39,9 @@ int main(int argc, char *argv[]) {
     } else {
         if (trace == 2) fprintf(stderr, header);
         exitcode = 0;
-        vm.run(args);
+        std::vector<std::string> envs;
+        envs.push_back("PATH=/bin:/usr/bin");
+        vm.run(args, envs);
     }
     return exitcode;
 }
