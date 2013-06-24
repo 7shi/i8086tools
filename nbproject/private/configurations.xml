@@ -68,6 +68,7 @@
       <df name="tests">
         <in>a.c</in>
         <in>idiv.asm</in>
+        <in>local.c</in>
         <in>test.asm</in>
         <in>write-libc.s</in>
         <in>write-nasm.asm</in>
