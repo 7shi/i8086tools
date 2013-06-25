@@ -1,23 +1,24 @@
 include ../Makefile.inc
-TARGET = pe2aout aout-tool
+TARGET = pe2aout aout-tool strip-cr
 CFLAGS = -g
 CROSSLDFLAGS = -s -Ttext=0 --image-base=0 --section-alignment=0 --file-alignment=0
 
 all: $(TARGET)
 
 pe2aout: pe2aout.c pe.h a.out.h
-	$(CC) $(CFLAGS) -o $@ $<
-
 aout-tool: aout-tool.c a.out.h
+strip-cr: strip-cr.c
+
+$(TARGET):
 	$(CC) $(CFLAGS) -o $@ $<
 
-test: exit-32.out write-16.out
-	./aout-tool $^
+test: exit-32.out write-16.out aout-tool
+	./aout-tool *.out
 
-exit-32.out: exit-32.exe $(TARGET)
+exit-32.out: exit-32.exe pe2aout
 	./pe2aout $<
 
-write-16.out: write-16.exe $(TARGET)
+write-16.out: write-16.exe pe2aout
 	./pe2aout -16 $<
 
 exit-32.exe: exit-32.o
