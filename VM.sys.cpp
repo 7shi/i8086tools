@@ -1,6 +1,7 @@
 #include "VM.h"
 #include "disasm.h"
 #include <stdio.h>
+#include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -8,6 +9,8 @@
 #ifdef WIN32
 #include <windows.h>
 #define NO_FORK
+#else
+#include <sys/wait.h>
 #endif
 #include <stack>
 #include <map>
@@ -343,7 +346,7 @@ void VM::_time() { // 13
     time_t result = time(NULL);
     write16(BX + 2, result == -1 ? -errno : 0);
     write32(BX + 10, result);
-    if (trace) fprintf(stderr, " => %ld>\n", result);
+    if (trace) fprintf(stderr, " => %d>\n", (int)result);
 }
 
 void VM::_chmod() { // 15

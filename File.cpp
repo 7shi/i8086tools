@@ -1,5 +1,5 @@
 #include "File.h"
-#include <unistd.h>
+#include <fcntl.h>
 
 FileBase::FileBase(int fd, const std::string &path) : fd(fd), count(1), path(path) {
 }

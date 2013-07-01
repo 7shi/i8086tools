@@ -1,6 +1,7 @@
 #include "VM.h"
 #include <stdio.h>
 #include <signal.h>
+#include <errno.h>
 
 #define MX_SIGINT   2
 #define MX_SIGILL   4
@@ -21,7 +22,7 @@ static int convsig(int sig) {
 }
 
 void VM::sighandler(int sig) {
-    current->ip = current->sigacts[sig].sa_handler;
+    current->ip = current->sigacts[sig].handler;
 }
 
 void VM::_signal() { // 48
@@ -42,11 +43,11 @@ void VM::_sigaction() { // 71
         return;
     }
     write16(BX + 2, 0);
-    write16(oact, sigacts[sig].sa_handler);
-    write16(oact + 2, sigacts[sig].sa_mask);
-    write16(oact + 4, sigacts[sig].sa_flags);
+    write16(oact, sigacts[sig].handler);
+    write16(oact + 2, sigacts[sig].mask);
+    write16(oact + 4, sigacts[sig].flags);
     sigact sa = {read16(act), read16(act + 2), read16(act + 4)};
-    switch (sa.sa_handler) {
+    switch (sa.handler) {
         case MX_SIG_DFL: signal(s, SIG_DFL);
             break;
         case MX_SIG_IGN: signal(s, SIG_IGN);
@@ -64,7 +65,7 @@ void VM::swtch(VM *to) {
             if (!to) {
                 signal(s, SIG_DFL);
             } else {
-                switch (to->sigacts[i].sa_handler) {
+                switch (to->sigacts[i].handler) {
                     case MX_SIG_DFL: signal(s, SIG_DFL);
                         break;
                     case MX_SIG_IGN: signal(s, SIG_IGN);
