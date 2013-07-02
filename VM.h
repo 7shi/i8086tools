@@ -150,4 +150,5 @@ private:
     sigact sigacts[nsig];
 
     void swtch(VM *to);
+    void resetsig();
 };

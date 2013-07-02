@@ -78,3 +78,18 @@ void VM::swtch(VM *to) {
     }
     current = to;
 }
+
+void VM::resetsig() {
+    for (int i = 0; i < nsig; i++) {
+        switch (sigacts[i].handler) {
+            case MX_SIG_DFL:
+            case MX_SIG_IGN:
+                break;
+            default:
+                sigacts[i].handler = MX_SIG_DFL;
+                int s = convsig(i);
+                if (s >= 0) signal(s, SIG_DFL);
+                break;
+        }
+    }
+}

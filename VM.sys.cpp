@@ -489,6 +489,7 @@ void VM::_exec() { // 59
         write16(BX + 2, -EINVAL);
         return;
     }
+    resetsig();
     start_sp = SP = 0x10000 - fsize;
     memcpy(data + start_sp, d + frame, fsize);
     if (d != t) delete[] d;
