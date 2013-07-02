@@ -112,6 +112,32 @@ private:
     static const int nsyscalls = 78;
     static syshandler syscalls[nsyscalls];
 
+    void sys_exit(int code);
+    //int sys_fork();
+    int sys_read(int fd, int buf, int len);
+    int sys_write(int fd, int buf, int len);
+    int sys_open(const char *path, int flag, mode_t mode = 0);
+    int sys_close(int fd);
+    int sys_wait(int *status);
+    int sys_creat(const char *path, mode_t mode);
+    int sys_link(const char *src, const char *dst);
+    int sys_unlink(const char *path);
+    int sys_time();
+    int sys_chmod(const char *path, mode_t mode);
+    int sys_brk(int nd);
+    int sys_stat(const char *path, int p);
+    off_t sys_lseek(int fd, off_t o, int w);
+    int sys_getpid();
+    int sys_getuid();
+    int sys_fstat(int fd, int p);
+    int sys_access(const char *path, mode_t mode);
+    int sys_getgid();
+    //void sys_signal();
+    int sys_ioctl(int fd, int rq, int d);
+    int sys_exec(const char *path, int frame, int fsize);
+    int sys_umask(mode_t mask);
+    //void sys_sigaction();
+
     void minix_syscall();
     void _exit(); //  1
     void _fork(); //  2
