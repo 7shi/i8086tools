@@ -105,13 +105,6 @@ private:
     FileBase *file(int fd);
     void setstat(uint16_t addr, struct stat *st);
 
-    struct syshandler {
-        const char *name;
-        void (VM::*f)();
-    };
-    static const int nsyscalls = 78;
-    static syshandler syscalls[nsyscalls];
-
     void sys_exit(int code);
     //int sys_fork();
     int sys_read(int fd, int buf, int len);
@@ -139,31 +132,9 @@ private:
     //void sys_sigaction();
 
     void minix_syscall();
-    void _exit(); //  1
-    void _fork(); //  2
-    void _read(); //  3
-    void _write(); //  4
-    void _open(); //  5
-    void _close(); //  6
-    void _wait(); //  7
-    void _creat(); //  8
-    void _link(); //  9
-    void _unlink(); // 10
-    void _time(); // 13
-    void _chmod(); // 15
-    void _brk(); // 17
-    void _stat(); // 18
-    void _lseek(); // 19
-    void _getpid(); // 20
-    void _getuid(); // 24
-    void _fstat(); // 28
-    void _access(); // 33
-    void _getgid(); // 47
-    void _signal(); // 48
-    void _ioctl(); // 54
-    void _exec(); // 59
-    void _umask(); // 60
-    void _sigaction(); // 71
+    int minix_fork(); //  2
+    int minix_signal(); // 48
+    int minix_sigaction(); // 71
 
     static void sighandler(int sig);
 
@@ -176,5 +147,6 @@ private:
     sigact sigacts[nsig];
 
     void swtch(VM *to);
+    void setsig(int sig, int h);
     void resetsig();
 };

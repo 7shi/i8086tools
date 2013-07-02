@@ -75,111 +75,260 @@ void VM::setstat(uint16_t addr, struct stat *st) {
     write32(addr + 26, st->st_ctime);
 }
 
-VM::syshandler VM::syscalls[nsyscalls] = {
-    { NULL, NULL}, //  0
-    { "exit", &VM::_exit}, //  1
-    { "fork", &VM::_fork}, //  2
-    { "read", &VM::_read}, //  3
-    { "write", &VM::_write}, //  4
-    { "open", &VM::_open}, //  5
-    { "close", &VM::_close}, //  6
-    { "wait", &VM::_wait}, //  7
-    { "creat", &VM::_creat}, //  8
-    { "link", &VM::_link}, //  9
-    { "unlink", &VM::_unlink}, // 10
-    { "waitpid", NULL}, // 11
-    { "chdir", NULL}, // 12
-    { "time", &VM::_time}, // 13
-    { "mknod", NULL}, // 14
-    { "chmod", &VM::_chmod}, // 15
-    { "chown", NULL}, // 16
-    { "brk", &VM::_brk}, // 17
-    { "stat", &VM::_stat}, // 18
-    { "lseek", &VM::_lseek}, // 19
-    { "getpid", &VM::_getpid}, // 20
-    { "mount", NULL}, // 21
-    { "umount", NULL}, // 22
-    { "setuid", NULL}, // 23
-    { "getuid", &VM::_getuid}, // 24
-    { "stime", NULL}, // 25
-    { "ptrace", NULL}, // 26
-    { "alarm", NULL}, // 27
-    { "fstat", &VM::_fstat}, // 28
-    { "pause", NULL}, // 29
-    { "utime", NULL}, // 30
-    { NULL, NULL}, // 31
-    { NULL, NULL}, // 32
-    { "access", &VM::_access}, // 33
-    { NULL, NULL}, // 34
-    { NULL, NULL}, // 35
-    { "sync", NULL}, // 36
-    { "kill", NULL}, // 37
-    { "rename", NULL}, // 38
-    { "mkdir", NULL}, // 39
-    { "rmdir", NULL}, // 40
-    { "dup", NULL}, // 41
-    { "pipe", NULL}, // 42
-    { "times", NULL}, // 43
-    { NULL, NULL}, // 44
-    { NULL, NULL}, // 45
-    { "setgid", NULL}, // 46
-    { "getgid", &VM::_getgid}, // 47
-    { "signal", &VM::_signal}, // 48
-    { NULL, NULL}, // 49
-    { NULL, NULL}, // 50
-    { NULL, NULL}, // 51
-    { NULL, NULL}, // 52
-    { NULL, NULL}, // 53
-    { "ioctl", &VM::_ioctl}, // 54
-    { "fcntl", NULL}, // 55
-    { NULL, NULL}, // 56
-    { NULL, NULL}, // 57
-    { NULL, NULL}, // 58
-    { "exec", &VM::_exec}, // 59
-    { "umask", &VM::_umask}, // 60
-    { "chroot", NULL}, // 61
-    { "setsid", NULL}, // 62
-    { "getpgrp", NULL}, // 63
-    { "ksig", NULL}, // 64
-    { "unpause", NULL}, // 65
-    { NULL, NULL}, // 66
-    { "revive", NULL}, // 67
-    { "task_reply", NULL}, // 68
-    { NULL, NULL}, // 69
-    { NULL, NULL}, // 70
-    { "sigaction", &VM::_sigaction}, // 71
-    { "sigsuspend", NULL}, // 72
-    { "sigpending", NULL}, // 73
-    { "sigprocmask", NULL}, // 74
-    { "sigreturn", NULL}, // 75
-    { "reboot", NULL}, // 76
-    { "svrctl", NULL}, // 77
-};
-
 void VM::minix_syscall() {
-    int type = read16(BX + 2);
-    if (type < nsyscalls) {
-        syshandler *sh = &syscalls[type];
-        if (sh->name) {
-            if (trace || !sh->f) {
-                fprintf(stderr, "<%s", sh->name);
-            }
-            if (sh->f) {
-                (this->*sh->f)();
-                AX = 0;
-            } else {
-                fprintf(stderr, ": not implemented>\n");
-                hasExited = true;
-            }
+    int type = read16(BX + 2), result = 0;
+    switch (type) {
+        case 1:
+            sys_exit((int16_t) read16(BX + 4));
             return;
+        case 2:
+            result = minix_fork();
+            break;
+        case 3:
+            result = sys_read(read16(BX + 4), read16(BX + 10), read16(BX + 6));
+            break;
+        case 4:
+            result = sys_write(read16(BX + 4), read16(BX + 10), read16(BX + 6));
+            break;
+        case 5:
+        {
+            int flag = read16(BX + 6);
+            if (flag & 64 /*O_CREAT*/) {
+                result = sys_open((const char *) (data + read16(BX + 10)), flag, read16(BX + 8));
+            } else {
+                result = sys_open((const char *) (data + read16(BX + 8)), flag);
+            }
+            break;
         }
+        case 6:
+            result = sys_close(read16(BX + 4));
+            break;
+        case 7:
+        {
+            int status;
+            result = sys_wait(&status);
+            write16(BX + 4, status);
+            break;
+        }
+        case 8:
+            result = sys_creat((const char *) (data + read16(BX + 8)), read16(BX + 6));
+            break;
+        case 9:
+            result = sys_link(
+                    (const char *) (data + read16(BX + 10)),
+                    (const char *) (data + read16(BX + 12)));
+            break;
+        case 10:
+            result = sys_unlink((const char *) (data + read16(BX + 8)));
+            break;
+        case 11:
+            fprintf(stderr, "<waitpid: not implemented>\n");
+            hasExited = true;
+            break;
+        case 12:
+            fprintf(stderr, "<chdir: not implemented>\n");
+            hasExited = true;
+            break;
+        case 13:
+            result = sys_time();
+            if (result >= 0) {
+                write32(BX + 10, result);
+                result = 0;
+            }
+            break;
+        case 14:
+            fprintf(stderr, "<mknod: not implemented>\n");
+            hasExited = true;
+            break;
+        case 15:
+            result = sys_chmod((const char *) (data + read16(BX + 8)), read16(BX + 6));
+            break;
+        case 16:
+            fprintf(stderr, "<chown: not implemented>\n");
+            hasExited = true;
+            break;
+        case 17:
+            result = sys_brk(read16(BX + 10));
+            if (!result) write16(BX + 18, brksize);
+            break;
+        case 18:
+            result = sys_stat((const char *) (data + read16(BX + 10)), read16(BX + 12));
+            break;
+        case 19:
+        {
+            off_t o = sys_lseek(read16(BX + 4), read32(BX + 10), read16(BX + 6));
+            if (o == -1) {
+                result = -1;
+            } else {
+                write32(BX + 10, o);
+            }
+            break;
+        }
+        case 20:
+            result = sys_getpid();
+            break;
+        case 21:
+            fprintf(stderr, "<mount: not implemented>\n");
+            hasExited = true;
+            break;
+        case 22:
+            fprintf(stderr, "<umount: not implemented>\n");
+            hasExited = true;
+            break;
+        case 23:
+            fprintf(stderr, "<setuid: not implemented>\n");
+            hasExited = true;
+            break;
+        case 24:
+            result = sys_getuid();
+            break;
+        case 25:
+            fprintf(stderr, "<stime: not implemented>\n");
+            hasExited = true;
+            break;
+        case 26:
+            fprintf(stderr, "<ptrace: not implemented>\n");
+            hasExited = true;
+            break;
+        case 27:
+            fprintf(stderr, "<alarm: not implemented>\n");
+            hasExited = true;
+            break;
+        case 28:
+            result = sys_fstat(read16(BX + 4), read16(BX + 10));
+            break;
+        case 29:
+            fprintf(stderr, "<pause: not implemented>\n");
+            hasExited = true;
+            break;
+        case 30:
+            fprintf(stderr, "<utime: not implemented>\n");
+            hasExited = true;
+            break;
+        case 33:
+            result = sys_access((const char *) (data + read16(BX + 8)), read16(BX + 6));
+            break;
+        case 36:
+            fprintf(stderr, "<sync: not implemented>\n");
+            hasExited = true;
+            break;
+        case 37:
+            fprintf(stderr, "<kill: not implemented>\n");
+            hasExited = true;
+            break;
+        case 38:
+            fprintf(stderr, "<rename: not implemented>\n");
+            hasExited = true;
+            break;
+        case 39:
+            fprintf(stderr, "<mkdir: not implemented>\n");
+            hasExited = true;
+            break;
+        case 40:
+            fprintf(stderr, "<rmdir: not implemented>\n");
+            hasExited = true;
+            break;
+        case 41:
+            fprintf(stderr, "<dup: not implemented>\n");
+            hasExited = true;
+            break;
+        case 42:
+            fprintf(stderr, "<pipe: not implemented>\n");
+            hasExited = true;
+            break;
+        case 43:
+            fprintf(stderr, "<times: not implemented>\n");
+            hasExited = true;
+            break;
+        case 46:
+            fprintf(stderr, "<setgid: not implemented>\n");
+            hasExited = true;
+            break;
+        case 47:
+            result = sys_getgid();
+            break;
+        case 48:
+            result = minix_signal();
+            break;
+        case 54:
+            result = sys_ioctl(read16(BX + 4), read16(BX + 8), read16(BX + 18));
+            break;
+        case 55:
+            fprintf(stderr, "<fcntl: not implemented>\n");
+            hasExited = true;
+            break;
+        case 59:
+            result = sys_exec((const char *) (data + read16(BX + 10)), read16(BX + 12), read16(BX + 6));
+            if (!result) return;
+        case 60:
+            result = sys_umask(read16(BX + 4));
+            break;
+        case 61:
+            fprintf(stderr, "<chroot: not implemented>\n");
+            hasExited = true;
+            break;
+        case 62:
+            fprintf(stderr, "<setsid: not implemented>\n");
+            hasExited = true;
+            break;
+        case 63:
+            fprintf(stderr, "<getpgrp: not implemented>\n");
+            hasExited = true;
+            break;
+        case 64:
+            fprintf(stderr, "<ksig: not implemented>\n");
+            hasExited = true;
+            break;
+        case 65:
+            fprintf(stderr, "<unpause: not implemented>\n");
+            hasExited = true;
+            break;
+        case 67:
+            fprintf(stderr, "<revive: not implemented>\n");
+            hasExited = true;
+            break;
+        case 68:
+            fprintf(stderr, "<task_reply: not implemented>\n");
+            hasExited = true;
+            break;
+        case 71:
+            result = minix_sigaction();
+            break;
+        case 72:
+            fprintf(stderr, "<sigsuspend: not implemented>\n");
+            hasExited = true;
+            break;
+        case 73:
+            fprintf(stderr, "<sigpending: not implemented>\n");
+            hasExited = true;
+            break;
+        case 74:
+            fprintf(stderr, "<sigprocmask: not implemented>\n");
+            hasExited = true;
+            break;
+        case 75:
+            fprintf(stderr, "<sigreturn: not implemented>\n");
+            hasExited = true;
+            break;
+        case 76:
+            fprintf(stderr, "<reboot: not implemented>\n");
+            hasExited = true;
+            break;
+        case 77:
+            fprintf(stderr, "<svrctl: not implemented>\n");
+            hasExited = true;
+            break;
+        default:
+            fprintf(stderr, "<%d: unknown syscall>\n", type);
+            hasExited = true;
+            return;
     }
-    fprintf(stderr, "<%d: unknown syscall>\n", type);
-    hasExited = true;
+    write16(BX + 2, result == -1 ? -errno : result);
+    AX = 0;
 }
 
 void VM::sys_exit(int code) {
-    if (trace) fprintf(stderr, "(%d)>\n", code);
+    if (trace) fprintf(stderr, "<exit(%d)>\n", code);
     exitcode = code;
 #ifdef NO_FORK
     exitcodes.push(std::pair<int, int>(convpid(pid), code));
@@ -187,26 +336,22 @@ void VM::sys_exit(int code) {
     hasExited = true;
 }
 
-void VM::_exit() { // 1
-    sys_exit((int16_t) read16(BX + 4));
-}
-
-void VM::_fork() { // 2
-    if (trace) fprintf(stderr, "()>\n");
+int VM::minix_fork() { // 2
+    if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
     VM vm = *this;
     vm.write16(BX + 2, 0);
     vm.AX = 0;
     vm.run();
-    write16(BX + 2, convpid(vm.pid));
+    return convpid(vm.pid);
 #else
     int result = fork();
-    write16(BX + 2, result == -1 ? -errno : result % 30000);
+    return result == -1 ? -1 : (result % 30000) + 1;
 #endif
 }
 
 int VM::sys_read(int fd, int buf, int len) {
-    if (trace) fprintf(stderr, "(%d, 0x%04x, %d)", fd, buf, len);
+    if (trace) fprintf(stderr, "<read(%d, 0x%04x, %d)", fd, buf, len);
     int max = 0x10000 - buf;
     if (len > max) len = max;
     FileBase *f = file(fd);
@@ -215,13 +360,8 @@ int VM::sys_read(int fd, int buf, int len) {
     return result;
 }
 
-void VM::_read() { // 3
-    int result = sys_read(read16(BX + 4), read16(BX + 10), read16(BX + 6));
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_write(int fd, int buf, int len) {
-    if (trace) fprintf(stderr, "(%d, 0x%04x, %d)", fd, buf, len);
+    if (trace) fprintf(stderr, "<write(%d, 0x%04x, %d)", fd, buf, len);
     int max = 0x10000 - buf;
     if (len > max) len = max;
     FileBase *f = file(fd);
@@ -237,48 +377,27 @@ int VM::sys_write(int fd, int buf, int len) {
     return result;
 }
 
-void VM::_write() { // 4
-    int result = sys_write(read16(BX + 4), read16(BX + 10), read16(BX + 6));
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_open(const char *path, int flag, mode_t mode) {
     if (flag & 64 /*O_CREAT*/) {
-        if (trace) fprintf(stderr, "(\"%s\", %d, 0%03o)", path, flag, mode & ~umask);
+        if (trace) fprintf(stderr, "<open(\"%s\", %d, 0%03o)", path, flag, mode);
     } else {
-        if (trace) fprintf(stderr, "(\"%s\", %d)", path, flag);
+        if (trace) fprintf(stderr, "<open(\"%s\", %d)", path, flag);
     }
     std::string path2 = convpath(path);
-    int result = open(path2, flag, mode);
+    int result = open(path2, flag, mode & ~umask);
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
 }
 
-void VM::_open() { // 5
-    int flag = read16(BX + 6);
-    int result;
-    if (flag & 64 /*O_CREAT*/) {
-        result = sys_open((const char *) (data + read16(BX + 10)), flag, read16(BX + 8));
-    } else {
-        result = sys_open((const char *) (data + read16(BX + 8)), flag);
-    }
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_close(int fd) {
-    if (trace) fprintf(stderr, "(%d)", fd);
+    if (trace) fprintf(stderr, "<close(%d)", fd);
     int result = close(fd);
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
 }
 
-void VM::_close() { // 6
-    int result = sys_close(read16(BX + 4));
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_wait(int *status) {
-    if (trace) fprintf(stderr, "()");
+    if (trace) fprintf(stderr, "<wait()");
 #ifdef NO_FORK
     if (!exitcodes.empty()) {
         std::pair<int, int> ec = exitcodes.top();
@@ -297,14 +416,8 @@ int VM::sys_wait(int *status) {
 #endif
 }
 
-void VM::_wait() { // 7
-    int status, result = sys_wait(&status);
-    write16(BX + 2, result == -1 ? -errno : result);
-    write16(BX + 4, status);
-}
-
 int VM::sys_creat(const char *path, mode_t mode) {
-    if (trace) fprintf(stderr, "(\"%s\", 0%03o)", path, mode);
+    if (trace) fprintf(stderr, "<creat(\"%s\", 0%03o)", path, mode);
     std::string path2 = convpath(path);
 #ifdef WIN32
     int result = open(path2, O_CREAT | O_TRUNC | O_WRONLY | O_BINARY, 0777);
@@ -315,13 +428,8 @@ int VM::sys_creat(const char *path, mode_t mode) {
     return result;
 }
 
-void VM::_creat() { // 8
-    int result = sys_creat((const char *) (data + read16(BX + 8)), read16(BX + 6));
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_link(const char *src, const char *dst) {
-    if (trace) fprintf(stderr, "(\"%s\", \"%s\")", src, dst);
+    if (trace) fprintf(stderr, "<link(\"%s\", \"%s\")", src, dst);
     std::string src2 = convpath(src), dst2 = convpath(dst);
 #ifdef WIN32
     int result = CopyFileA(src2.c_str(), dst2.c_str(), TRUE) ? 0 : -1;
@@ -337,15 +445,8 @@ int VM::sys_link(const char *src, const char *dst) {
     return result;
 }
 
-void VM::_link() { // 9
-    int result = sys_link(
-            (const char *) (data + read16(BX + 10)),
-            (const char *) (data + read16(BX + 12)));
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_unlink(const char *path) {
-    if (trace) fprintf(stderr, "(\"%s\")", path);
+    if (trace) fprintf(stderr, "<unlink(\"%s\")", path);
     std::string path2 = convpath(path);
 #ifdef WIN32
     int result = DeleteFileA(path2.c_str()) ? 0 : -1;
@@ -368,38 +469,22 @@ int VM::sys_unlink(const char *path) {
     return result;
 }
 
-void VM::_unlink() { // 10
-    int result = sys_unlink((const char *) (data + read16(BX + 8)));
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_time() {
-    if (trace) fprintf(stderr, "()");
+    if (trace) fprintf(stderr, "<time()");
     int result = time(NULL);
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
 }
 
-void VM::_time() { // 13
-    int result = sys_time();
-    write16(BX + 2, result == -1 ? -errno : 0);
-    write32(BX + 10, result);
-}
-
 int VM::sys_chmod(const char *path, mode_t mode) {
-    if (trace) fprintf(stderr, "(\"%s\", 0%03o)", path, mode);
+    if (trace) fprintf(stderr, "<chmod(\"%s\", 0%03o)", path, mode);
     int result = chmod(convpath(path).c_str(), mode);
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
 }
 
-void VM::_chmod() { // 15
-    int result = sys_chmod((const char *) (data + read16(BX + 8)), read16(BX + 6));
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_brk(int nd) {
-    if (trace) fprintf(stderr, "(0x%04x)", nd);
+    if (trace) fprintf(stderr, "<brk(0x%04x)", nd);
     if (nd < (int) dsize || nd >= ((SP - 0x400) & ~0x3ff)) {
         errno = ENOMEM;
         if (trace) fprintf(stderr, " => ENOMEM>\n");
@@ -410,14 +495,8 @@ int VM::sys_brk(int nd) {
     return 0;
 }
 
-void VM::_brk() { // 17
-    int result = sys_brk(read16(BX + 10));
-    write16(BX + 2, result == -1 ? -errno : result);
-    if (!result) write16(BX + 18, brksize);
-}
-
 int VM::sys_stat(const char *path, int p) {
-    if (trace) fprintf(stderr, "(\"%s\", 0x%04x)", path, p);
+    if (trace) fprintf(stderr, "<stat(\"%s\", 0x%04x)", path, p);
     struct stat st;
     int result;
     if (!(result = stat(path, &st))) {
@@ -427,13 +506,8 @@ int VM::sys_stat(const char *path, int p) {
     return result;
 }
 
-void VM::_stat() { // 18
-    int result = sys_stat((const char *) (data + read16(BX + 10)), read16(BX + 12));
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 off_t VM::sys_lseek(int fd, off_t o, int w) {
-    if (trace) fprintf(stderr, "(%d, %ld, %d)", fd, o, w);
+    if (trace) fprintf(stderr, "<lseek(%d, %ld, %d)", fd, o, w);
     FileBase *f = file(fd);
     off_t result = -1;
     if (f) result = f->lseek(o, w);
@@ -441,26 +515,15 @@ off_t VM::sys_lseek(int fd, off_t o, int w) {
     return result;
 }
 
-void VM::_lseek() { // 19
-    off_t result = sys_lseek(read16(BX + 4), read32(BX + 10), read16(BX + 6));
-    write16(BX + 2, result == -1 ? -errno : 0);
-    if (result != -1) write32(BX + 10, result);
-}
-
 int VM::sys_getpid() {
-    if (trace) fprintf(stderr, "()");
+    if (trace) fprintf(stderr, "<getpid()");
     int result = convpid(pid);
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
 }
 
-void VM::_getpid() { // 20
-    int result = sys_getpid();
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_getuid() {
-    if (trace) fprintf(stderr, "()");
+    if (trace) fprintf(stderr, "<getuid()");
 #ifdef WIN32
     int result = 0;
 #else
@@ -470,13 +533,8 @@ int VM::sys_getuid() {
     return result;
 }
 
-void VM::_getuid() { // 24
-    int result = sys_getuid();
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_fstat(int fd, int p) {
-    if (trace) fprintf(stderr, "(%d, 0x%04x)", fd, p);
+    if (trace) fprintf(stderr, "<fstat(%d, 0x%04x)", fd, p);
     struct stat st;
     FileBase *f = file(fd);
     int result = -1;
@@ -491,26 +549,16 @@ int VM::sys_fstat(int fd, int p) {
     return result;
 }
 
-void VM::_fstat() { // 28
-    int result = sys_fstat(read16(BX + 4), read16(BX + 10));
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_access(const char *path, mode_t mode) {
-    if (trace) fprintf(stderr, "(\"%s\", 0%03o)", path, mode);
+    if (trace) fprintf(stderr, "<access(\"%s\", 0%03o)", path, mode);
     std::string path2 = convpath(path);
     int result = access(path2.c_str(), mode);
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
 }
 
-void VM::_access() { // 33
-    int result = sys_access((const char *) (data + read16(BX + 8)), read16(BX + 6));
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_getgid() {
-    if (trace) fprintf(stderr, "()");
+    if (trace) fprintf(stderr, "<getgid()");
 #ifdef WIN32
     int result = 0;
 #else
@@ -520,20 +568,10 @@ int VM::sys_getgid() {
     return result;
 }
 
-void VM::_getgid() { // 47
-    int result = sys_getgid();
-    write16(BX + 2, result == -1 ? -errno : result);
-}
-
 int VM::sys_ioctl(int fd, int rq, int d) {
-    if (trace) fprintf(stderr, "(%d, 0x%04x, 0x%04x)>\n", fd, rq, d);
+    if (trace) fprintf(stderr, "<ioctl(%d, 0x%04x, 0x%04x)>\n", fd, rq, d);
     errno = EINVAL;
     return -1;
-}
-
-void VM::_ioctl() { // 54
-    int result = sys_ioctl(read16(BX + 4), read16(BX + 8), read16(BX + 18));
-    write16(BX + 2, result == -1 ? -errno : result);
 }
 
 int VM::sys_exec(const char *path, int frame, int fsize) {
@@ -544,7 +582,7 @@ int VM::sys_exec(const char *path, int frame, int fsize) {
 #endif
     int argc = read16(frame);
     if (trace) {
-        fprintf(stderr, "(\"%s\"", path);
+        fprintf(stderr, "<exec(\"%s\"", path);
         for (int i = 2; i <= argc; i++) {
             fprintf(stderr, ", \"%s\"", data + frame + read16(frame + i * 2));
         }
@@ -574,19 +612,9 @@ int VM::sys_exec(const char *path, int frame, int fsize) {
     return 0;
 }
 
-void VM::_exec() { // 59
-    int result = sys_exec((const char *) (data + read16(BX + 10)), read16(BX + 12), read16(BX + 6));
-    if (result) write16(BX + 2, -errno);
-}
-
 int VM::sys_umask(mode_t mask) {
     int result = umask;
     umask = mask;
-    if (trace) fprintf(stderr, "(0%03o) => 0%03o\n", umask, result);
+    if (trace) fprintf(stderr, "<umask(0%03o) => 0%03o\n", umask, result);
     return result;
-}
-
-void VM::_umask() { // 60
-    int result = sys_umask(read16(BX + 4));
-    write16(BX + 2, result);
 }
