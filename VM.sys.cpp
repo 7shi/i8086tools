@@ -55,9 +55,9 @@ int VM::close(int fd) {
 
 static int convpid(int pid) {
 #ifdef NO_FORK
-    return ((getpid() << 4) % 30000) +pid;
+    return ((getpid() << 4) % 30000) + pid;
 #else
-    return getpid() % 30000;
+    return (getpid() % 30000) + 1;
 #endif
 }
 
