@@ -256,7 +256,7 @@ void VM::minix_syscall() {
             hasExited = true;
             break;
         case 59:
-            result = sys_exec(str(read16(BX + 10)), read16(BX + 12), read16(BX + 6));
+            result = minix_exec();
             if (!result) return;
         case 60:
             result = sys_umask(read16(BX + 4));
@@ -572,7 +572,10 @@ int VM::sys_ioctl(int fd, int rq, int d) {
     return -1;
 }
 
-int VM::sys_exec(const char *path, int frame, int fsize) {
+int VM::minix_exec() {
+    const char *path = str(read16(BX + 10));
+    int frame = read16(BX + 12);
+    int fsize = read16(BX + 6);
 #if 0
     FILE *f = fopen("core", "wb");
     fwrite(data, 1, 0x10000, f);

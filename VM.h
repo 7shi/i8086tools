@@ -131,13 +131,14 @@ private:
     int sys_getgid();
     //void sys_signal();
     int sys_ioctl(int fd, int rq, int d);
-    int sys_exec(const char *path, int frame, int fsize);
+    //int sys_exec(const char *path, int frame, int fsize);
     int sys_umask(mode_t mask);
     //void sys_sigaction();
 
     void minix_syscall();
     int minix_fork(); //  2
     int minix_signal(); // 48
+    int minix_exec(); // 59
     int minix_sigaction(); // 71
 
     static void sighandler(int sig);
