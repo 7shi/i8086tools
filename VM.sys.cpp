@@ -94,9 +94,9 @@ void VM::minix_syscall() {
         {
             int flag = read16(BX + 6);
             if (flag & 64 /*O_CREAT*/) {
-                result = sys_open((const char *) (data + read16(BX + 10)), flag, read16(BX + 8));
+                result = sys_open(str(read16(BX + 10)), flag, read16(BX + 8));
             } else {
-                result = sys_open((const char *) (data + read16(BX + 8)), flag);
+                result = sys_open(str(read16(BX + 8)), flag);
             }
             break;
         }
@@ -111,15 +111,13 @@ void VM::minix_syscall() {
             break;
         }
         case 8:
-            result = sys_creat((const char *) (data + read16(BX + 8)), read16(BX + 6));
+            result = sys_creat(str(read16(BX + 8)), read16(BX + 6));
             break;
         case 9:
-            result = sys_link(
-                    (const char *) (data + read16(BX + 10)),
-                    (const char *) (data + read16(BX + 12)));
+            result = sys_link(str(read16(BX + 10)), str(read16(BX + 12)));
             break;
         case 10:
-            result = sys_unlink((const char *) (data + read16(BX + 8)));
+            result = sys_unlink(str(read16(BX + 8)));
             break;
         case 11:
             fprintf(stderr, "<waitpid: not implemented>\n");
@@ -141,7 +139,7 @@ void VM::minix_syscall() {
             hasExited = true;
             break;
         case 15:
-            result = sys_chmod((const char *) (data + read16(BX + 8)), read16(BX + 6));
+            result = sys_chmod(str(read16(BX + 8)), read16(BX + 6));
             break;
         case 16:
             fprintf(stderr, "<chown: not implemented>\n");
@@ -152,7 +150,7 @@ void VM::minix_syscall() {
             if (!result) write16(BX + 18, brksize);
             break;
         case 18:
-            result = sys_stat((const char *) (data + read16(BX + 10)), read16(BX + 12));
+            result = sys_stat(str(read16(BX + 10)), read16(BX + 12));
             break;
         case 19:
         {
@@ -206,7 +204,7 @@ void VM::minix_syscall() {
             hasExited = true;
             break;
         case 33:
-            result = sys_access((const char *) (data + read16(BX + 8)), read16(BX + 6));
+            result = sys_access(str(read16(BX + 8)), read16(BX + 6));
             break;
         case 36:
             fprintf(stderr, "<sync: not implemented>\n");
@@ -258,7 +256,7 @@ void VM::minix_syscall() {
             hasExited = true;
             break;
         case 59:
-            result = sys_exec((const char *) (data + read16(BX + 10)), read16(BX + 12), read16(BX + 6));
+            result = sys_exec(str(read16(BX + 10)), read16(BX + 12), read16(BX + 6));
             if (!result) return;
         case 60:
             result = sys_umask(read16(BX + 4));

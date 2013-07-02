@@ -92,6 +92,10 @@ private:
         ::write32(data + addr, value);
     }
 
+    inline const char *str(uint16_t addr) {
+        return (const char *) (data + addr);
+    }
+
     void debug(uint16_t ip, const OpCode &op);
     int addr(const Operand &opr);
     uint8_t get8(const Operand &opr);
