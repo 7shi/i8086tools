@@ -65,6 +65,10 @@
         </df>
         <in>mylib.c</in>
       </df>
+      <df name="misc">
+        <in>binsplit.c</in>
+        <in>stdio-wrap.c</in>
+      </df>
       <df name="tests">
         <in>a.c</in>
         <in>idiv.asm</in>
@@ -81,6 +85,7 @@
         <in>exit-32.c</in>
         <in>pe.h</in>
         <in>pe2aout.c</in>
+        <in>strip-cr.c</in>
         <in>write-16.s</in>
       </df>
       <in>File.cpp</in>
