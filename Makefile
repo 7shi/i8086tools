@@ -5,7 +5,7 @@ CXXFLAGS = -Wall -O2 -g
 LDFLAGS  =
 OBJECTS  = $(SOURCES:%.cpp=%.o)
 SOURCES  = main.cpp utils.cpp \
-	   OpCode.cpp Operand.cpp File.cpp \
+	   Op8086.cpp Opr8086.cpp File.cpp \
 	   VM.cpp VM.sys.cpp \
 	   VM8086.cpp VM8086.disasm.cpp VM8086.inst.cpp \
 	   VMMinix2.cpp VMMinix2.signal.cpp

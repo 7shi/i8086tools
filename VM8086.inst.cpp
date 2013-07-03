@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 void VM8086::run1(uint8_t prefix) {
-    OpCode op;
+    Op8086 op;
     if (cache.empty()) {
         op = disasm1(text + ip, ip, tsize);
     } else {

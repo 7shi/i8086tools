@@ -6,7 +6,7 @@
 bool ptable[256];
 const char *header = " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n";
 
-void VM8086::debug(uint16_t ip, const OpCode &op) {
+void VM8086::debug(uint16_t ip, const Op8086 &op) {
     fprintf(stderr,
             "%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-12s %s",
             r[0], r[3], r[1], r[2], r[4], r[5], r[6], r[7],
@@ -84,7 +84,7 @@ VM8086::VM8086(const VM8086 &vm) : VM(vm) {
 VM8086::~VM8086() {
 }
 
-int VM8086::addr(const Operand &opr) {
+int VM8086::addr(const Opr8086 &opr) {
     switch (opr.type) {
         case Ptr: return uint16_t(opr.value);
         case ModRM + 0: return uint16_t(BX + SI + opr.value);
@@ -99,7 +99,7 @@ int VM8086::addr(const Operand &opr) {
     return -1;
 }
 
-uint8_t VM8086::get8(const Operand &opr) {
+uint8_t VM8086::get8(const Opr8086 &opr) {
     switch (opr.type) {
         case Reg: return *r8[opr.value];
         case Imm: return opr.value;
@@ -108,7 +108,7 @@ uint8_t VM8086::get8(const Operand &opr) {
     return ad < 0 ? 0 : data[ad];
 }
 
-uint16_t VM8086::get16(const Operand &opr) {
+uint16_t VM8086::get16(const Opr8086 &opr) {
     switch (opr.type) {
         case Reg: return r[opr.value];
         case Imm: return opr.value;
@@ -117,7 +117,7 @@ uint16_t VM8086::get16(const Operand &opr) {
     return ad < 0 ? 0 : read16(ad);
 }
 
-void VM8086::set8(const Operand &opr, uint8_t value) {
+void VM8086::set8(const Opr8086 &opr, uint8_t value) {
     if (opr.type == Reg) {
         *r8[opr.value] = value;
     } else {
@@ -126,7 +126,7 @@ void VM8086::set8(const Operand &opr, uint8_t value) {
     }
 }
 
-void VM8086::set16(const Operand &opr, uint16_t value) {
+void VM8086::set16(const Opr8086 &opr, uint16_t value) {
     if (opr.type == Reg) {
         r[opr.value] = value;
     } else {

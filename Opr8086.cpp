@@ -1,21 +1,21 @@
-#include "Operand.h"
+#include "Opr8086.h"
 
-Operand dx = Operand(0, true, Reg, 2);
-Operand cl = Operand(0, false, Reg, 1);
-Operand es = Operand(0, true, SReg, 0);
-Operand cs = Operand(0, true, SReg, 1);
-Operand ss = Operand(0, true, SReg, 2);
-Operand ds = Operand(0, true, SReg, 3);
+Opr8086 dx = Opr8086(0, true, Reg, 2);
+Opr8086 cl = Opr8086(0, false, Reg, 1);
+Opr8086 es = Opr8086(0, true, SReg, 0);
+Opr8086 cs = Opr8086(0, true, SReg, 1);
+Opr8086 ss = Opr8086(0, true, SReg, 2);
+Opr8086 ds = Opr8086(0, true, SReg, 3);
 
-Operand::Operand()
+Opr8086::Opr8086()
 : len(-1), w(false), type(0), value(0), seg(-1) {
 }
 
-Operand::Operand(int len, bool w, int type, int value)
+Opr8086::Opr8086(int len, bool w, int type, int value)
 : len(len), w(w), type(type), value(value), seg(-1) {
 }
 
-std::string Operand::str() const {
+std::string Opr8086::str() const {
     switch (type) {
         case Reg: return (w ? regs16: regs8)[value];
         case SReg: return sregs[value];

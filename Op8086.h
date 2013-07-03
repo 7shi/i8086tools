@@ -1,19 +1,19 @@
 #pragma once
-#include "Operand.h"
+#include "Opr8086.h"
 #include <stdint.h>
 
-struct OpCode {
+struct Op8086 {
     bool prefix;
     size_t len;
     std::string mne;
-    Operand opr1, opr2;
+    Opr8086 opr1, opr2;
 
-    OpCode();
-    OpCode(
+    Op8086();
+    Op8086(
             int len, const std::string &mne,
-            const Operand &opr1 = Operand(),
-            const Operand &opr2 = Operand());
-    OpCode(const std::string &mne, const Operand &opr = Operand());
+            const Opr8086 &opr1 = Opr8086(),
+            const Opr8086 &opr2 = Opr8086());
+    Op8086(const std::string &mne, const Opr8086 &opr = Opr8086());
 
     inline bool empty() const {
         return len == 0;

@@ -37,10 +37,10 @@
       </df>
       <in>File.cpp</in>
       <in>File.h</in>
-      <in>OpCode.cpp</in>
-      <in>OpCode.h</in>
-      <in>Operand.cpp</in>
-      <in>Operand.h</in>
+      <in>Op8086.cpp</in>
+      <in>Op8086.h</in>
+      <in>Opr8086.cpp</in>
+      <in>Opr8086.h</in>
       <in>VM.cpp</in>
       <in>VM.h</in>
       <in>VM.sys.cpp</in>
@@ -126,13 +126,13 @@
       </item>
       <item path="File.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="OpCode.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Op8086.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="OpCode.h" ex="false" tool="3" flavor2="0">
+      <item path="Op8086.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="Operand.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Opr8086.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="Operand.h" ex="false" tool="3" flavor2="0">
+      <item path="Opr8086.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="VM.cpp" ex="false" tool="1" flavor2="0">
       </item>
