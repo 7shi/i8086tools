@@ -1,53 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="89">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
-    <df root="." name="i8086tools">
-      <df name="Ack-5.5">
-        <df name="dis88">
-          <in>dis.h</in>
-        </df>
-        <df name="include">
-          <in>a.out.h</in>
-          <in>ansi.h</in>
-          <in>arch.h</in>
-          <in>local.h</in>
-          <in>out.h</in>
-          <in>ranlib.h</in>
-        </df>
-        <df name="ld">
-          <in>assert.h</in>
-          <in>const.h</in>
-          <in>debug.h</in>
-          <in>defs.h</in>
-          <in>mach.c</in>
-          <in>memory.h</in>
-          <in>orig.h</in>
-          <in>scan.h</in>
-        </df>
-        <df name="lib">
-          <in>obj.h</in>
-          <in>object.h</in>
-        </df>
-      </df>
-      <df name="tools">
-        <in>a.out.h</in>
-        <in>aout-tool.c</in>
-        <in>pe.h</in>
-        <in>pe2aout.c</in>
-      </df>
-      <in>File.cpp</in>
-      <in>File.h</in>
-      <in>Op8086.cpp</in>
-      <in>Op8086.h</in>
-      <in>Opr8086.cpp</in>
-      <in>Opr8086.h</in>
-      <in>VM.cpp</in>
-      <in>VM.h</in>
-      <in>VM.sys.cpp</in>
-      <in>main.cpp</in>
-      <in>utils.cpp</in>
-      <in>utils.h</in>
-    </df>
+    <logicalFolder name="i8086tools"
+                   displayName="i8086tools"
+                   projectFiles="true"
+                   root=".">
+      <logicalFolder name="tools" displayName="tools" projectFiles="true">
+        <itemPath>tools/a.out.h</itemPath>
+        <itemPath>tools/aout-tool.c</itemPath>
+        <itemPath>tools/pe.h</itemPath>
+        <itemPath>tools/pe2aout.c</itemPath>
+        <itemPath>tools/strip-cr.c</itemPath>
+      </logicalFolder>
+      <itemPath>File.cpp</itemPath>
+      <itemPath>File.h</itemPath>
+      <itemPath>Op8086.cpp</itemPath>
+      <itemPath>Op8086.h</itemPath>
+      <itemPath>Opr8086.cpp</itemPath>
+      <itemPath>Opr8086.h</itemPath>
+      <itemPath>VM.cpp</itemPath>
+      <itemPath>VM.h</itemPath>
+      <itemPath>VM.sys.cpp</itemPath>
+      <itemPath>VM8086.cpp</itemPath>
+      <itemPath>VM8086.disasm.cpp</itemPath>
+      <itemPath>VM8086.h</itemPath>
+      <itemPath>VM8086.inst.cpp</itemPath>
+      <itemPath>VMMinix2.cpp</itemPath>
+      <itemPath>VMMinix2.h</itemPath>
+      <itemPath>VMMinix2.signal.cpp</itemPath>
+      <itemPath>main.cpp</itemPath>
+      <itemPath>utils.cpp</itemPath>
+      <itemPath>utils.h</itemPath>
+    </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="重要なファイル"
                    projectFiles="false"
@@ -55,10 +39,6 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
-  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
-  <sourceRootList>
-    <Elem>.</Elem>
-  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Default" type="0">
@@ -75,7 +55,7 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
-          <executablePath>m2run.exe</executablePath>
+          <executablePath></executablePath>
           <cTool>
             <incDir>
               <pElem>tools</pElem>
@@ -88,40 +68,6 @@
           </ccTool>
         </makeTool>
       </makefileType>
-      <item path="Ack-5.5/dis88/dis.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/include/a.out.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/include/ansi.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/include/arch.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/include/local.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/include/out.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/include/ranlib.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/ld/assert.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/ld/const.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/ld/debug.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/ld/defs.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/ld/mach.c" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/ld/memory.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/ld/orig.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/ld/scan.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/lib/obj.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Ack-5.5/lib/object.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="File.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="File.h" ex="false" tool="3" flavor2="0">
@@ -140,6 +86,20 @@
       </item>
       <item path="VM.sys.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="VM8086.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="VM8086.disasm.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="VM8086.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="VM8086.inst.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="VMMinix2.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="VMMinix2.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="VMMinix2.signal.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tools/a.out.h" ex="false" tool="3" flavor2="0">
@@ -149,6 +109,8 @@
       <item path="tools/pe.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tools/pe2aout.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="tools/strip-cr.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="utils.cpp" ex="false" tool="1" flavor2="0">
       </item>
