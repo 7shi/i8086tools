@@ -4,6 +4,9 @@
 #include "File.h"
 #include <vector>
 #include <list>
+#ifdef WIN32
+#define NO_FORK
+#endif
 
 #define AX r[0]
 #define CX r[1]
@@ -28,7 +31,7 @@ extern int exitcode;
 extern const char *header;
 
 class VM {
-private:
+protected:
     static VM *current;
     uint16_t ip, r[8];
     uint8_t *r8[8];
@@ -46,7 +49,7 @@ private:
 public:
     VM();
     VM(const VM &vm);
-    ~VM();
+    virtual ~VM();
     bool load(const std::string &fn);
     void run(
             const std::vector<std::string> &args,
@@ -54,8 +57,7 @@ public:
     void run();
     void disasm();
 
-private:
-
+protected:
     inline int setf8(int value, bool cf) {
         int8_t v = value;
         OF = value != v;
@@ -108,6 +110,7 @@ private:
     int close(int fd);
     FileBase *file(int fd);
     void setstat(uint16_t addr, struct stat *st);
+    void swtch(VM *to);
 
     void sys_exit(int code);
     //int sys_fork();
@@ -135,14 +138,10 @@ private:
     int sys_umask(mode_t mask);
     //void sys_sigaction();
 
-    void minix_syscall();
-    int minix_fork(); //  2
-    int minix_signal(); // 48
-    int minix_exec(); // 59
-    int minix_sigaction(); // 71
+    virtual bool syscall(int n) = 0;
 
     static void sighandler(int sig);
-
+    
     struct sigact {
         uint16_t handler;
         uint16_t mask;
@@ -151,7 +150,6 @@ private:
     static const int nsig = 12;
     sigact sigacts[nsig];
 
-    void swtch(VM *to);
-    void setsig(int sig, int h);
-    void resetsig();
+    virtual int convsig(int sig) = 0;
+    virtual void setsig(int sig, int h) = 0;
 };

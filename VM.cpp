@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <signal.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/stat.h>
 
 bool ptable[256];
@@ -72,7 +74,11 @@ void VM::init() {
     text = new uint8_t[0x10000];
     hasExited = false;
     memset(sigacts, 0, sizeof (sigacts));
-    pid = ++pid_max;
+#ifdef NO_FORK
+    pid = ((getpid() << 4) % 30000) + (++pid_max);
+#else
+    pid = (getpid() % 30000) + 1;
+#endif
 }
 
 VM::VM() : ip(0), data(NULL), tsize(0), start_sp(0), umask(0) {
@@ -305,4 +311,22 @@ FileBase *VM::file(int fd) {
         return NULL;
     }
     return files[fd];
+}
+
+void VM::sighandler(int sig) {
+    current->ip = current->sigacts[sig].handler;
+}
+
+void VM::swtch(VM *to) {
+    for (int i = 0; i < nsig; i++) {
+        int s = convsig(i);
+        if (s >= 0) {
+            if (!to) {
+                signal(s, SIG_DFL);
+            } else {
+                setsig(s, to->sigacts[i].handler);
+            }
+        }
+    }
+    current = to;
 }

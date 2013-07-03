@@ -1,4 +1,4 @@
-main.o: main.cpp VM.h utils.h OpCode.h Operand.h File.h
+main.o: main.cpp VMMinix2.h VM.h utils.h OpCode.h Operand.h File.h
 utils.o: utils.cpp utils.h
 disasm.o: disasm.cpp disasm.h OpCode.h Operand.h utils.h
 OpCode.o: OpCode.cpp OpCode.h Operand.h utils.h
@@ -7,4 +7,7 @@ File.o: File.cpp File.h
 VM.o: VM.cpp VM.h utils.h OpCode.h Operand.h File.h disasm.h
 VM.inst.o: VM.inst.cpp VM.h utils.h OpCode.h Operand.h File.h disasm.h
 VM.sys.o: VM.sys.cpp VM.h utils.h OpCode.h Operand.h File.h disasm.h
-VM.signal.o: VM.signal.cpp VM.h utils.h OpCode.h Operand.h File.h
+VMMinix2.o: VMMinix2.cpp VMMinix2.h VM.h utils.h OpCode.h Operand.h \
+ File.h
+VMMinix2.signal.o: VMMinix2.signal.cpp VMMinix2.h VM.h utils.h OpCode.h \
+ Operand.h File.h

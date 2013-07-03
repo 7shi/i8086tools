@@ -6,7 +6,8 @@ LDFLAGS  =
 OBJECTS  = $(SOURCES:%.cpp=%.o)
 SOURCES  = main.cpp utils.cpp disasm.cpp \
 	   OpCode.cpp Operand.cpp File.cpp \
-	   VM.cpp VM.inst.cpp VM.sys.cpp VM.signal.cpp
+	   VM.cpp VM.inst.cpp VM.sys.cpp \
+	   VMMinix2.cpp VMMinix2.signal.cpp
 COMMANDS = bin/aal bin/ar bin/cc bin/nm bin/strip \
 	   bin/crc bin/install bin/m2 \
 	   lib/as lib/ld lib/cv

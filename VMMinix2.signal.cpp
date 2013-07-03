@@ -1,4 +1,4 @@
-#include "VM.h"
+#include "VMMinix2.h"
 #include <stdio.h>
 #include <signal.h>
 #include <errno.h>
@@ -11,7 +11,7 @@
 #define MX_SIG_DFL  0
 #define MX_SIG_IGN  1
 
-static int convsig(int sig) {
+int VMMinix2::convsig(int sig) {
     switch (sig) {
         case MX_SIGINT: return SIGINT;
         case MX_SIGILL: return SIGILL;
@@ -21,11 +21,7 @@ static int convsig(int sig) {
     return -1;
 }
 
-void VM::sighandler(int sig) {
-    current->ip = current->sigacts[sig].handler;
-}
-
-int VM::minix_signal() { // 48
+int VMMinix2::minix_signal() { // 48
     int sig = read16(BX + 4);
     int sgh = read16(BX + 14);
     if (trace) fprintf(stderr, "<signal(%d, 0x%04x)>\n", sig, sgh);
@@ -41,7 +37,7 @@ int VM::minix_signal() { // 48
     return oh;
 }
 
-int VM::minix_sigaction() { // 71
+int VMMinix2::minix_sigaction() { // 71
     int sig = read16(BX + 6);
     int act = read16(BX + 10);
     int oact = read16(BX + 12);
@@ -60,28 +56,7 @@ int VM::minix_sigaction() { // 71
     return 0;
 }
 
-void VM::swtch(VM *to) {
-    for (int i = 0; i < nsig; i++) {
-        int s = convsig(i);
-        if (s >= 0) {
-            if (!to) {
-                signal(s, SIG_DFL);
-            } else {
-                switch (to->sigacts[i].handler) {
-                    case MX_SIG_DFL: signal(s, SIG_DFL);
-                        break;
-                    case MX_SIG_IGN: signal(s, SIG_IGN);
-                        break;
-                    default: signal(s, &sighandler);
-                        break;
-                }
-            }
-        }
-    }
-    current = to;
-}
-
-void VM::setsig(int sig, int h) {
+void VMMinix2::setsig(int sig, int h) {
     switch (h) {
         case MX_SIG_DFL: signal(sig, SIG_DFL);
             break;
@@ -92,7 +67,7 @@ void VM::setsig(int sig, int h) {
     }
 }
 
-void VM::resetsig() {
+void VMMinix2::resetsig() {
     for (int i = 0; i < nsig; i++) {
         switch (sigacts[i].handler) {
             case MX_SIG_DFL:

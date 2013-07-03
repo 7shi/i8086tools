@@ -1,4 +1,4 @@
-#include "VM.h"
+#include "VMMinix2.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
         printf("    -s: syscall mode (output syscall)\n");
         return 1;
     }
-    VM vm;
+    VMMinix2 vm;
     if (!vm.load(args[0])) return 1;
     if (dis) {
         vm.disasm();
