@@ -1,7 +1,7 @@
 #include "VM8086.h"
 #include <stdio.h>
 
-Operand modrm(uint8_t *mem, bool w) {
+static Operand modrm(uint8_t *mem, bool w) {
     uint8_t b = mem[1], mod = b >> 6, rm = b & 7;
     switch (mod) {
         case 0:
@@ -40,7 +40,7 @@ static OpCode aimm(uint8_t *mem, const std::string &mne) {
 
 static int undefined;
 
-OpCode disasm1(uint8_t *mem, uint16_t addr) {
+OpCode VM8086::disasm1(uint8_t *mem, uint16_t addr) {
     uint8_t b = mem[0];
     switch (b) {
         case 0x00:
@@ -175,7 +175,7 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
                 op.opr2 = Operand(1, false, Imm, (int8_t) mem[iimm]);
             } else if (b & 1) {
                 op.len += 2;
-                op.opr2 = imm16(read16(mem + iimm));
+                op.opr2 = imm16(::read16(mem + iimm));
             } else {
                 op.len++;
                 op.opr2 = imm8(mem[iimm]);
@@ -204,22 +204,22 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
         case 0x97: return OpCode(1, "xchg", reg(b & 7, true), reg(0, true));
         case 0x98: return OpCode(1, "cbw");
         case 0x99: return OpCode(1, "cwd");
-        case 0x9a: return OpCode(5, "callf", far(read32(mem + 1)));
+        case 0x9a: return OpCode(5, "callf", far(::read32(mem + 1)));
         case 0x9b: return OpCode(1, "wait");
         case 0x9c: return OpCode(1, "pushf");
         case 0x9d: return OpCode(1, "popf");
         case 0x9e: return OpCode(1, "sahf");
         case 0x9f: return OpCode(1, "lahf");
         case 0xa0:
-        case 0xa1: return OpCode(3, "mov", reg(0, b & 1), ptr(read16(mem + 1), b & 1));
+        case 0xa1: return OpCode(3, "mov", reg(0, b & 1), ptr(::read16(mem + 1), b & 1));
         case 0xa2:
-        case 0xa3: return OpCode(3, "mov", ptr(read16(mem + 1), b & 1), reg(0, b & 1));
+        case 0xa3: return OpCode(3, "mov", ptr(::read16(mem + 1), b & 1), reg(0, b & 1));
         case 0xa4: return OpCode(1, "movsb");
         case 0xa5: return OpCode(1, "movsw");
         case 0xa6: return OpCode(1, "cmpsb");
         case 0xa7: return OpCode(1, "cmpsw");
         case 0xa8: return OpCode(2, "test", reg(0, false), imm8(mem[1]));
-        case 0xa9: return OpCode(3, "test", reg(0, true), imm16(read16(mem + 1)));
+        case 0xa9: return OpCode(3, "test", reg(0, true), imm16(::read16(mem + 1)));
         case 0xaa: return OpCode(1, "stosb");
         case 0xab: return OpCode(1, "stosw");
         case 0xac: return OpCode(1, "lodsb");
@@ -241,8 +241,8 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
         case 0xbc:
         case 0xbd:
         case 0xbe:
-        case 0xbf: return OpCode(3, "mov", reg(b & 7, true), imm16(read16(mem + 1)));
-        case 0xc2: return OpCode(3, "ret", imm16(read16(mem + 1)));
+        case 0xbf: return OpCode(3, "mov", reg(b & 7, true), imm16(::read16(mem + 1)));
+        case 0xc2: return OpCode(3, "ret", imm16(::read16(mem + 1)));
         case 0xc3: return OpCode(1, "ret");
         case 0xc4: return regrm(mem, "les", true, 1);
         case 0xc5: return regrm(mem, "lds", true, 1);
@@ -250,11 +250,11 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
         case 0xc7:
         {
             OpCode op = modrm(mem, "mov", b & 1);
-            op.opr2 = b & 1 ? imm16(read16(mem + op.len)) : imm8(mem[op.len]);
+            op.opr2 = b & 1 ? imm16(::read16(mem + op.len)) : imm8(mem[op.len]);
             op.len += op.opr2.len;
             return op;
         }
-        case 0xca: return OpCode(3, "retf", imm16(read16(mem + 1)));
+        case 0xca: return OpCode(3, "retf", imm16(::read16(mem + 1)));
         case 0xcb: return OpCode(1, "retf");
         case 0xcc: return OpCode(1, "int3");
         case 0xcd: return OpCode(2, "int", imm8(mem[1]));
@@ -303,7 +303,7 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
         case 0xe7: return OpCode(2, "out", imm8(mem[1]), reg(0, b & 1));
         case 0xe8: return OpCode(3, "call", disp16(mem + 1, addr + 1));
         case 0xe9: return OpCode(3, "jmp", disp16(mem + 1, addr + 1));
-        case 0xea: return OpCode(5, "jmpf", far(read32(mem + 1)));
+        case 0xea: return OpCode(5, "jmpf", far(::read32(mem + 1)));
         case 0xeb: return OpCode(2, "jmp short", disp8(mem + 1, addr + 1));
         case 0xec:
         case 0xed: return OpCode(1, "in", reg(0, b & 1), dx);
@@ -323,7 +323,7 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
             if (mne.empty()) break;
             OpCode op = modrm(mem, mne, b & 1);
             if (t > 0) return op;
-            op.opr2 = b & 1 ? imm16(read16(mem + op.len)) : imm8(mem[op.len]);
+            op.opr2 = b & 1 ? imm16(::read16(mem + op.len)) : imm8(mem[op.len]);
             op.len += op.opr2.len;
             return op;
         }
@@ -346,7 +346,7 @@ OpCode disasm1(uint8_t *mem, uint16_t addr) {
     return OpCode(1, "(undefined)");
 }
 
-OpCode disasm1(uint8_t *mem, uint16_t addr, size_t last) {
+OpCode VM8086::disasm1(uint8_t *mem, uint16_t addr, size_t last) {
     OpCode op1 = disasm1(mem, addr);
     uint16_t addr2 = addr + op1.len;
     if (!op1.prefix || addr2 > last) return op1;
@@ -370,7 +370,7 @@ OpCode disasm1(uint8_t *mem, uint16_t addr, size_t last) {
     return op2;
 }
 
-void disasm(uint8_t *mem, size_t size) {
+void VM8086::disasm(uint8_t *mem, size_t size) {
     undefined = 0;
     int index = 0;
     while (index < (int) size) {

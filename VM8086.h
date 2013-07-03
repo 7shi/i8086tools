@@ -22,11 +22,6 @@
 extern bool ptable[256];
 extern const char *header;
 
-Operand modrm(uint8_t *mem, bool w);
-OpCode disasm1(uint8_t *mem, uint16_t addr);
-OpCode disasm1(uint8_t *mem, uint16_t addr, size_t last);
-void disasm(uint8_t *mem, size_t size);
-
 class VM8086 : public VM {
 protected:
     uint16_t ip, r[8];
@@ -37,6 +32,7 @@ protected:
 
 private:
     void init();
+
 public:
     VM8086();
     VM8086(const VM8086 &vm);
@@ -47,6 +43,10 @@ public:
             const std::vector<std::string> &envs);
     void run();
     void disasm();
+
+    static OpCode disasm1(uint8_t *mem, uint16_t addr);
+    static OpCode disasm1(uint8_t *mem, uint16_t addr, size_t last);
+    static void disasm(uint8_t *mem, size_t size);
 
 protected:
 

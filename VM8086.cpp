@@ -234,5 +234,5 @@ bool VM8086::load(const std::string &fn) {
 }
 
 void VM8086::disasm() {
-    ::disasm(text, tsize);
+    disasm(text, tsize);
 }
