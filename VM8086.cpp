@@ -2,12 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-#if 0
-#include <errno.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <unistd.h>
-#endif
 
 bool ptable[256];
 const char *header = " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n";
