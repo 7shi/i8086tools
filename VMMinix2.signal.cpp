@@ -11,6 +11,15 @@
 #define MX_SIG_DFL  0
 #define MX_SIG_IGN  1
 
+void VMMinix2::sighandler(int sig) {
+    VMMinix2 *cur = dynamic_cast<VMMinix2 *> (current);
+    if (cur) cur->sighandler2(sig);
+}
+
+void VMMinix2::sighandler2(int sig) {
+    ip = sigacts[sig].handler;
+}
+
 int VMMinix2::convsig(int sig) {
     switch (sig) {
         case MX_SIGINT: return SIGINT;

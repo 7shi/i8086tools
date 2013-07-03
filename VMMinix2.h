@@ -1,8 +1,7 @@
 #pragma once
-#include "VM.h"
+#include "VM8086.h"
 
-class VMMinix2: public VM {
-
+class VMMinix2 : public VM8086 {
 public:
     VMMinix2();
     VMMinix2(const VMMinix2 &vm);
@@ -11,6 +10,7 @@ public:
 protected:
     virtual bool syscall(int n);
     virtual void setsig(int sig, int h);
+    virtual void setstat(uint16_t addr, struct stat *st);
 
 private:
     int minix_fork(); //  2
@@ -18,6 +18,8 @@ private:
     int minix_exec(); // 59
     int minix_sigaction(); // 71
 
+    static void sighandler(int sig);
+    void sighandler2(int sig);
     virtual int convsig(int sig);
     void resetsig();
 };

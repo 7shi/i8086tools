@@ -1,8 +1,7 @@
-#include "VM.h"
-#include "disasm.h"
+#include "VM8086.h"
 #include <stdio.h>
 
-void VM::run1(uint8_t prefix) {
+void VM8086::run1(uint8_t prefix) {
     OpCode op;
     if (cache.empty()) {
         op = disasm1(text + ip, ip, tsize);

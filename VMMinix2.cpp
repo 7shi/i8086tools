@@ -3,9 +3,14 @@
 #include <string.h>
 #include <unistd.h>
 
-VMMinix2::VMMinix2() : VM() {}
-VMMinix2::VMMinix2(const VMMinix2 &vm) : VM(vm) {}
-VMMinix2::~VMMinix2() {}
+VMMinix2::VMMinix2() {
+}
+
+VMMinix2::VMMinix2(const VMMinix2 &vm) : VM8086(vm) {
+}
+
+VMMinix2::~VMMinix2() {
+}
 
 bool VMMinix2::syscall(int n) {
     if (n != 0x20) return false;
@@ -79,7 +84,7 @@ bool VMMinix2::syscall(int n) {
             hasExited = true;
             break;
         case 17:
-            result = sys_brk(read16(BX + 10));
+            result = sys_brk(read16(BX + 10), SP);
             if (!result) write16(BX + 18, brksize);
             break;
         case 18:
@@ -312,4 +317,18 @@ int VMMinix2::minix_exec() { // 59
         }
     }
     return 0;
+}
+
+void VMMinix2::setstat(uint16_t addr, struct stat *st) {
+    write16(addr, st->st_dev);
+    write16(addr + 2, st->st_ino);
+    write16(addr + 4, st->st_mode);
+    write16(addr + 6, st->st_nlink);
+    write16(addr + 8, st->st_uid);
+    write16(addr + 10, st->st_gid);
+    write16(addr + 12, st->st_rdev);
+    write32(addr + 14, st->st_size);
+    write32(addr + 18, st->st_atime);
+    write32(addr + 22, st->st_mtime);
+    write32(addr + 26, st->st_ctime);
 }

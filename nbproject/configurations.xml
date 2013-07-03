@@ -43,11 +43,7 @@
       <in>Operand.h</in>
       <in>VM.cpp</in>
       <in>VM.h</in>
-      <in>VM.inst.cpp</in>
-      <in>VM.signal.cpp</in>
       <in>VM.sys.cpp</in>
-      <in>disasm.cpp</in>
-      <in>disasm.h</in>
       <in>main.cpp</in>
       <in>utils.cpp</in>
       <in>utils.h</in>
@@ -142,15 +138,7 @@
       </item>
       <item path="VM.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="VM.inst.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="VM.signal.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="VM.sys.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="disasm.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="disasm.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>

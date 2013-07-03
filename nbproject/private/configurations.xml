@@ -96,14 +96,14 @@
       <in>Operand.h</in>
       <in>VM.cpp</in>
       <in>VM.h</in>
-      <in>VM.inst.cpp</in>
-      <in>VM.signal.cpp</in>
       <in>VM.sys.cpp</in>
+      <in>VM8086.cpp</in>
+      <in>VM8086.disasm.cpp</in>
+      <in>VM8086.h</in>
+      <in>VM8086.inst.cpp</in>
       <in>VMMinix2.cpp</in>
       <in>VMMinix2.h</in>
       <in>VMMinix2.signal.cpp</in>
-      <in>disasm.cpp</in>
-      <in>disasm.h</in>
       <in>main.cpp</in>
       <in>utils.cpp</in>
       <in>utils.h</in>

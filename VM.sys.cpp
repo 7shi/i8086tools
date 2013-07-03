@@ -1,5 +1,4 @@
 #include "VM.h"
-#include "disasm.h"
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
@@ -50,20 +49,6 @@ int VM::close(int fd) {
     }
 #endif
     return 0;
-}
-
-void VM::setstat(uint16_t addr, struct stat *st) {
-    write16(addr, st->st_dev);
-    write16(addr + 2, st->st_ino);
-    write16(addr + 4, st->st_mode);
-    write16(addr + 6, st->st_nlink);
-    write16(addr + 8, st->st_uid);
-    write16(addr + 10, st->st_gid);
-    write16(addr + 12, st->st_rdev);
-    write32(addr + 14, st->st_size);
-    write32(addr + 18, st->st_atime);
-    write32(addr + 22, st->st_mtime);
-    write32(addr + 26, st->st_ctime);
 }
 
 void VM::sys_exit(int code) {
@@ -208,9 +193,9 @@ int VM::sys_chmod(const char *path, mode_t mode) {
     return result;
 }
 
-int VM::sys_brk(int nd) {
+int VM::sys_brk(int nd, int sp) {
     if (trace) fprintf(stderr, "<brk(0x%04x)", nd);
-    if (nd < (int) dsize || nd >= ((SP - 0x400) & ~0x3ff)) {
+    if (nd < (int) dsize || nd >= ((sp - 0x400) & ~0x3ff)) {
         errno = ENOMEM;
         if (trace) fprintf(stderr, " => ENOMEM>\n");
         return -1;
