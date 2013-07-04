@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     }
 
     uint8_t buf[2];
-    FILE *f = fopen(args[0].c_str(), "rb");
+    FILE *f = fopen(convpath(args[0]).c_str(), "rb");
     if (!f) {
         fprintf(stderr, "can not open: %s\n", args[0].c_str());
         return 1;
