@@ -50,8 +50,7 @@ int main(int argc, char *argv[]) {
     }
 
     VMUnix *vm;
-    int magic = read16(buf);
-    if (pdp11 || magic == 0407 || magic == 0410 || magic == 0411) {
+    if (pdp11 || PDP11::check(buf)) {
         vm = new PDP11::VM();
     } else {
         vm = new Minix2::VM();

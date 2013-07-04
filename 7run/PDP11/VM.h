@@ -4,6 +4,8 @@
 namespace PDP11 {
     extern const char *header;
 
+    bool check(uint8_t h[2]);
+
     class VM : public VMUnix {
     public:
         VM();
