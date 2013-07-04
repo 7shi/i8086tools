@@ -27,13 +27,13 @@ write-libc.o: write-libc.s
 	m2as - -o $@ $<
 
 test: $(TARGET)
-	m2run a.out
-	m2run write-libc.out
-	m2run -v write.out
-	m2run -v test.bin
-	m2run -v idiv.bin
-	m2run -v xchg.bin
-	m2run -v write-nasm.bin
+	7run a.out
+	7run write-libc.out
+	7run -v write.out
+	7run -v test.bin
+	7run -v idiv.bin
+	7run -v xchg.bin
+	7run -v write-nasm.bin
 
 clean:
 	rm -f $(TARGET) *.o *.tmp

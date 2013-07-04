@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="89">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="7run">
+      <in>File.cpp</in>
+      <in>File.h</in>
+      <in>Op8086.cpp</in>
+      <in>Op8086.h</in>
+      <in>Opr8086.cpp</in>
+      <in>Opr8086.h</in>
+      <in>VM.cpp</in>
+      <in>VM.h</in>
+      <in>VM.sys.cpp</in>
+      <in>VM8086.cpp</in>
+      <in>VM8086.disasm.cpp</in>
+      <in>VM8086.h</in>
+      <in>VM8086.inst.cpp</in>
+      <in>VMMinix2.cpp</in>
+      <in>VMMinix2.h</in>
+      <in>VMMinix2.signal.cpp</in>
+      <in>main.cpp</in>
+      <in>utils.cpp</in>
+      <in>utils.h</in>
+    </df>
+  </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Default" type="0">

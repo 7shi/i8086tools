@@ -1,37 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="89">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
-    <logicalFolder name="i8086tools"
-                   displayName="i8086tools"
-                   projectFiles="true"
-                   root=".">
-      <logicalFolder name="tools" displayName="tools" projectFiles="true">
-        <itemPath>tools/a.out.h</itemPath>
-        <itemPath>tools/aout-tool.c</itemPath>
-        <itemPath>tools/pe.h</itemPath>
-        <itemPath>tools/pe2aout.c</itemPath>
-        <itemPath>tools/strip-cr.c</itemPath>
-      </logicalFolder>
-      <itemPath>File.cpp</itemPath>
-      <itemPath>File.h</itemPath>
-      <itemPath>Op8086.cpp</itemPath>
-      <itemPath>Op8086.h</itemPath>
-      <itemPath>Opr8086.cpp</itemPath>
-      <itemPath>Opr8086.h</itemPath>
-      <itemPath>VM.cpp</itemPath>
-      <itemPath>VM.h</itemPath>
-      <itemPath>VM.sys.cpp</itemPath>
-      <itemPath>VM8086.cpp</itemPath>
-      <itemPath>VM8086.disasm.cpp</itemPath>
-      <itemPath>VM8086.h</itemPath>
-      <itemPath>VM8086.inst.cpp</itemPath>
-      <itemPath>VMMinix2.cpp</itemPath>
-      <itemPath>VMMinix2.h</itemPath>
-      <itemPath>VMMinix2.signal.cpp</itemPath>
-      <itemPath>main.cpp</itemPath>
-      <itemPath>utils.cpp</itemPath>
-      <itemPath>utils.h</itemPath>
-    </logicalFolder>
+    <df root="." name="7run">
+      <in>File.cpp</in>
+      <in>File.h</in>
+      <in>Op8086.cpp</in>
+      <in>Op8086.h</in>
+      <in>Opr8086.cpp</in>
+      <in>Opr8086.h</in>
+      <in>VM.cpp</in>
+      <in>VM.h</in>
+      <in>VM.sys.cpp</in>
+      <in>VM8086.cpp</in>
+      <in>VM8086.disasm.cpp</in>
+      <in>VM8086.h</in>
+      <in>VM8086.inst.cpp</in>
+      <in>VMMinix2.cpp</in>
+      <in>VMMinix2.h</in>
+      <in>VMMinix2.signal.cpp</in>
+      <in>main.cpp</in>
+      <in>utils.cpp</in>
+      <in>utils.h</in>
+    </df>
     <logicalFolder name="ExternalFiles"
                    displayName="重要なファイル"
                    projectFiles="false"
@@ -39,6 +29,10 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Default" type="0">
@@ -56,11 +50,6 @@
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
           <executablePath></executablePath>
-          <cTool>
-            <incDir>
-              <pElem>tools</pElem>
-            </incDir>
-          </cTool>
           <ccTool>
             <incDir>
               <pElem></pElem>
@@ -101,16 +90,6 @@
       <item path="VMMinix2.signal.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="tools/a.out.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="tools/aout-tool.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="tools/pe.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="tools/pe2aout.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="tools/strip-cr.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="utils.cpp" ex="false" tool="1" flavor2="0">
       </item>
