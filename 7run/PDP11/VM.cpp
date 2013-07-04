@@ -46,8 +46,15 @@ bool VM::load(const std::string &fn) {
             } else {
                 //cache.clear();
                 data = text;
-                dsize += tsize;
-                fread(text, 1, dsize, f);
+                if (h[0] == 8) { // 0410
+                    fread(text, 1, tsize, f);
+                    uint16_t doff = (tsize + 0x1fff) & ~0x1fff;
+                    fread(text + doff, 1, dsize, f);
+                    dsize += doff;
+                } else {
+                    dsize += tsize;
+                    fread(text, 1, dsize, f);
+                }
             }
             dsize += ::read16(h + 6); // bss
             brksize = dsize;
