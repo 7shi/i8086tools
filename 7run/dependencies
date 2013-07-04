@@ -6,7 +6,8 @@ VM.o: VM.cpp VM.h utils.h File.h
 VM.sys.o: VM.sys.cpp VM.h utils.h File.h
 OpCode.o: i8086/OpCode.cpp i8086/OpCode.h i8086/Operand.h \
  i8086/../utils.h
-Operand.o: i8086/Operand.cpp i8086/Operand.h i8086/../utils.h
+Operand.o: i8086/Operand.cpp i8086/Operand.h i8086/../utils.h \
+ i8086/disasm.h i8086/OpCode.h
 VM.o: i8086/VM.cpp i8086/VM.h i8086/../VM.h i8086/../utils.h \
  i8086/../File.h i8086/OpCode.h i8086/Operand.h i8086/disasm.h
 VM.inst.o: i8086/VM.inst.cpp i8086/VM.h i8086/../VM.h i8086/../utils.h \
