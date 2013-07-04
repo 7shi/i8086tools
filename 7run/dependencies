@@ -1,5 +1,7 @@
-./main.o: main.cpp VMMinix2.h i8086/VM.h i8086/../VMUnix.h i8086/../utils.h \
- i8086/../File.h i8086/OpCode.h i8086/Operand.h PDP11/VM.h
+./main.o: main.cpp Minix2/VM.h Minix2/../i8086/VM.h \
+ Minix2/../i8086/../VMUnix.h Minix2/../i8086/../utils.h \
+ Minix2/../i8086/../File.h Minix2/../i8086/OpCode.h \
+ Minix2/../i8086/Operand.h PDP11/VM.h
 ./utils.o: utils.cpp utils.h
 ./File.o: File.cpp File.h
 ./VMUnix.o: VMUnix.cpp VMUnix.h utils.h File.h
@@ -15,10 +17,13 @@ i8086/VM.inst.o: i8086/VM.inst.cpp i8086/VM.h i8086/../VMUnix.h \
  i8086/disasm.h
 i8086/disasm.o: i8086/disasm.cpp i8086/disasm.h i8086/OpCode.h i8086/Operand.h \
  i8086/../utils.h
-./VMMinix2.o: VMMinix2.cpp VMMinix2.h i8086/VM.h i8086/../VMUnix.h \
- i8086/../utils.h i8086/../File.h i8086/OpCode.h i8086/Operand.h
-./VMMinix2.signal.o: VMMinix2.signal.cpp VMMinix2.h i8086/VM.h \
- i8086/../VMUnix.h i8086/../utils.h i8086/../File.h i8086/OpCode.h \
- i8086/Operand.h
+Minix2/VM.o: Minix2/VM.cpp Minix2/VM.h Minix2/../i8086/VM.h \
+ Minix2/../i8086/../VMUnix.h Minix2/../i8086/../utils.h \
+ Minix2/../i8086/../File.h Minix2/../i8086/OpCode.h \
+ Minix2/../i8086/Operand.h
+Minix2/VM.signal.o: Minix2/VM.signal.cpp Minix2/VM.h Minix2/../i8086/VM.h \
+ Minix2/../i8086/../VMUnix.h Minix2/../i8086/../utils.h \
+ Minix2/../i8086/../File.h Minix2/../i8086/OpCode.h \
+ Minix2/../i8086/Operand.h
 PDP11/VM.o: PDP11/VM.cpp PDP11/VM.h PDP11/../VMUnix.h PDP11/../utils.h \
  PDP11/../File.h

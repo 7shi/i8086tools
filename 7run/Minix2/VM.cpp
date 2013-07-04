@@ -1,18 +1,20 @@
-#include "VMMinix2.h"
+#include "VM.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
-VMMinix2::VMMinix2() {
+using namespace Minix2;
+
+VM::VM() {
 }
 
-VMMinix2::VMMinix2(const VMMinix2 &vm) : VM(vm) {
+VM::VM(const VM &vm) : i8086::VM(vm) {
 }
 
-VMMinix2::~VMMinix2() {
+VM::~VM() {
 }
 
-bool VMMinix2::syscall(int n) {
+bool VM::syscall(int n) {
     if (n != 0x20) return false;
     int type = read16(BX + 2), result = 0;
     switch (type) {
@@ -264,10 +266,10 @@ bool VMMinix2::syscall(int n) {
     return true;
 }
 
-int VMMinix2::minix_fork() { // 2
+int VM::minix_fork() { // 2
     if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
-    VMMinix2 vm = *this;
+    VM vm = *this;
     vm.write16(BX + 2, 0);
     vm.AX = 0;
     vm.run();
@@ -278,7 +280,7 @@ int VMMinix2::minix_fork() { // 2
 #endif
 }
 
-int VMMinix2::minix_exec() { // 59
+int VM::minix_exec() { // 59
     const char *path = str(read16(BX + 10));
     int frame = read16(BX + 12);
     int fsize = read16(BX + 6);
@@ -319,7 +321,7 @@ int VMMinix2::minix_exec() { // 59
     return 0;
 }
 
-void VMMinix2::setstat(uint16_t addr, struct stat *st) {
+void VM::setstat(uint16_t addr, struct stat *st) {
     write16(addr, st->st_dev);
     write16(addr + 2, st->st_ino);
     write16(addr + 4, st->st_mode);

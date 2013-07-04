@@ -1,4 +1,4 @@
-#include "VMMinix2.h"
+#include "VM.h"
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
@@ -12,12 +12,14 @@
 #define MX_SIG_DFL  0
 #define MX_SIG_IGN  1
 
-void VMMinix2::sighandler(int sig) {
-    VMMinix2 *cur = dynamic_cast<VMMinix2 *> (current);
+using namespace Minix2;
+
+void VM::sighandler(int sig) {
+    VM *cur = dynamic_cast<VM *> (current);
     if (cur) cur->sighandler2(sig);
 }
 
-void VMMinix2::sighandler2(int sig) {
+void VM::sighandler2(int sig) {
     uint16_t ip = this->ip, r[8];
     memcpy(r, this->r, sizeof (r));
     bool OF = this->OF, DF = this->DF, SF = this->SF;
@@ -38,7 +40,7 @@ void VMMinix2::sighandler2(int sig) {
     }
 }
 
-int VMMinix2::convsig(int sig) {
+int VM::convsig(int sig) {
     switch (sig) {
         case MX_SIGINT: return SIGINT;
         case MX_SIGILL: return SIGILL;
@@ -48,7 +50,7 @@ int VMMinix2::convsig(int sig) {
     return -1;
 }
 
-int VMMinix2::minix_signal() { // 48
+int VM::minix_signal() { // 48
     int sig = read16(BX + 4);
     int sgh = read16(BX + 14);
     if (trace) fprintf(stderr, "<signal(%d, 0x%04x)>\n", sig, sgh);
@@ -64,7 +66,7 @@ int VMMinix2::minix_signal() { // 48
     return oh;
 }
 
-int VMMinix2::minix_sigaction() { // 71
+int VM::minix_sigaction() { // 71
     int sig = read16(BX + 6);
     int act = read16(BX + 10);
     int oact = read16(BX + 12);
@@ -83,7 +85,7 @@ int VMMinix2::minix_sigaction() { // 71
     return 0;
 }
 
-void VMMinix2::setsig(int sig, int h) {
+void VM::setsig(int sig, int h) {
     switch (h) {
         case MX_SIG_DFL: signal(sig, SIG_DFL);
             break;
@@ -94,7 +96,7 @@ void VMMinix2::setsig(int sig, int h) {
     }
 }
 
-void VMMinix2::resetsig() {
+void VM::resetsig() {
     for (int i = 0; i < nsig; i++) {
         switch (sigacts[i].handler) {
             case MX_SIG_DFL:

@@ -13,15 +13,17 @@
         <in>disasm.cpp</in>
         <in>disasm.h</in>
       </df>
+      <df name="Minix2">
+        <in>VM.cpp</in>
+        <in>VM.h</in>
+        <in>VM.signal.cpp</in>
+      </df>
       <df name="PDP11">
         <in>VM.cpp</in>
         <in>VM.h</in>
       </df>
       <in>File.cpp</in>
       <in>File.h</in>
-      <in>VMMinix2.cpp</in>
-      <in>VMMinix2.h</in>
-      <in>VMMinix2.signal.cpp</in>
       <in>VMUnix.cpp</in>
       <in>VMUnix.h</in>
       <in>VMUnix.sys.cpp</in>
@@ -68,27 +70,27 @@
       </item>
       <item path="File.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="Minix2/VM.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
+            <pElem>i8086</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="Minix2/VM.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Minix2/VM.signal.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
+            <pElem>i8086</pElem>
+          </incDir>
+        </ccTool>
+      </item>
       <item path="PDP11/VM.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="PDP11/VM.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="VMMinix2.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool>
-          <incDir>
-            <pElem></pElem>
-            <pElem>i8086</pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="VMMinix2.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="VMMinix2.signal.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool>
-          <incDir>
-            <pElem></pElem>
-            <pElem>i8086</pElem>
-          </incDir>
-        </ccTool>
       </item>
       <item path="VMUnix.cpp" ex="false" tool="1" flavor2="0">
         <ccTool>
