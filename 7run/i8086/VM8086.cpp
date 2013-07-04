@@ -69,7 +69,7 @@ VM8086::VM8086() : ip(0), start_sp(0) {
     OF = DF = SF = ZF = PF = CF = false;
 }
 
-VM8086::VM8086(const VM8086 &vm) : VM(vm) {
+VM8086::VM8086(const VM8086 &vm) : VMBase(vm) {
     init();
     memcpy(r, vm.r, sizeof (r));
     ip = vm.ip;
@@ -168,7 +168,7 @@ void VM8086::run(
 }
 
 void VM8086::run() {
-    VM *from = current;
+    VMBase *from = current;
     swtch(this);
     hasExited = false;
     while (!hasExited) run1();

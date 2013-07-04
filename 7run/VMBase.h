@@ -10,9 +10,9 @@
 extern int trace;
 extern int exitcode;
 
-class VM {
+class VMBase {
 protected:
-    static VM *current;
+    static VMBase *current;
     uint8_t *text, *data;
     size_t tsize, dsize;
     uint16_t umask, brksize;
@@ -24,9 +24,9 @@ private:
     void init();
 
 public:
-    VM();
-    VM(const VM &vm);
-    virtual ~VM();
+    VMBase();
+    VMBase(const VMBase &vm);
+    virtual ~VMBase();
     virtual bool load(const std::string &fn) = 0;
     virtual void run(
             const std::vector<std::string> &args,
@@ -61,7 +61,7 @@ protected:
     int close(int fd);
     FileBase *file(int fd);
     virtual void setstat(uint16_t addr, struct stat *st) = 0;
-    void swtch(VM *to);
+    void swtch(VMBase *to);
 
     void sys_exit(int code);
     //int sys_fork();

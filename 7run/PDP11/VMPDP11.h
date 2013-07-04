@@ -1,10 +1,10 @@
 #pragma once
-#include "../VM.h"
+#include "../VMBase.h"
 
 namespace PDP11 {
     extern const char *header;
 
-    class VMPDP11 : public VM {
+    class VMPDP11 : public VMBase {
     public:
         VMPDP11();
         virtual ~VMPDP11();
