@@ -1,4 +1,4 @@
-#include "VM8086.h"
+#include "VM.h"
 #include "disasm.h"
 #include <stdio.h>
 #include <string.h>
@@ -8,9 +8,9 @@ const char *i8086::header = " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n"
 
 using namespace i8086;
 
-bool VM8086::ptable[256];
+bool VM::ptable[256];
 
-void VM8086::debug(uint16_t ip, const OpCode &op) {
+void VM::debug(uint16_t ip, const OpCode &op) {
     fprintf(stderr,
             "%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-12s %s",
             r[0], r[3], r[1], r[2], r[4], r[5], r[6], r[7],
@@ -37,7 +37,7 @@ void VM8086::debug(uint16_t ip, const OpCode &op) {
 
 static bool initialized;
 
-void VM8086::init() {
+void VM::init() {
     if (!initialized) {
         for (int i = 0; i < 256; i++) {
             int n = 0;
@@ -63,13 +63,13 @@ void VM8086::init() {
     }
 }
 
-VM8086::VM8086() : ip(0), start_sp(0) {
+VM::VM() : ip(0), start_sp(0) {
     init();
     memset(r, 0, sizeof (r));
     OF = DF = SF = ZF = PF = CF = false;
 }
 
-VM8086::VM8086(const VM8086 &vm) : VMBase(vm) {
+VM::VM(const VM &vm) : VMBase(vm) {
     init();
     memcpy(r, vm.r, sizeof (r));
     ip = vm.ip;
@@ -83,10 +83,10 @@ VM8086::VM8086(const VM8086 &vm) : VMBase(vm) {
     cache = vm.cache;
 }
 
-VM8086::~VM8086() {
+VM::~VM() {
 }
 
-int VM8086::addr(const Operand &opr) {
+int VM::addr(const Operand &opr) {
     switch (opr.type) {
         case Ptr: return uint16_t(opr.value);
         case ModRM + 0: return uint16_t(BX + SI + opr.value);
@@ -101,7 +101,7 @@ int VM8086::addr(const Operand &opr) {
     return -1;
 }
 
-uint8_t VM8086::get8(const Operand &opr) {
+uint8_t VM::get8(const Operand &opr) {
     switch (opr.type) {
         case Reg: return *r8[opr.value];
         case Imm: return opr.value;
@@ -110,7 +110,7 @@ uint8_t VM8086::get8(const Operand &opr) {
     return ad < 0 ? 0 : data[ad];
 }
 
-uint16_t VM8086::get16(const Operand &opr) {
+uint16_t VM::get16(const Operand &opr) {
     switch (opr.type) {
         case Reg: return r[opr.value];
         case Imm: return opr.value;
@@ -119,7 +119,7 @@ uint16_t VM8086::get16(const Operand &opr) {
     return ad < 0 ? 0 : read16(ad);
 }
 
-void VM8086::set8(const Operand &opr, uint8_t value) {
+void VM::set8(const Operand &opr, uint8_t value) {
     if (opr.type == Reg) {
         *r8[opr.value] = value;
     } else {
@@ -128,7 +128,7 @@ void VM8086::set8(const Operand &opr, uint8_t value) {
     }
 }
 
-void VM8086::set16(const Operand &opr, uint16_t value) {
+void VM::set16(const Operand &opr, uint16_t value) {
     if (opr.type == Reg) {
         r[opr.value] = value;
     } else {
@@ -137,7 +137,7 @@ void VM8086::set16(const Operand &opr, uint16_t value) {
     }
 }
 
-void VM8086::run(
+void VM::run(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
     int slen = 0;
@@ -167,7 +167,7 @@ void VM8086::run(
     run();
 }
 
-void VM8086::run() {
+void VM::run() {
     VMBase *from = current;
     swtch(this);
     hasExited = false;
@@ -175,7 +175,7 @@ void VM8086::run() {
     swtch(from);
 }
 
-bool VM8086::load(const std::string &fn) {
+bool VM::load(const std::string &fn) {
     std::string fn2 = convpath(fn);
     const char *file = fn2.c_str();
     struct stat st;
@@ -235,6 +235,6 @@ bool VM8086::load(const std::string &fn) {
     return true;
 }
 
-void VM8086::disasm() {
+void VM::disasm() {
     ::disasm(text, tsize);
 }

@@ -22,7 +22,7 @@
 namespace i8086 {
     extern const char *header;
 
-    class VM8086 : public VMBase {
+    class VM : public VMBase {
     protected:
         uint16_t ip, r[8];
         uint8_t *r8[8];
@@ -35,9 +35,9 @@ namespace i8086 {
         void init();
 
     public:
-        VM8086();
-        VM8086(const VM8086 &vm);
-        virtual ~VM8086();
+        VM();
+        VM(const VM &vm);
+        virtual ~VM();
         virtual bool load(const std::string &fn);
         virtual void run(
                 const std::vector<std::string> &args,

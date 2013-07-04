@@ -6,7 +6,7 @@
 VMMinix2::VMMinix2() {
 }
 
-VMMinix2::VMMinix2(const VMMinix2 &vm) : VM8086(vm) {
+VMMinix2::VMMinix2(const VMMinix2 &vm) : VM(vm) {
 }
 
 VMMinix2::~VMMinix2() {

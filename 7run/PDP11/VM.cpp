@@ -1,47 +1,47 @@
-#include "VMPDP11.h"
+#include "VM.h"
 #include <stdio.h>
 
 using namespace PDP11;
 
-VMPDP11::VMPDP11() {
+VM::VM() {
 }
 
-VMPDP11::~VMPDP11() {
+VM::~VM() {
 }
 
-bool VMPDP11::load(const std::string &fn) {
+bool VM::load(const std::string &fn) {
     fprintf(stderr, "not implemented\n");
     return false;
 }
 
-void VMPDP11::run(
+void VM::run(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
     fprintf(stderr, "not implemented\n");
 }
 
-void VMPDP11::run() {
+void VM::run() {
     fprintf(stderr, "not implemented\n");
 }
 
-void VMPDP11::disasm() {
+void VM::disasm() {
     fprintf(stderr, "not implemented\n");
 }
 
-void VMPDP11::setstat(uint16_t addr, struct stat *st) {
+void VM::setstat(uint16_t addr, struct stat *st) {
     fprintf(stderr, "not implemented\n");
 }
 
-bool VMPDP11::syscall(int n) {
+bool VM::syscall(int n) {
     fprintf(stderr, "not implemented\n");
     return false;
 }
 
-int VMPDP11::convsig(int sig) {
+int VM::convsig(int sig) {
     fprintf(stderr, "not implemented\n");
     return 0;
 }
 
-void VMPDP11::setsig(int sig, int h) {
+void VM::setsig(int sig, int h) {
     fprintf(stderr, "not implemented\n");
 }

@@ -1,5 +1,5 @@
 #include "VMMinix2.h"
-#include "PDP11/VMPDP11.h"
+#include "PDP11/VM.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
     VMBase *vm;
     int magic = read16(buf);
     if (pdp11 || magic == 0407 || magic == 0410 || magic == 0411) {
-        vm = new PDP11::VMPDP11();
+        vm = new PDP11::VM();
     } else {
         vm = new VMMinix2();
     }
