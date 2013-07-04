@@ -9,13 +9,13 @@
 
 int trace;
 int exitcode;
-static int pid_max;
 VMUnix *VMUnix::current;
 
 void VMUnix::init() {
     text = new uint8_t[0x10000];
     hasExited = false;
 #ifdef NO_FORK
+    static int pid_max;
     pid = ((getpid() << 4) % 30000) + (++pid_max);
 #else
     pid = (getpid() % 30000) + 1;

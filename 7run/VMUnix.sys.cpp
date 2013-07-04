@@ -107,22 +107,20 @@ int VMUnix::sys_close(int fd) {
 }
 
 int VMUnix::sys_wait(int *status) {
-    if (trace) fprintf(stderr, "<wait()");
 #ifdef NO_FORK
-    if (!exitcodes.empty()) {
-        std::pair<int, int> ec = exitcodes.top();
-        exitcodes.pop();
-        *status = ec.second << 8;
-        if (trace) fprintf(stderr, " => %d>\n", *status);
-        return ec.first;
-    } else {
-        if (trace) fprintf(stderr, " => EINVAL>\n");
+    if (exitcodes.empty()) {
+        if (trace) fprintf(stderr, "<wait() => EINVAL>\n");
         errno = EINVAL;
         return -1;
     }
+    std::pair<int, int> ec = exitcodes.top();
+    exitcodes.pop();
+    *status = ec.second << 8;
+    if (trace) fprintf(stderr, "<wait() => %d>\n", *status);
+    return ec.first;
 #else
     int result = wait(status);
-    if (trace) fprintf(stderr, " => 0x%04x>\n", *status);
+    if (trace) fprintf(stderr, "<wait() => 0x%04x>\n", *status);
     return result;
 #endif
 }

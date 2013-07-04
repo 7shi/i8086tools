@@ -278,7 +278,7 @@ int VM::minix_fork() { // 2
     return vm.pid;
 #else
     int result = fork();
-    return result == -1 ? -1 : (result % 30000) + 1;
+    return result <= 0 ? result : (result % 30000) + 1;
 #endif
 }
 
