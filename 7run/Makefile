@@ -45,7 +45,8 @@ uninstall:
 depend:
 	rm -f dependencies
 	for cpp in $(SOURCES); do \
-		g++ -MM $(CXXFLAGS) $$cpp >> dependencies; \
+	  (echo -n `dirname $$cpp`/; \
+	   g++ -MM $(CXXFLAGS) $$cpp) >> dependencies; \
 	done
 
 -include dependencies
