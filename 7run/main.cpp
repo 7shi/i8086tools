@@ -32,16 +32,18 @@ int main(int argc, char *argv[]) {
         printf("    -s: syscall mode (output syscall)\n");
         return 1;
     }
-    VMMinix2 vm;
-    if (!vm.load(args[0])) return 1;
-    if (dis) {
-        vm.disasm();
+    VM *vm = new VMMinix2();
+    if (!vm->load(args[0])) {
+        exitcode = 1;
+    } else if (dis) {
+        vm->disasm();
     } else {
         if (trace == 2) fprintf(stderr, i8086::header);
         exitcode = 0;
         std::vector<std::string> envs;
         envs.push_back("PATH=/bin:/usr/bin");
-        vm.run(args, envs);
+        vm->run(args, envs);
     }
+    delete vm;
     return exitcode;
 }

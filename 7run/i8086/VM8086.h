@@ -38,12 +38,12 @@ namespace i8086 {
         VM8086();
         VM8086(const VM8086 &vm);
         virtual ~VM8086();
-        bool load(const std::string &fn);
-        void run(
+        virtual bool load(const std::string &fn);
+        virtual void run(
                 const std::vector<std::string> &args,
                 const std::vector<std::string> &envs);
-        void run();
-        void disasm();
+        virtual void run();
+        virtual void disasm();
 
     protected:
 

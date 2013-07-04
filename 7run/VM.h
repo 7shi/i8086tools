@@ -27,8 +27,15 @@ public:
     VM();
     VM(const VM &vm);
     virtual ~VM();
+    virtual bool load(const std::string &fn) = 0;
+    virtual void run(
+            const std::vector<std::string> &args,
+            const std::vector<std::string> &envs) = 0;
+    virtual void run() = 0;
+    virtual void disasm() = 0;
 
 protected:
+
     inline uint16_t read16(uint16_t addr) {
         return ::read16(data + addr);
     }
@@ -83,7 +90,7 @@ protected:
     //void sys_sigaction();
 
     virtual bool syscall(int n) = 0;
-    
+
     struct sigact {
         uint16_t handler;
         uint16_t mask;
