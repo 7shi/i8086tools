@@ -1,4 +1,4 @@
-#include "VMBase.h"
+#include "VMUnix.h"
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -10,9 +10,9 @@
 int trace;
 int exitcode;
 static int pid_max;
-VMBase *VMBase::current;
+VMUnix *VMUnix::current;
 
-void VMBase::init() {
+void VMUnix::init() {
     text = new uint8_t[0x10000];
     hasExited = false;
 #ifdef NO_FORK
@@ -22,7 +22,7 @@ void VMBase::init() {
 #endif
 }
 
-VMBase::VMBase() : data(NULL), tsize(0), umask(0) {
+VMUnix::VMUnix() : data(NULL), tsize(0), umask(0) {
     init();
     memset(text, 0, 0x10000);
     memset(sigacts, 0, sizeof (sigacts));
@@ -31,7 +31,7 @@ VMBase::VMBase() : data(NULL), tsize(0), umask(0) {
     files.push_back(new File(2, "stderr"));
 }
 
-VMBase::VMBase(const VMBase &vm) {
+VMUnix::VMUnix(const VMUnix &vm) {
     init();
     memcpy(text, vm.text, 0x10000);
     memcpy(sigacts, vm.sigacts, sizeof(sigacts));
@@ -51,7 +51,7 @@ VMBase::VMBase(const VMBase &vm) {
     }
 }
 
-VMBase::~VMBase() {
+VMUnix::~VMUnix() {
     if (data != text) delete[] data;
     delete[] text;
     for (int i = 0; i <= (int) files.size(); i++) {
@@ -59,7 +59,7 @@ VMBase::~VMBase() {
     }
 }
 
-int VMBase::getfd() {
+int VMUnix::getfd() {
     int len = files.size();
     for (int i = 0; i < len; i++) {
         if (!files[i]) return i;
@@ -68,7 +68,7 @@ int VMBase::getfd() {
     return len;
 }
 
-int VMBase::open(const std::string &path, int flag, int mode) {
+int VMUnix::open(const std::string &path, int flag, int mode) {
 #ifdef WIN32
     flag |= O_BINARY;
 #endif
@@ -82,7 +82,7 @@ int VMBase::open(const std::string &path, int flag, int mode) {
     return fd;
 }
 
-FileBase *VMBase::file(int fd) {
+FileBase *VMUnix::file(int fd) {
     if (fd < 0 || fd >= (int) files.size() || !files[fd]) {
         errno = EBADF;
         return NULL;
@@ -90,7 +90,7 @@ FileBase *VMBase::file(int fd) {
     return files[fd];
 }
 
-void VMBase::swtch(VMBase *to) {
+void VMUnix::swtch(VMUnix *to) {
     for (int i = 0; i < nsig; i++) {
         int s = convsig(i);
         if (s >= 0) {

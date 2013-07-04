@@ -1,4 +1,4 @@
-#include "VMBase.h"
+#include "VMUnix.h"
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
@@ -26,7 +26,7 @@ static void showError(int err) {
 }
 #endif
 
-int VMBase::close(int fd) {
+int VMUnix::close(int fd) {
     FileBase *f = file(fd);
     if (!f) return -1;
 
@@ -51,7 +51,7 @@ int VMBase::close(int fd) {
     return 0;
 }
 
-void VMBase::sys_exit(int code) {
+void VMUnix::sys_exit(int code) {
     if (trace) fprintf(stderr, "<exit(%d)>\n", code);
     exitcode = code;
 #ifdef NO_FORK
@@ -60,7 +60,7 @@ void VMBase::sys_exit(int code) {
     hasExited = true;
 }
 
-int VMBase::sys_read(int fd, int buf, int len) {
+int VMUnix::sys_read(int fd, int buf, int len) {
     if (trace) fprintf(stderr, "<read(%d, 0x%04x, %d)", fd, buf, len);
     int max = 0x10000 - buf;
     if (len > max) len = max;
@@ -70,7 +70,7 @@ int VMBase::sys_read(int fd, int buf, int len) {
     return result;
 }
 
-int VMBase::sys_write(int fd, int buf, int len) {
+int VMUnix::sys_write(int fd, int buf, int len) {
     if (trace) fprintf(stderr, "<write(%d, 0x%04x, %d)", fd, buf, len);
     int max = 0x10000 - buf;
     if (len > max) len = max;
@@ -87,7 +87,7 @@ int VMBase::sys_write(int fd, int buf, int len) {
     return result;
 }
 
-int VMBase::sys_open(const char *path, int flag, mode_t mode) {
+int VMUnix::sys_open(const char *path, int flag, mode_t mode) {
     if (flag & 64 /*O_CREAT*/) {
         if (trace) fprintf(stderr, "<open(\"%s\", %d, 0%03o)", path, flag, mode);
     } else {
@@ -99,14 +99,14 @@ int VMBase::sys_open(const char *path, int flag, mode_t mode) {
     return result;
 }
 
-int VMBase::sys_close(int fd) {
+int VMUnix::sys_close(int fd) {
     if (trace) fprintf(stderr, "<close(%d)", fd);
     int result = close(fd);
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
 }
 
-int VMBase::sys_wait(int *status) {
+int VMUnix::sys_wait(int *status) {
     if (trace) fprintf(stderr, "<wait()");
 #ifdef NO_FORK
     if (!exitcodes.empty()) {
@@ -126,7 +126,7 @@ int VMBase::sys_wait(int *status) {
 #endif
 }
 
-int VMBase::sys_creat(const char *path, mode_t mode) {
+int VMUnix::sys_creat(const char *path, mode_t mode) {
     if (trace) fprintf(stderr, "<creat(\"%s\", 0%03o)", path, mode);
     std::string path2 = convpath(path);
 #ifdef WIN32
@@ -138,7 +138,7 @@ int VMBase::sys_creat(const char *path, mode_t mode) {
     return result;
 }
 
-int VMBase::sys_link(const char *src, const char *dst) {
+int VMUnix::sys_link(const char *src, const char *dst) {
     if (trace) fprintf(stderr, "<link(\"%s\", \"%s\")", src, dst);
     std::string src2 = convpath(src), dst2 = convpath(dst);
 #ifdef WIN32
@@ -155,7 +155,7 @@ int VMBase::sys_link(const char *src, const char *dst) {
     return result;
 }
 
-int VMBase::sys_unlink(const char *path) {
+int VMUnix::sys_unlink(const char *path) {
     if (trace) fprintf(stderr, "<unlink(\"%s\")", path);
     std::string path2 = convpath(path);
 #ifdef WIN32
@@ -179,21 +179,21 @@ int VMBase::sys_unlink(const char *path) {
     return result;
 }
 
-int VMBase::sys_time() {
+int VMUnix::sys_time() {
     if (trace) fprintf(stderr, "<time()");
     int result = time(NULL);
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
 }
 
-int VMBase::sys_chmod(const char *path, mode_t mode) {
+int VMUnix::sys_chmod(const char *path, mode_t mode) {
     if (trace) fprintf(stderr, "<chmod(\"%s\", 0%03o)", path, mode);
     int result = chmod(convpath(path).c_str(), mode);
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
 }
 
-int VMBase::sys_brk(int nd, int sp) {
+int VMUnix::sys_brk(int nd, int sp) {
     if (trace) fprintf(stderr, "<brk(0x%04x)", nd);
     if (nd < (int) dsize || nd >= ((sp - 0x400) & ~0x3ff)) {
         errno = ENOMEM;
@@ -205,7 +205,7 @@ int VMBase::sys_brk(int nd, int sp) {
     return 0;
 }
 
-int VMBase::sys_stat(const char *path, int p) {
+int VMUnix::sys_stat(const char *path, int p) {
     if (trace) fprintf(stderr, "<stat(\"%s\", 0x%04x)", path, p);
     struct stat st;
     int result;
@@ -216,7 +216,7 @@ int VMBase::sys_stat(const char *path, int p) {
     return result;
 }
 
-off_t VMBase::sys_lseek(int fd, off_t o, int w) {
+off_t VMUnix::sys_lseek(int fd, off_t o, int w) {
     if (trace) fprintf(stderr, "<lseek(%d, %ld, %d)", fd, o, w);
     FileBase *f = file(fd);
     off_t result = -1;
@@ -225,14 +225,14 @@ off_t VMBase::sys_lseek(int fd, off_t o, int w) {
     return result;
 }
 
-int VMBase::sys_getpid() {
+int VMUnix::sys_getpid() {
     if (trace) fprintf(stderr, "<getpid()");
     int result = pid;
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
 }
 
-int VMBase::sys_getuid() {
+int VMUnix::sys_getuid() {
     if (trace) fprintf(stderr, "<getuid()");
 #ifdef WIN32
     int result = 0;
@@ -243,7 +243,7 @@ int VMBase::sys_getuid() {
     return result;
 }
 
-int VMBase::sys_fstat(int fd, int p) {
+int VMUnix::sys_fstat(int fd, int p) {
     if (trace) fprintf(stderr, "<fstat(%d, 0x%04x)", fd, p);
     struct stat st;
     FileBase *f = file(fd);
@@ -259,7 +259,7 @@ int VMBase::sys_fstat(int fd, int p) {
     return result;
 }
 
-int VMBase::sys_access(const char *path, mode_t mode) {
+int VMUnix::sys_access(const char *path, mode_t mode) {
     if (trace) fprintf(stderr, "<access(\"%s\", 0%03o)", path, mode);
     std::string path2 = convpath(path);
     int result = access(path2.c_str(), mode);
@@ -267,7 +267,7 @@ int VMBase::sys_access(const char *path, mode_t mode) {
     return result;
 }
 
-int VMBase::sys_getgid() {
+int VMUnix::sys_getgid() {
     if (trace) fprintf(stderr, "<getgid()");
 #ifdef WIN32
     int result = 0;
@@ -278,13 +278,13 @@ int VMBase::sys_getgid() {
     return result;
 }
 
-int VMBase::sys_ioctl(int fd, int rq, int d) {
+int VMUnix::sys_ioctl(int fd, int rq, int d) {
     if (trace) fprintf(stderr, "<ioctl(%d, 0x%04x, 0x%04x)>\n", fd, rq, d);
     errno = EINVAL;
     return -1;
 }
 
-int VMBase::sys_umask(mode_t mask) {
+int VMUnix::sys_umask(mode_t mask) {
     int result = umask;
     umask = mask;
     if (trace) fprintf(stderr, "<umask(0%03o) => 0%03o\n", umask, result);

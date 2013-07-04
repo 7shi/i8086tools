@@ -19,12 +19,12 @@
       </df>
       <in>File.cpp</in>
       <in>File.h</in>
-      <in>VMBase.cpp</in>
-      <in>VMBase.h</in>
-      <in>VMBase.sys.cpp</in>
       <in>VMMinix2.cpp</in>
       <in>VMMinix2.h</in>
       <in>VMMinix2.signal.cpp</in>
+      <in>VMUnix.cpp</in>
+      <in>VMUnix.h</in>
+      <in>VMUnix.sys.cpp</in>
       <in>main.cpp</in>
       <in>utils.cpp</in>
       <in>utils.h</in>
@@ -72,22 +72,6 @@
       </item>
       <item path="PDP11/VM.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="VMBase.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool>
-          <incDir>
-            <pElem></pElem>
-          </incDir>
-        </ccTool>
-      </item>
-      <item path="VMBase.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="VMBase.sys.cpp" ex="false" tool="1" flavor2="0">
-        <ccTool>
-          <incDir>
-            <pElem></pElem>
-          </incDir>
-        </ccTool>
-      </item>
       <item path="VMMinix2.cpp" ex="false" tool="1" flavor2="0">
         <ccTool>
           <incDir>
@@ -103,6 +87,22 @@
           <incDir>
             <pElem></pElem>
             <pElem>i8086</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="VMUnix.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="VMUnix.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="VMUnix.sys.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
           </incDir>
         </ccTool>
       </item>

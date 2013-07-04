@@ -69,7 +69,7 @@ VM::VM() : ip(0), start_sp(0) {
     OF = DF = SF = ZF = PF = CF = false;
 }
 
-VM::VM(const VM &vm) : VMBase(vm) {
+VM::VM(const VM &vm) : VMUnix(vm) {
     init();
     memcpy(r, vm.r, sizeof (r));
     ip = vm.ip;
@@ -168,7 +168,7 @@ void VM::run(
 }
 
 void VM::run() {
-    VMBase *from = current;
+    VMUnix *from = current;
     swtch(this);
     hasExited = false;
     while (!hasExited) run1();

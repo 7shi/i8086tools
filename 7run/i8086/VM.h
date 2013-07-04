@@ -1,5 +1,5 @@
 #pragma once
-#include "../VMBase.h"
+#include "../VMUnix.h"
 #include "OpCode.h"
 
 #define AX r[0]
@@ -22,7 +22,7 @@
 namespace i8086 {
     extern const char *header;
 
-    class VM : public VMBase {
+    class VM : public VMUnix {
     protected:
         uint16_t ip, r[8];
         uint8_t *r8[8];

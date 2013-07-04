@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    VMBase *vm;
+    VMUnix *vm;
     int magic = read16(buf);
     if (pdp11 || magic == 0407 || magic == 0410 || magic == 0411) {
         vm = new PDP11::VM();

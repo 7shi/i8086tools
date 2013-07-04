@@ -1,10 +1,10 @@
 #pragma once
-#include "../VMBase.h"
+#include "../VMUnix.h"
 
 namespace PDP11 {
     extern const char *header;
 
-    class VM : public VMBase {
+    class VM : public VMUnix {
     public:
         VM();
         virtual ~VM();
