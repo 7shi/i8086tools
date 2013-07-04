@@ -24,12 +24,12 @@ static Operand modrm(uint8_t *mem, bool w) {
     }
 }
 
-static OpCode modrm(uint8_t *mem, std::string mne, bool w) {
+static OpCode modrm(uint8_t *mem, const char *mne, bool w) {
     Operand opr = modrm(mem, w);
     return OpCode(1 + opr.len, mne, opr);
 }
 
-static OpCode regrm(uint8_t *mem, const std::string &mne, bool d, int w) {
+static OpCode regrm(uint8_t *mem, const char *mne, bool d, int w) {
     OpCode op = modrm(mem, mne, w);
     if (w == 2) {
         op.opr2 = Operand(0, w, SReg, (mem[1] >> 3) & 3);
@@ -40,7 +40,7 @@ static OpCode regrm(uint8_t *mem, const std::string &mne, bool d, int w) {
     return op;
 }
 
-static OpCode aimm(uint8_t *mem, const std::string &mne) {
+static OpCode aimm(uint8_t *mem, const char *mne) {
     return *mem & 1 ?
             OpCode(3, mne, reg(0, true), imm16(read16(mem + 1))) :
             OpCode(2, mne, reg(0, false), imm8(mem[1]));
@@ -175,7 +175,7 @@ OpCode i8086::disasm1(uint8_t *mem, uint16_t addr) {
         case 0x83:
         {
             const char *mnes[] = {"add", "or", "adc", "sbb", "and", "sub", "xor", "cmp"};
-            std::string mne = mnes[(mem[1] >> 3) & 7];
+            const char *mne = mnes[(mem[1] >> 3) & 7];
             OpCode op = modrm(mem, mne, b & 1);
             off_t iimm = op.len;
             if (b & 2) {
@@ -273,9 +273,9 @@ OpCode i8086::disasm1(uint8_t *mem, uint16_t addr) {
         case 0xd2:
         case 0xd3:
         {
-            const char *mnes[] = {"rol", "ror", "rcl", "rcr", "shl", "shr", "", "sar"};
-            std::string mne = mnes[(mem[1] >> 3) & 7];
-            if (mne.empty()) break;
+            const char *mnes[] = {"rol", "ror", "rcl", "rcr", "shl", "shr", NULL, "sar"};
+            const char *mne = mnes[(mem[1] >> 3) & 7];
+            if (!mne) break;
             OpCode op = modrm(mem, mne, b & 1);
             op.opr2 = b & 2 ? cl : Operand(0, false, Imm, 1);
             return op;
@@ -325,10 +325,10 @@ OpCode i8086::disasm1(uint8_t *mem, uint16_t addr) {
         case 0xf6:
         case 0xf7:
         {
-            const char *mnes[] = {"test", "", "not", "neg", "mul", "imul", "div", "idiv"};
+            const char *mnes[] = {"test", NULL, "not", "neg", "mul", "imul", "div", "idiv"};
             int t = (mem[1] >> 3) & 7;
-            std::string mne = mnes[t];
-            if (mne.empty()) break;
+            const char *mne = mnes[t];
+            if (!mne) break;
             OpCode op = modrm(mem, mne, b & 1);
             if (t > 0) return op;
             op.opr2 = b & 1 ? imm16(::read16(mem + op.len)) : imm8(mem[op.len]);
@@ -344,9 +344,9 @@ OpCode i8086::disasm1(uint8_t *mem, uint16_t addr) {
         case 0xfe:
         case 0xff:
         {
-            const char *mnes[] = {"inc", "dec", "call", "callf", "jmp", "jmpf", "push", ""};
-            std::string mne = mnes[(mem[1] >> 3) & 7];
-            if (mne.empty()) break;
+            const char *mnes[] = {"inc", "dec", "call", "callf", "jmp", "jmpf", "push", NULL};
+            const char *mne = mnes[(mem[1] >> 3) & 7];
+            if (!mne) break;
             return modrm(mem, mne, b & 1);
         }
     }
@@ -371,10 +371,8 @@ OpCode i8086::disasm1(uint8_t *mem, uint16_t addr, size_t last) {
             op2.opr2.seg = op1.opr2.value;
             return op2;
         }
-    } else if (op1.mne == "repz" && op2.mne != "cmps" && op2.mne != "scas") {
-        op1.mne = "rep";
     }
-    op2.mne = op1.mne + " " + op2.mne;
+    op2.prefix = op1.prefix;
     return op2;
 }
 

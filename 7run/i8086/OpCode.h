@@ -5,17 +5,16 @@
 namespace i8086 {
 
     struct OpCode {
-        bool prefix;
+        const char *prefix;
         size_t len;
-        std::string mne;
+        const char *mne;
         Operand opr1, opr2;
 
         OpCode();
-        OpCode(
-                int len, const std::string &mne,
+        OpCode(int len, const char *mne,
                 const Operand &opr1 = Operand(),
                 const Operand &opr2 = Operand());
-        OpCode(const std::string &mne, const Operand &opr = Operand());
+        OpCode(const char *mne, const Operand &opr = Operand());
 
         inline bool empty() const {
             return len == 0;
