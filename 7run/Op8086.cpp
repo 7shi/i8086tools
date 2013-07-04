@@ -1,5 +1,7 @@
 #include "Op8086.h"
 
+using namespace i8086;
+
 Op8086::Op8086()
 : prefix(false), len(0) {
 }

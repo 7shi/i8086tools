@@ -1,6 +1,8 @@
 #include "VM8086.h"
 #include <stdio.h>
 
+using namespace i8086;
+
 static Opr8086 modrm(uint8_t *mem, bool w) {
     uint8_t b = mem[1], mod = b >> 6, rm = b & 7;
     switch (mod) {

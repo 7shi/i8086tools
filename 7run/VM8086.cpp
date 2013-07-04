@@ -3,6 +3,8 @@
 #include <string.h>
 #include <sys/stat.h>
 
+using namespace i8086;
+
 bool ptable[256];
 const char *header = " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n";
 

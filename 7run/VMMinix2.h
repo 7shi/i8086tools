@@ -1,7 +1,7 @@
 #pragma once
 #include "VM8086.h"
 
-class VMMinix2 : public VM8086 {
+class VMMinix2 : public i8086::VM8086 {
 public:
     VMMinix2();
     VMMinix2(const VMMinix2 &vm);

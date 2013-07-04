@@ -22,60 +22,63 @@
 extern bool ptable[256];
 extern const char *header;
 
-class VM8086 : public VM {
-protected:
-    uint16_t ip, r[8];
-    uint8_t *r8[8];
-    bool OF, DF, SF, ZF, PF, CF;
-    uint16_t start_sp;
-    std::vector<Op8086> cache;
+namespace i8086 {
 
-private:
-    void init();
+    class VM8086 : public VM {
+    protected:
+        uint16_t ip, r[8];
+        uint8_t *r8[8];
+        bool OF, DF, SF, ZF, PF, CF;
+        uint16_t start_sp;
+        std::vector<Op8086> cache;
 
-public:
-    VM8086();
-    VM8086(const VM8086 &vm);
-    virtual ~VM8086();
-    bool load(const std::string &fn);
-    void run(
-            const std::vector<std::string> &args,
-            const std::vector<std::string> &envs);
-    void run();
-    void disasm();
+    private:
+        void init();
 
-    static Op8086 disasm1(uint8_t *mem, uint16_t addr);
-    static Op8086 disasm1(uint8_t *mem, uint16_t addr, size_t last);
-    static void disasm(uint8_t *mem, size_t size);
+    public:
+        VM8086();
+        VM8086(const VM8086 &vm);
+        virtual ~VM8086();
+        bool load(const std::string &fn);
+        void run(
+                const std::vector<std::string> &args,
+                const std::vector<std::string> &envs);
+        void run();
+        void disasm();
 
-protected:
+        static Op8086 disasm1(uint8_t *mem, uint16_t addr);
+        static Op8086 disasm1(uint8_t *mem, uint16_t addr, size_t last);
+        static void disasm(uint8_t *mem, size_t size);
 
-    inline int setf8(int value, bool cf) {
-        int8_t v = value;
-        OF = value != v;
-        SF = v < 0;
-        ZF = v == 0;
-        PF = ptable[uint8_t(value)];
-        CF = cf;
-        return value;
-    }
+    protected:
 
-    inline int setf16(int value, bool cf) {
-        int16_t v = value;
-        OF = value != v;
-        SF = v < 0;
-        ZF = v == 0;
-        PF = ptable[uint8_t(value)];
-        CF = cf;
-        return value;
-    }
+        inline int setf8(int value, bool cf) {
+            int8_t v = value;
+            OF = value != v;
+            SF = v < 0;
+            ZF = v == 0;
+            PF = ptable[uint8_t(value)];
+            CF = cf;
+            return value;
+        }
 
-    uint8_t get8(const Opr8086 &opr);
-    uint16_t get16(const Opr8086 &opr);
-    void set8(const Opr8086 &opr, uint8_t value);
-    void set16(const Opr8086 &opr, uint16_t value);
+        inline int setf16(int value, bool cf) {
+            int16_t v = value;
+            OF = value != v;
+            SF = v < 0;
+            ZF = v == 0;
+            PF = ptable[uint8_t(value)];
+            CF = cf;
+            return value;
+        }
 
-    void debug(uint16_t ip, const Op8086 &op);
-    int addr(const Opr8086 &opr);
-    void run1(uint8_t prefix = 0);
-};
+        uint8_t get8(const Opr8086 &opr);
+        uint16_t get16(const Opr8086 &opr);
+        void set8(const Opr8086 &opr, uint8_t value);
+        void set16(const Opr8086 &opr, uint16_t value);
+
+        void debug(uint16_t ip, const Op8086 &op);
+        int addr(const Opr8086 &opr);
+        void run1(uint8_t prefix = 0);
+    };
+}

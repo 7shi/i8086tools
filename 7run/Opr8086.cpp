@@ -1,11 +1,15 @@
 #include "Opr8086.h"
 
-Opr8086 dx = Opr8086(0, true, Reg, 2);
-Opr8086 cl = Opr8086(0, false, Reg, 1);
-Opr8086 es = Opr8086(0, true, SReg, 0);
-Opr8086 cs = Opr8086(0, true, SReg, 1);
-Opr8086 ss = Opr8086(0, true, SReg, 2);
-Opr8086 ds = Opr8086(0, true, SReg, 3);
+namespace i8086 {
+    Opr8086 dx = Opr8086(0, true, Reg, 2);
+    Opr8086 cl = Opr8086(0, false, Reg, 1);
+    Opr8086 es = Opr8086(0, true, SReg, 0);
+    Opr8086 cs = Opr8086(0, true, SReg, 1);
+    Opr8086 ss = Opr8086(0, true, SReg, 2);
+    Opr8086 ds = Opr8086(0, true, SReg, 3);
+}
+
+using namespace i8086;
 
 Opr8086::Opr8086()
 : len(-1), w(false), type(0), value(0), seg(-1) {
