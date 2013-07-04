@@ -122,7 +122,8 @@ int VMUnix::sys_wait(int *status) {
     }
 #else
     int result = wait(status);
-    if (trace) fprintf(stderr, " => 0x%04x>\n", status);
+    if (trace) fprintf(stderr, " => 0x%04x>\n", *status);
+    return result;
 #endif
 }
 
