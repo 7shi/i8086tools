@@ -1,5 +1,5 @@
 main.o: main.cpp VMMinix2.h i8086/VM8086.h i8086/../VM.h i8086/../utils.h \
- i8086/../File.h i8086/OpCode.h i8086/Operand.h
+ i8086/../File.h i8086/OpCode.h i8086/Operand.h PDP11/VMPDP11.h
 utils.o: utils.cpp utils.h
 File.o: File.cpp File.h
 VM.o: VM.cpp VM.h utils.h File.h
@@ -20,3 +20,5 @@ VMMinix2.o: VMMinix2.cpp VMMinix2.h i8086/VM8086.h i8086/../VM.h \
 VMMinix2.signal.o: VMMinix2.signal.cpp VMMinix2.h i8086/VM8086.h \
  i8086/../VM.h i8086/../utils.h i8086/../File.h i8086/OpCode.h \
  i8086/Operand.h
+VMPDP11.o: PDP11/VMPDP11.cpp PDP11/VMPDP11.h PDP11/../VM.h \
+ PDP11/../utils.h PDP11/../File.h

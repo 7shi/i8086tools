@@ -8,7 +8,8 @@ SOURCES  = main.cpp utils.cpp \
 	   File.cpp VM.cpp VM.sys.cpp \
 	   i8086/OpCode.cpp i8086/Operand.cpp \
 	   i8086/VM8086.cpp i8086/VM8086.inst.cpp i8086/disasm.cpp \
-	   VMMinix2.cpp VMMinix2.signal.cpp
+	   VMMinix2.cpp VMMinix2.signal.cpp \
+	   PDP11/VMPDP11.cpp
 COMMANDS = bin/aal bin/ar bin/cc bin/nm bin/strip \
 	   bin/crc bin/install bin/m2 \
 	   lib/as lib/ld lib/cv

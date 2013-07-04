@@ -1,9 +1,10 @@
 #include "VMMinix2.h"
+#include "PDP11/VMPDP11.h"
 #include <stdio.h>
 #include <string.h>
 
 int main(int argc, char *argv[]) {
-    bool dis = false;
+    bool dis = false, pdp11 = false;
     std::vector<std::string> args;
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -18,6 +19,8 @@ int main(int argc, char *argv[]) {
             trace = 1;
         } else if (arg == "-d") {
             dis = true;
+        } else if (arg == "-p") {
+            pdp11 = true;
         } else {
             for (; i < argc; i++) {
                 args.push_back(argv[i]);
@@ -25,14 +28,35 @@ int main(int argc, char *argv[]) {
         }
     }
     if (args.empty()) {
-        printf("usage: %s [-d|-v/-s] cmd [args ...]\n", argv[0]);
+        printf("usage: %s [-p] [-d|-v/-s] cmd [args ...]\n", argv[0]);
+        printf("    -p: PDP-11 mode\n");
         printf("    -d: disassemble mode (not run)\n");
         printf("    -m: verbose mode with memory dump\n");
         printf("    -v: verbose mode (output syscall and disassemble)\n");
         printf("    -s: syscall mode (output syscall)\n");
         return 1;
     }
-    VM *vm = new VMMinix2();
+
+    uint8_t buf[2];
+    FILE *f = fopen(args[0].c_str(), "rb");
+    if (!f) {
+        fprintf(stderr, "can not open: %s\n", args[0].c_str());
+        return 1;
+    }
+    if (fread(buf, 1, 2, f) != 2) {
+        fprintf(stderr, "can not read: %s\n", args[0].c_str());
+        fclose(f);
+        return 1;
+    }
+
+    VM *vm;
+    int magic = read16(buf);
+    if (pdp11 || magic == 0407 || magic == 0410 || magic == 0411) {
+        vm = new PDP11::VMPDP11();
+    } else {
+        vm = new VMMinix2();
+    }
+
     if (!vm->load(args[0])) {
         exitcode = 1;
     } else if (dis) {
