@@ -1,5 +1,6 @@
 #include "VMMinix2.h"
 #include <stdio.h>
+#include <string.h>
 #include <signal.h>
 #include <errno.h>
 
@@ -17,7 +18,24 @@ void VMMinix2::sighandler(int sig) {
 }
 
 void VMMinix2::sighandler2(int sig) {
-    ip = sigacts[sig].handler;
+    uint16_t ip = this->ip, r[8];
+    memcpy(r, this->r, sizeof (r));
+    bool OF = this->OF, DF = this->DF, SF = this->SF;
+    bool ZF = this->ZF, PF = this->PF, CF = this->CF;
+    write16((this->SP -= 2), ip);
+    this->ip = sigacts[sig].handler;
+    while (!hasExited && !(this->ip == ip && this->SP == SP)) {
+        run1();
+    }
+    if (!hasExited) {
+        memcpy(this->r, r, sizeof (r));
+        this->OF = OF;
+        this->DF = DF;
+        this->SF = SF;
+        this->ZF = ZF;
+        this->PF = PF;
+        this->CF = CF;
+    }
 }
 
 int VMMinix2::convsig(int sig) {
