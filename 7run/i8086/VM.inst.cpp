@@ -1,10 +1,11 @@
-#include "VM8086.h"
+#include "VM.h"
+#include "disasm.h"
 #include <stdio.h>
 
 using namespace i8086;
 
 void VM8086::run1(uint8_t prefix) {
-    Op8086 op;
+    OpCode op;
     if (cache.empty()) {
         op = disasm1(text + ip, ip, tsize);
     } else {

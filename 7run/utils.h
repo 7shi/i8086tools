@@ -4,10 +4,6 @@
 
 extern std::string rootpath;
 
-extern std::string regs8[];
-extern std::string regs16[];
-extern std::string sregs[];
-
 inline uint16_t read16(uint8_t *mem) {
     return mem[0] | (mem[1] << 8);
 }

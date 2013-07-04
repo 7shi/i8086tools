@@ -2,19 +2,22 @@
 <configurationDescriptor version="89">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="7run">
+      <df name="i8086">
+        <in>OpCode.cpp</in>
+        <in>OpCode.h</in>
+        <in>Operand.cpp</in>
+        <in>Operand.h</in>
+        <in>VM.cpp</in>
+        <in>VM.h</in>
+        <in>VM.inst.cpp</in>
+        <in>disasm.cpp</in>
+        <in>disasm.h</in>
+      </df>
       <in>File.cpp</in>
       <in>File.h</in>
-      <in>Op8086.cpp</in>
-      <in>Op8086.h</in>
-      <in>Opr8086.cpp</in>
-      <in>Opr8086.h</in>
       <in>VM.cpp</in>
       <in>VM.h</in>
       <in>VM.sys.cpp</in>
-      <in>VM8086.cpp</in>
-      <in>VM8086.disasm.cpp</in>
-      <in>VM8086.h</in>
-      <in>VM8086.inst.cpp</in>
       <in>VMMinix2.cpp</in>
       <in>VMMinix2.h</in>
       <in>VMMinix2.signal.cpp</in>
@@ -50,48 +53,91 @@
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
           <executablePath></executablePath>
-          <ccTool>
-            <incDir>
-              <pElem></pElem>
-            </incDir>
-          </ccTool>
         </makeTool>
       </makefileType>
       <item path="File.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
+          </incDir>
+        </ccTool>
       </item>
       <item path="File.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="Op8086.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="Op8086.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Opr8086.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="Opr8086.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="VM.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
+          </incDir>
+        </ccTool>
       </item>
       <item path="VM.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="VM.sys.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="VM8086.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="VM8086.disasm.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="VM8086.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="VM8086.inst.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
+          </incDir>
+        </ccTool>
       </item>
       <item path="VMMinix2.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
+            <pElem>i8086</pElem>
+          </incDir>
+        </ccTool>
       </item>
       <item path="VMMinix2.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="VMMinix2.signal.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
+            <pElem>i8086</pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <folder path="7run/i8086">
+        <ccTool>
+          <incDir>
+            <pElem>i8086</pElem>
+            <pElem></pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <item path="i8086/OpCode.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="i8086/OpCode.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="i8086/Operand.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="i8086/Operand.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="i8086/VM.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="i8086/VM.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="i8086/VM.inst.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="i8086/disasm.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="i8086/disasm.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem>i8086</pElem>
+            <pElem></pElem>
+          </incDir>
+        </ccTool>
       </item>
       <item path="utils.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
+          </incDir>
+        </ccTool>
       </item>
       <item path="utils.h" ex="false" tool="3" flavor2="0">
       </item>

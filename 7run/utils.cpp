@@ -8,10 +8,6 @@
 
 std::string rootpath;
 
-std::string regs8 [] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
-std::string regs16[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"};
-std::string sregs [] = {"es", "cs", "ss", "ds"};
-
 std::string hex(int v, int len) {
     char buf[32], format[16] = "%x";
     if (v < 0) {

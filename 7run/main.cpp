@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     if (dis) {
         vm.disasm();
     } else {
-        if (trace == 2) fprintf(stderr, header);
+        if (trace == 2) fprintf(stderr, i8086::header);
         exitcode = 0;
         std::vector<std::string> envs;
         envs.push_back("PATH=/bin:/usr/bin");

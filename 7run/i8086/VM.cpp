@@ -1,14 +1,16 @@
-#include "VM8086.h"
+#include "VM.h"
+#include "disasm.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 
+const char *i8086::header = " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n";
+
 using namespace i8086;
 
-bool ptable[256];
-const char *header = " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n";
+bool VM8086::ptable[256];
 
-void VM8086::debug(uint16_t ip, const Op8086 &op) {
+void VM8086::debug(uint16_t ip, const OpCode &op) {
     fprintf(stderr,
             "%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-12s %s",
             r[0], r[3], r[1], r[2], r[4], r[5], r[6], r[7],
@@ -35,19 +37,17 @@ void VM8086::debug(uint16_t ip, const Op8086 &op) {
 
 static bool initialized;
 
-static void init_table() {
-    for (int i = 0; i < 256; i++) {
-        int n = 0;
-        for (int j = 1; j < 256; j += j) {
-            if (i & j) n++;
-        }
-        ptable[i] = (n & 1) == 0;
-    }
-    initialized = true;
-}
-
 void VM8086::init() {
-    if (!initialized) init_table();
+    if (!initialized) {
+        for (int i = 0; i < 256; i++) {
+            int n = 0;
+            for (int j = 1; j < 256; j += j) {
+                if (i & j) n++;
+            }
+            ptable[i] = (n & 1) == 0;
+        }
+        initialized = true;
+    }
     uint16_t tmp = 0x1234;
     uint8_t *p = (uint8_t *) r;
     if (*(uint8_t *) & tmp == 0x34) {
@@ -86,7 +86,7 @@ VM8086::VM8086(const VM8086 &vm) : VM(vm) {
 VM8086::~VM8086() {
 }
 
-int VM8086::addr(const Opr8086 &opr) {
+int VM8086::addr(const Operand &opr) {
     switch (opr.type) {
         case Ptr: return uint16_t(opr.value);
         case ModRM + 0: return uint16_t(BX + SI + opr.value);
@@ -101,7 +101,7 @@ int VM8086::addr(const Opr8086 &opr) {
     return -1;
 }
 
-uint8_t VM8086::get8(const Opr8086 &opr) {
+uint8_t VM8086::get8(const Operand &opr) {
     switch (opr.type) {
         case Reg: return *r8[opr.value];
         case Imm: return opr.value;
@@ -110,7 +110,7 @@ uint8_t VM8086::get8(const Opr8086 &opr) {
     return ad < 0 ? 0 : data[ad];
 }
 
-uint16_t VM8086::get16(const Opr8086 &opr) {
+uint16_t VM8086::get16(const Operand &opr) {
     switch (opr.type) {
         case Reg: return r[opr.value];
         case Imm: return opr.value;
@@ -119,7 +119,7 @@ uint16_t VM8086::get16(const Opr8086 &opr) {
     return ad < 0 ? 0 : read16(ad);
 }
 
-void VM8086::set8(const Opr8086 &opr, uint8_t value) {
+void VM8086::set8(const Operand &opr, uint8_t value) {
     if (opr.type == Reg) {
         *r8[opr.value] = value;
     } else {
@@ -128,7 +128,7 @@ void VM8086::set8(const Opr8086 &opr, uint8_t value) {
     }
 }
 
-void VM8086::set16(const Opr8086 &opr, uint16_t value) {
+void VM8086::set16(const Operand &opr, uint16_t value) {
     if (opr.type == Reg) {
         r[opr.value] = value;
     } else {
@@ -236,5 +236,5 @@ bool VM8086::load(const std::string &fn) {
 }
 
 void VM8086::disasm() {
-    disasm(text, tsize);
+    ::disasm(text, tsize);
 }

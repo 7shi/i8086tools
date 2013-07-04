@@ -1,21 +1,21 @@
 #pragma once
-#include "Opr8086.h"
+#include "Operand.h"
 #include <stdint.h>
 
 namespace i8086 {
 
-    struct Op8086 {
+    struct OpCode {
         bool prefix;
         size_t len;
         std::string mne;
-        Opr8086 opr1, opr2;
+        Operand opr1, opr2;
 
-        Op8086();
-        Op8086(
+        OpCode();
+        OpCode(
                 int len, const std::string &mne,
-                const Opr8086 &opr1 = Opr8086(),
-                const Opr8086 &opr2 = Opr8086());
-        Op8086(const std::string &mne, const Opr8086 &opr = Opr8086());
+                const Operand &opr1 = Operand(),
+                const Operand &opr2 = Operand());
+        OpCode(const std::string &mne, const Operand &opr = Operand());
 
         inline bool empty() const {
             return len == 0;

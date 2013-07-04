@@ -1,6 +1,6 @@
 #pragma once
-#include "VM.h"
-#include "Op8086.h"
+#include "../VM.h"
+#include "OpCode.h"
 
 #define AX r[0]
 #define CX r[1]
@@ -19,10 +19,8 @@
 #define DH *r8[6]
 #define BH *r8[7]
 
-extern bool ptable[256];
-extern const char *header;
-
 namespace i8086 {
+    extern const char *header;
 
     class VM8086 : public VM {
     protected:
@@ -30,9 +28,10 @@ namespace i8086 {
         uint8_t *r8[8];
         bool OF, DF, SF, ZF, PF, CF;
         uint16_t start_sp;
-        std::vector<Op8086> cache;
+        std::vector<OpCode> cache;
 
     private:
+        static bool ptable[256];
         void init();
 
     public:
@@ -45,10 +44,6 @@ namespace i8086 {
                 const std::vector<std::string> &envs);
         void run();
         void disasm();
-
-        static Op8086 disasm1(uint8_t *mem, uint16_t addr);
-        static Op8086 disasm1(uint8_t *mem, uint16_t addr, size_t last);
-        static void disasm(uint8_t *mem, size_t size);
 
     protected:
 
@@ -72,13 +67,13 @@ namespace i8086 {
             return value;
         }
 
-        uint8_t get8(const Opr8086 &opr);
-        uint16_t get16(const Opr8086 &opr);
-        void set8(const Opr8086 &opr, uint8_t value);
-        void set16(const Opr8086 &opr, uint16_t value);
+        uint8_t get8(const Operand &opr);
+        uint16_t get16(const Operand &opr);
+        void set8(const Operand &opr, uint8_t value);
+        void set16(const Operand &opr, uint16_t value);
 
-        void debug(uint16_t ip, const Op8086 &op);
-        int addr(const Opr8086 &opr);
+        void debug(uint16_t ip, const OpCode &op);
+        int addr(const Operand &opr);
         void run1(uint8_t prefix = 0);
     };
 }
