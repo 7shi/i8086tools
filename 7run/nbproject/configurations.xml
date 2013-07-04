@@ -7,9 +7,9 @@
         <in>OpCode.h</in>
         <in>Operand.cpp</in>
         <in>Operand.h</in>
-        <in>VM.cpp</in>
-        <in>VM.h</in>
-        <in>VM.inst.cpp</in>
+        <in>VM8086.cpp</in>
+        <in>VM8086.h</in>
+        <in>VM8086.inst.cpp</in>
         <in>disasm.cpp</in>
         <in>disasm.h</in>
       </df>
@@ -114,11 +114,11 @@
       </item>
       <item path="i8086/Operand.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="i8086/VM.cpp" ex="false" tool="1" flavor2="0">
+      <item path="i8086/VM8086.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="i8086/VM.h" ex="false" tool="3" flavor2="0">
+      <item path="i8086/VM8086.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="i8086/VM.inst.cpp" ex="false" tool="1" flavor2="0">
+      <item path="i8086/VM8086.inst.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="i8086/disasm.cpp" ex="false" tool="1" flavor2="0">
       </item>

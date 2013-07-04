@@ -1,4 +1,4 @@
-#include "VM.h"
+#include "VM8086.h"
 #include "disasm.h"
 #include <stdio.h>
 

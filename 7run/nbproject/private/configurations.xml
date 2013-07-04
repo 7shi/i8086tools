@@ -7,9 +7,9 @@
         <in>OpCode.h</in>
         <in>Operand.cpp</in>
         <in>Operand.h</in>
-        <in>VM.cpp</in>
-        <in>VM.h</in>
-        <in>VM.inst.cpp</in>
+        <in>VM8086.cpp</in>
+        <in>VM8086.h</in>
+        <in>VM8086.inst.cpp</in>
         <in>disasm.cpp</in>
         <in>disasm.h</in>
       </df>

@@ -1,5 +1,5 @@
 #pragma once
-#include "i8086/VM.h"
+#include "i8086/VM8086.h"
 
 class VMMinix2 : public i8086::VM8086 {
 public:
