@@ -24,7 +24,7 @@ Operand::Operand(uint8_t *mem, int pc, int modr) {
             case 6:
             case 7:
                 len = 2;
-                value = uint16_t(pc + read16(mem));
+                value = uint16_t(pc + 2 + read16(mem));
                 return;
         }
     }
