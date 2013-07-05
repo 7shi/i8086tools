@@ -137,7 +137,7 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
                 case 061: return modr(mem, addr, w, "rol");
                 case 062: return modr(mem, addr, w, "asr");
                 case 063: return modr(mem, addr, w, "asl");
-                case 064: break;
+                case 064: return OpCode(2, "mark", imm(w & 077));
                 case 065: return modr(mem, addr, w, "mfpi");
                 case 066: return modr(mem, addr, w, "mtpi");
                 case 067: return modr(mem, addr, w, "sxt");
@@ -156,6 +156,7 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
                 case 2: return rmodr(mem, addr, w, "ash");
                 case 3: return rmodr(mem, addr, w, "ashc");
                 case 4: return rmodr(mem, addr, w, "xor");
+                case 7: return OpCode(2, "sob", reg(w >> 6), imm(w & 077));
             }
             break;
         case 010:
@@ -195,11 +196,11 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
                 case 040:
                 case 041:
                 case 042:
-                case 043:
+                case 043: return OpCode(2, "emt", imm(w & 255));
                 case 044:
                 case 045:
                 case 046:
-                case 047: break;
+                case 047: return OpCode(2, "sys", imm(w & 255));
                 case 050: return modr(mem, addr, w, "clrb");
                 case 051: return modr(mem, addr, w, "comb");
                 case 052: return modr(mem, addr, w, "incb");
