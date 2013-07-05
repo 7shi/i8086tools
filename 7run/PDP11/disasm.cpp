@@ -45,7 +45,49 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
                     }
                     break;
                 case 001: return modr(mem, addr, w, "jmp");
-                case 002: break;
+                case 002:
+                    switch ((w >> 3) & 7) {
+                        case 0: return OpCode(2, "rts", reg(w & 7));
+                        case 3: return OpCode(2, "spl", imm(w & 7));
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                            switch (w) {
+                                case 0240: return OpCode(2, "nop");
+                                case 0241: return OpCode(2, "clc");
+                                case 0242: return OpCode(2, "clv");
+                                case 0243: return OpCode(2, "clvc");
+                                case 0244: return OpCode(2, "clz");
+                                case 0245: return OpCode(2, "clzc");
+                                case 0246: return OpCode(2, "clzv");
+                                case 0247: return OpCode(2, "clzvc");
+                                case 0250: return OpCode(2, "cln");
+                                case 0251: return OpCode(2, "clnc");
+                                case 0252: return OpCode(2, "clnv");
+                                case 0253: return OpCode(2, "clnvc");
+                                case 0254: return OpCode(2, "clnz");
+                                case 0255: return OpCode(2, "clnzc");
+                                case 0256: return OpCode(2, "clnzv");
+                                case 0257: return OpCode(2, "ccc");
+                                case 0261: return OpCode(2, "sec");
+                                case 0262: return OpCode(2, "sev");
+                                case 0263: return OpCode(2, "sevc");
+                                case 0264: return OpCode(2, "sez");
+                                case 0265: return OpCode(2, "sezc");
+                                case 0266: return OpCode(2, "sezv");
+                                case 0267: return OpCode(2, "sezvc");
+                                case 0270: return OpCode(2, "sen");
+                                case 0271: return OpCode(2, "senc");
+                                case 0272: return OpCode(2, "senv");
+                                case 0273: return OpCode(2, "senvc");
+                                case 0274: return OpCode(2, "senz");
+                                case 0275: return OpCode(2, "senzc");
+                                case 0276: return OpCode(2, "senzv");
+                                case 0277: return OpCode(2, "scc");
+                            }
+                    }
+                    break;
                 case 003: return modr(mem, addr, w, "swab");
                 case 004:
                 case 005:
