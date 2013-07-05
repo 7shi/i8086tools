@@ -9,6 +9,7 @@ namespace PDP11 {
 
         Operand();
         Operand(int len, int mode, int reg, int value = 0);
+        Operand(uint8_t *mem, int pc, int modr);
 
         inline bool empty() const {
             return len == -1;
@@ -18,6 +19,6 @@ namespace PDP11 {
     };
 
     inline Operand reg(int r) {
-        return Operand(0, 0, r);
+        return Operand(0, 0, r & 7);
     }
 }

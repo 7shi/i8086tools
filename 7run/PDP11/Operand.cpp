@@ -11,6 +11,31 @@ Operand::Operand(int len, int mode, int reg, int value)
 : len(len), mode(mode), reg(reg), value(value) {
 }
 
+Operand::Operand(uint8_t *mem, int pc, int modr) {
+    mode = (modr >> 3) & 7;
+    reg = modr & 7;
+    if (reg == 7) {
+        switch (mode) {
+            case 2:
+            case 3:
+                len = 2;
+                value = read16(mem);
+                return;
+            case 6:
+            case 7:
+                len = 2;
+                value = uint16_t(pc + read16(mem));
+                return;
+        }
+    }
+    if (mode < 6) {
+        len = value = 0;
+    } else {
+        len = 2;
+        value = read16(mem);
+    }
+}
+
 std::string Operand::str() const {
     if (reg == 7) {
         switch (mode) {
