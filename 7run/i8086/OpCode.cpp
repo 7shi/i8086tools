@@ -2,19 +2,6 @@
 
 using namespace i8086;
 
-OpCode::OpCode()
-: prefix(NULL), len(0) {
-}
-
-OpCode::OpCode(
-        int len, const char *mne, const Operand &opr1, const Operand &opr2)
-: prefix(NULL), len(len), mne(mne), opr1(opr1), opr2(opr2) {
-}
-
-OpCode::OpCode(const char *mne, const Operand &opr)
-: prefix(mne), len(1), mne(mne), opr2(opr) {
-}
-
 std::string OpCode::str() const {
     std::string mne = this->mne;
     if (prefix) {

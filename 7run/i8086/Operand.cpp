@@ -1,24 +1,15 @@
 #include "Operand.h"
 #include "disasm.h"
 
-namespace i8086 {
-    Operand dx = Operand(0, true, Reg, 2);
-    Operand cl = Operand(0, false, Reg, 1);
-    Operand es = Operand(0, true, SReg, 0);
-    Operand cs = Operand(0, true, SReg, 1);
-    Operand ss = Operand(0, true, SReg, 2);
-    Operand ds = Operand(0, true, SReg, 3);
-}
-
 using namespace i8086;
 
-Operand::Operand()
-: len(-1), w(false), type(0), value(0), seg(-1) {
-}
-
-Operand::Operand(int len, bool w, int type, int value)
-: len(len), w(w), type(type), value(value), seg(-1) {
-}
+Operand i8086::noopr = getopr(-1, false, 0, 0);
+Operand i8086::dx = getopr(0, true, Reg, 2);
+Operand i8086::cl = getopr(0, false, Reg, 1);
+Operand i8086::es = getopr(0, true, SReg, 0);
+Operand i8086::cs = getopr(0, true, SReg, 1);
+Operand i8086::ss = getopr(0, true, SReg, 2);
+Operand i8086::ds = getopr(0, true, SReg, 3);
 
 std::string Operand::str() const {
     switch (type) {
