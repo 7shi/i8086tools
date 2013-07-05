@@ -32,7 +32,7 @@ Operand::Operand(uint8_t *mem, int pc, int modr) {
         len = value = 0;
     } else {
         len = 2;
-        value = read16(mem);
+        value = (int16_t) read16(mem);
     }
 }
 
