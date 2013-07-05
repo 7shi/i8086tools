@@ -12,6 +12,7 @@
         <in>VM.inst.cpp</in>
         <in>disasm.cpp</in>
         <in>disasm.h</in>
+        <in>regs.h</in>
       </df>
       <df name="Minix2">
         <in>VM.cpp</in>
@@ -27,6 +28,7 @@
         <in>VM.h</in>
         <in>disasm.cpp</in>
         <in>disasm.h</in>
+        <in>regs.h</in>
       </df>
       <df name="UnixV6">
         <in>VM.cpp</in>

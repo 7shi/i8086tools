@@ -12,6 +12,7 @@
         <in>VM.inst.cpp</in>
         <in>disasm.cpp</in>
         <in>disasm.h</in>
+        <in>regs.h</in>
       </df>
       <df name="Minix2">
         <in>VM.cpp</in>
@@ -27,6 +28,7 @@
         <in>VM.h</in>
         <in>disasm.cpp</in>
         <in>disasm.h</in>
+        <in>regs.h</in>
       </df>
       <df name="UnixV6">
         <in>VM.cpp</in>
@@ -114,6 +116,8 @@
       </item>
       <item path="PDP11/disasm.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="PDP11/regs.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="UnixV6/VM.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="UnixV6/VM.h" ex="false" tool="3" flavor2="0">
@@ -159,6 +163,8 @@
       <item path="i8086/disasm.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="i8086/disasm.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="i8086/regs.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
         <ccTool>
