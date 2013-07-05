@@ -225,6 +225,9 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
         case 015: return srcdst(mem, addr, w, "bisb");
         case 016: return srcdst(mem, addr, w, "sub");
         case 017:
+            switch (w) {
+                case 0170011: return OpCode(2, "setd");
+            }
             break;
     }
     undefined++;
