@@ -19,6 +19,11 @@ static inline OpCode dst(uint8_t *mem, uint16_t addr, int w, const char *mne) {
     return OpCode(2 + opr.len, mne, opr);
 }
 
+static inline OpCode branch(uint16_t addr, int w, const char *mne) {
+    uint16_t to = addr + 2 + ((int8_t) (w & 255)) * 2;
+    return OpCode(2, mne, Operand(2, 6, 7, to));
+}
+
 OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
     uint16_t w = ::read16(mem);
     switch (w >> 12) {
@@ -41,31 +46,31 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
                 case 004:
                 case 005:
                 case 006:
-                case 007:
+                case 007: return branch(addr, w, "br");
                 case 010:
                 case 011:
                 case 012:
-                case 013:
+                case 013: return branch(addr, w, "bne");
                 case 014:
                 case 015:
                 case 016:
-                case 017:
+                case 017: return branch(addr, w, "beq");
                 case 020:
                 case 021:
                 case 022:
-                case 023:
+                case 023: return branch(addr, w, "bge");
                 case 024:
                 case 025:
                 case 026:
-                case 027:
+                case 027: return branch(addr, w, "blt");
                 case 030:
                 case 031:
                 case 032:
-                case 033:
+                case 033: return branch(addr, w, "bgt");
                 case 034:
                 case 035:
                 case 036:
-                case 037:
+                case 037: return branch(addr, w, "ble");
                 case 040:
                 case 041:
                 case 042:
@@ -102,6 +107,46 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
             break;
         case 010:
             switch ((w >> 6) & 077) {
+                case 000:
+                case 001:
+                case 002:
+                case 003: return branch(addr, w, "bpl");
+                case 004:
+                case 005:
+                case 006:
+                case 007: return branch(addr, w, "bmi");
+                case 010:
+                case 011:
+                case 012:
+                case 013: return branch(addr, w, "bhi");
+                case 014:
+                case 015:
+                case 016:
+                case 017: return branch(addr, w, "blos");
+                case 020:
+                case 021:
+                case 022:
+                case 023: return branch(addr, w, "bvc");
+                case 024:
+                case 025:
+                case 026:
+                case 027: return branch(addr, w, "bvs");
+                case 030:
+                case 031:
+                case 032:
+                case 033: return branch(addr, w, "bcc");
+                case 034:
+                case 035:
+                case 036:
+                case 037: return branch(addr, w, "bcs");
+                case 040:
+                case 041:
+                case 042:
+                case 043:
+                case 044:
+                case 045:
+                case 046:
+                case 047: break;
                 case 050: return dst(mem, addr, w, "clrb");
                 case 051: return dst(mem, addr, w, "comb");
                 case 052: return dst(mem, addr, w, "incb");
