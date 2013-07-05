@@ -30,6 +30,17 @@ std::string hexdump(uint8_t *mem, int len) {
     return ret;
 }
 
+std::string hexdump2(uint8_t *mem, int len) {
+    std::string ret;
+    char buf[5];
+    for (int i = 0; i < len; i += 2) {
+        if (i > 0) ret += ' ';
+        snprintf(buf, sizeof (buf), "%04x", read16(mem + i));
+        ret += buf;
+    }
+    return ret;
+}
+
 void setroot(std::string root) {
     while (endsWith(root, "/"))
         root = root.substr(0, root.size() - 1);

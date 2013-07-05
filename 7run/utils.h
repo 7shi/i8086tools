@@ -26,6 +26,7 @@ inline void write32(uint8_t *mem, uint32_t v) {
 
 extern std::string hex(int v, int len = 0);
 extern std::string hexdump(uint8_t *mem, int len);
+extern std::string hexdump2(uint8_t *mem, int len);
 void setroot(std::string root);
 std::string convpath(const std::string &path);
 bool startsWith(const std::string &s, const std::string &prefix);
