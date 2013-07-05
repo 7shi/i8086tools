@@ -7,7 +7,18 @@ std::string PDP11::regs[] = {"r0", "r1", "r2", "r3", "r4", "r5", "sp", "pc"};
 
 static int undefined;
 
+static OpCode srcdst(uint8_t *mem, uint16_t addr, int w, const char *mne) {
+    Operand opr1(mem + 2, addr + 2, w >> 6);
+    int offset = 2 + opr1.len;
+    Operand opr2(mem + offset, addr + offset, w);
+    return OpCode(offset + opr2.len, mne, opr1, opr2);
+}
+
 OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
+    uint16_t w = ::read16(mem);
+    switch (w >> 12) {
+        case 001: return srcdst(mem, addr, w, "mov");
+    }
     undefined++;
     return OpCode(2, "(undefined)");
 }
