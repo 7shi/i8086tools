@@ -31,13 +31,13 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
             switch ((w >> 6) & 077) {
                 case 000:
                     switch (w & 7) {
-                        case 0: return OpCode(1, "halt");
-                        case 1: return OpCode(1, "wait");
-                        case 2: return OpCode(1, "rti");
-                        case 3: return OpCode(1, "bpt");
-                        case 4: return OpCode(1, "iot");
-                        case 5: return OpCode(1, "reset");
-                        case 6: return OpCode(1, "rtt");
+                        case 0: return OpCode(2, "halt");
+                        case 1: return OpCode(2, "wait");
+                        case 2: return OpCode(2, "rti");
+                        case 3: return OpCode(2, "bpt");
+                        case 4: return OpCode(2, "iot");
+                        case 5: return OpCode(2, "reset");
+                        case 6: return OpCode(2, "rtt");
                     }
                     break;
                 case 001: return dst(mem, addr, w, "jmp");
