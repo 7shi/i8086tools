@@ -17,7 +17,26 @@ static OpCode srcdst(uint8_t *mem, uint16_t addr, int w, const char *mne) {
 OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
     uint16_t w = ::read16(mem);
     switch (w >> 12) {
+        case 000:
+            break;
         case 001: return srcdst(mem, addr, w, "mov");
+        case 002: return srcdst(mem, addr, w, "cmp");
+        case 003: return srcdst(mem, addr, w, "bit");
+        case 004: return srcdst(mem, addr, w, "bic");
+        case 005: return srcdst(mem, addr, w, "bis");
+        case 006: return srcdst(mem, addr, w, "add");
+        case 007:
+            break;
+        case 010:
+            break;
+        case 011: return srcdst(mem, addr, w, "movb");
+        case 012: return srcdst(mem, addr, w, "cmpb");
+        case 013: return srcdst(mem, addr, w, "bitb");
+        case 014: return srcdst(mem, addr, w, "bicb");
+        case 015: return srcdst(mem, addr, w, "bisb");
+        case 016: return srcdst(mem, addr, w, "sub");
+        case 017:
+            break;
     }
     undefined++;
     return OpCode(2, "(undefined)");
