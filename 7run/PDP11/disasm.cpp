@@ -14,7 +14,7 @@ static inline OpCode srcdst(uint8_t *mem, uint16_t addr, int w, const char *mne)
     return OpCode(offset + opr2.len, mne, opr1, opr2);
 }
 
-static inline OpCode dst(uint8_t *mem, uint16_t addr, int w, const char *mne) {
+static inline OpCode modr(uint8_t *mem, uint16_t addr, int w, const char *mne) {
     Operand opr(mem + 2, addr + 2, w);
     return OpCode(2 + opr.len, mne, opr);
 }
@@ -40,9 +40,9 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
                         case 6: return OpCode(2, "rtt");
                     }
                     break;
-                case 001: return dst(mem, addr, w, "jmp");
+                case 001: return modr(mem, addr, w, "jmp");
                 case 002: break;
-                case 003: return dst(mem, addr, w, "swab");
+                case 003: return modr(mem, addr, w, "swab");
                 case 004:
                 case 005:
                 case 006:
@@ -79,22 +79,22 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
                 case 045:
                 case 046:
                 case 047: break;
-                case 050: return dst(mem, addr, w, "clr");
-                case 051: return dst(mem, addr, w, "com");
-                case 052: return dst(mem, addr, w, "inc");
-                case 053: return dst(mem, addr, w, "dec");
-                case 054: return dst(mem, addr, w, "neg");
-                case 055: return dst(mem, addr, w, "adc");
-                case 056: return dst(mem, addr, w, "sbc");
-                case 057: return dst(mem, addr, w, "tst");
-                case 060: return dst(mem, addr, w, "ror");
-                case 061: return dst(mem, addr, w, "rol");
-                case 062: return dst(mem, addr, w, "asr");
-                case 063: return dst(mem, addr, w, "asl");
+                case 050: return modr(mem, addr, w, "clr");
+                case 051: return modr(mem, addr, w, "com");
+                case 052: return modr(mem, addr, w, "inc");
+                case 053: return modr(mem, addr, w, "dec");
+                case 054: return modr(mem, addr, w, "neg");
+                case 055: return modr(mem, addr, w, "adc");
+                case 056: return modr(mem, addr, w, "sbc");
+                case 057: return modr(mem, addr, w, "tst");
+                case 060: return modr(mem, addr, w, "ror");
+                case 061: return modr(mem, addr, w, "rol");
+                case 062: return modr(mem, addr, w, "asr");
+                case 063: return modr(mem, addr, w, "asl");
                 case 064: break;
-                case 065: return dst(mem, addr, w, "mfpi");
-                case 066: return dst(mem, addr, w, "mtpi");
-                case 067: return dst(mem, addr, w, "sxt");
+                case 065: return modr(mem, addr, w, "mfpi");
+                case 066: return modr(mem, addr, w, "mtpi");
+                case 067: return modr(mem, addr, w, "sxt");
             }
             break;
         case 001: return srcdst(mem, addr, w, "mov");
@@ -147,21 +147,21 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
                 case 045:
                 case 046:
                 case 047: break;
-                case 050: return dst(mem, addr, w, "clrb");
-                case 051: return dst(mem, addr, w, "comb");
-                case 052: return dst(mem, addr, w, "incb");
-                case 053: return dst(mem, addr, w, "decb");
-                case 054: return dst(mem, addr, w, "negb");
-                case 055: return dst(mem, addr, w, "adcb");
-                case 056: return dst(mem, addr, w, "sbcb");
-                case 057: return dst(mem, addr, w, "tstb");
-                case 060: return dst(mem, addr, w, "rorb");
-                case 061: return dst(mem, addr, w, "rolb");
-                case 062: return dst(mem, addr, w, "asrb");
-                case 063: return dst(mem, addr, w, "aslb");
+                case 050: return modr(mem, addr, w, "clrb");
+                case 051: return modr(mem, addr, w, "comb");
+                case 052: return modr(mem, addr, w, "incb");
+                case 053: return modr(mem, addr, w, "decb");
+                case 054: return modr(mem, addr, w, "negb");
+                case 055: return modr(mem, addr, w, "adcb");
+                case 056: return modr(mem, addr, w, "sbcb");
+                case 057: return modr(mem, addr, w, "tstb");
+                case 060: return modr(mem, addr, w, "rorb");
+                case 061: return modr(mem, addr, w, "rolb");
+                case 062: return modr(mem, addr, w, "asrb");
+                case 063: return modr(mem, addr, w, "aslb");
                 case 064: break;
-                case 065: return dst(mem, addr, w, "mfpd");
-                case 066: return dst(mem, addr, w, "mtpd");
+                case 065: return modr(mem, addr, w, "mfpd");
+                case 066: return modr(mem, addr, w, "mtpd");
             }
             break;
         case 011: return srcdst(mem, addr, w, "movb");
