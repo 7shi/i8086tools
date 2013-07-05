@@ -19,8 +19,14 @@
         <in>VM.signal.cpp</in>
       </df>
       <df name="PDP11">
+        <in>OpCode.cpp</in>
+        <in>OpCode.h</in>
+        <in>Operand.cpp</in>
+        <in>Operand.h</in>
         <in>VM.cpp</in>
         <in>VM.h</in>
+        <in>disasm.cpp</in>
+        <in>disasm.h</in>
       </df>
       <df name="UnixV6">
         <in>VM.cpp</in>

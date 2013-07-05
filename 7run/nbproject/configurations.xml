@@ -19,8 +19,14 @@
         <in>VM.signal.cpp</in>
       </df>
       <df name="PDP11">
+        <in>OpCode.cpp</in>
+        <in>OpCode.h</in>
+        <in>Operand.cpp</in>
+        <in>Operand.h</in>
         <in>VM.cpp</in>
         <in>VM.h</in>
+        <in>disasm.cpp</in>
+        <in>disasm.h</in>
       </df>
       <df name="UnixV6">
         <in>VM.cpp</in>
@@ -92,9 +98,21 @@
           </incDir>
         </ccTool>
       </item>
+      <item path="PDP11/OpCode.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="PDP11/OpCode.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="PDP11/Operand.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="PDP11/Operand.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="PDP11/VM.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="PDP11/VM.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="PDP11/disasm.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="PDP11/disasm.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="UnixV6/VM.cpp" ex="false" tool="1" flavor2="0">
       </item>

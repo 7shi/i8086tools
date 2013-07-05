@@ -1,4 +1,5 @@
 #include "VM.h"
+#include "disasm.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -88,5 +89,5 @@ void VM::run() {
 }
 
 void VM::disasm() {
-    fprintf(stderr, "[%s] not implemented\n", __func__);
+    ::disasm(text, tsize);
 }
