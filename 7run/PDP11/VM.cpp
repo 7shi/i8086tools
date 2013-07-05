@@ -1,5 +1,6 @@
 #include "VM.h"
 #include "disasm.h"
+#include "regs.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -11,7 +12,9 @@ bool PDP11::check(uint8_t h[2]) {
     return magic == 0407 || magic == 0410 || magic == 0411;
 }
 
-VM::VM() {
+VM::VM() : start_sp(0) {
+    memset(r, 0, sizeof (r));
+    Z = N = C = V = false;
 }
 
 VM::~VM() {
@@ -81,7 +84,21 @@ bool VM::load(const std::string &fn) {
 void VM::run(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
-    fprintf(stderr, "[%s] not implemented\n", __func__);
+    int slen = 0;
+    for (int i = 0; i < (int) args.size(); i++) {
+        slen += args[i].size() + 1;
+    }
+    SP -= (slen + 1) & ~1;
+    uint16_t ad1 = SP;
+    SP -= (1 + args.size()) * 2;
+    uint16_t ad2 = start_sp = SP;
+    write16(SP, args.size()); // argc
+    for (int i = 0; i < (int) args.size(); i++) {
+        write16(ad2 += 2, ad1);
+        strcpy((char *) data + ad1, args[i].c_str());
+        ad1 += args[i].size() + 1;
+    }
+    run();
 }
 
 void VM::run() {

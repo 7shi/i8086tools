@@ -32,7 +32,8 @@ PDP11/OpCode.o: PDP11/OpCode.cpp PDP11/OpCode.h PDP11/Operand.h \
 PDP11/Operand.o: PDP11/Operand.cpp PDP11/Operand.h PDP11/../utils.h \
  PDP11/disasm.h PDP11/OpCode.h
 PDP11/VM.o: PDP11/VM.cpp PDP11/VM.h PDP11/../VMUnix.h PDP11/../utils.h \
- PDP11/../File.h PDP11/OpCode.h PDP11/Operand.h PDP11/disasm.h
+ PDP11/../File.h PDP11/OpCode.h PDP11/Operand.h PDP11/disasm.h \
+ PDP11/regs.h
 PDP11/disasm.o: PDP11/disasm.cpp PDP11/disasm.h PDP11/OpCode.h PDP11/Operand.h \
  PDP11/../utils.h
 UnixV6/VM.o: UnixV6/VM.cpp UnixV6/VM.h UnixV6/../PDP11/VM.h \
