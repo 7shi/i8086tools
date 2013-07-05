@@ -16,10 +16,5 @@ namespace PDP11 {
                 const std::vector<std::string> &envs);
         virtual void run();
         virtual void disasm();
-
-        virtual void setstat(uint16_t addr, struct stat *st);
-        virtual bool syscall(int n);
-        virtual int convsig(int sig);
-        virtual void setsig(int sig, int h);
     };
 }

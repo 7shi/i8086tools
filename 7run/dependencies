@@ -1,7 +1,7 @@
 ./main.o: main.cpp Minix2/VM.h Minix2/../i8086/VM.h \
  Minix2/../i8086/../VMUnix.h Minix2/../i8086/../utils.h \
  Minix2/../i8086/../File.h Minix2/../i8086/OpCode.h \
- Minix2/../i8086/Operand.h PDP11/VM.h
+ Minix2/../i8086/Operand.h UnixV6/VM.h UnixV6/../PDP11/VM.h
 ./utils.o: utils.cpp utils.h
 ./File.o: File.cpp File.h
 ./VMUnix.o: VMUnix.cpp VMUnix.h utils.h File.h
@@ -27,3 +27,6 @@ Minix2/VM.signal.o: Minix2/VM.signal.cpp Minix2/VM.h Minix2/../i8086/VM.h \
  Minix2/../i8086/Operand.h
 PDP11/VM.o: PDP11/VM.cpp PDP11/VM.h PDP11/../VMUnix.h PDP11/../utils.h \
  PDP11/../File.h
+UnixV6/VM.o: UnixV6/VM.cpp UnixV6/VM.h UnixV6/../PDP11/VM.h \
+ UnixV6/../PDP11/../VMUnix.h UnixV6/../PDP11/../utils.h \
+ UnixV6/../PDP11/../File.h

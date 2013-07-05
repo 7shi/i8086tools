@@ -1,5 +1,5 @@
 #include "Minix2/VM.h"
-#include "PDP11/VM.h"
+#include "UnixV6/VM.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 
     VMUnix *vm;
     if (pdp11 || PDP11::check(buf)) {
-        vm = new PDP11::VM();
+        vm = new UnixV6::VM();
     } else {
         vm = new Minix2::VM();
     }
