@@ -501,7 +501,7 @@ void VM::run1(uint8_t prefix) {
             return;
         case 0xa4: // movsb
             do {
-                data[DI] = data[SI];
+                write8(DI, read8(SI));
                 if (DF) {
                     SI--;
                     DI--;
@@ -527,7 +527,7 @@ void VM::run1(uint8_t prefix) {
             return;
         case 0xa6: // cmpsb
             do {
-                val = int8_t(dst = data[SI]) - int8_t(src = data[DI]);
+                val = int8_t(dst = read8(SI)) - int8_t(src = read8(DI));
                 setf8(val, dst < src);
                 if (DF) {
                     SI--;
@@ -561,7 +561,7 @@ void VM::run1(uint8_t prefix) {
             return;
         case 0xaa: // stosb
             do {
-                data[DI] = AL;
+                write8(DI, AL);
                 if (DF) DI--;
                 else DI++;
                 if (prefix) CX--;
@@ -577,7 +577,7 @@ void VM::run1(uint8_t prefix) {
             return;
         case 0xac: // lodsb
             do {
-                AL = data[SI];
+                AL = read8(SI);
                 if (DF) SI--;
                 else SI++;
                 if (prefix) CX--;
@@ -593,7 +593,7 @@ void VM::run1(uint8_t prefix) {
             return;
         case 0xae: // scasb
             do {
-                val = int8_t(AL) - int8_t(src = data[DI]);
+                val = int8_t(AL) - int8_t(src = read8(DI));
                 setf8(val, AL < src);
                 if (DF) DI--;
                 else DI++;
@@ -818,7 +818,7 @@ void VM::run1(uint8_t prefix) {
             }
             break;
         case 0xd7: // xlat
-            AL = data[BX + AL];
+            AL = read8(BX + AL);
             return;
         case 0xe0: // loopnz/loopne
             if (--CX > 0 && !ZF) ip = opr1;

@@ -36,12 +36,20 @@ public:
 
 protected:
 
+    inline uint8_t read8(uint16_t addr) {
+        return data[addr];
+    }
+
     inline uint16_t read16(uint16_t addr) {
         return ::read16(data + addr);
     }
 
     inline uint32_t read32(uint16_t addr) {
         return ::read32(data + addr);
+    }
+
+    inline void write8(uint16_t addr, uint8_t value) {
+        data[addr] = value;
     }
 
     inline void write16(uint16_t addr, uint16_t value) {

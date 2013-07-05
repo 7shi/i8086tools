@@ -23,13 +23,13 @@ void VM::debug(uint16_t ip, const OpCode &op) {
             if (op.opr1.w)
                 fprintf(stderr, " ;[%04x]%04x", ad1, read16(ad1));
             else
-                fprintf(stderr, " ;[%04x]%02x", ad1, data[ad1]);
+                fprintf(stderr, " ;[%04x]%02x", ad1, read8(ad1));
         }
         if (ad2 >= 0) {
             if (op.opr2.w)
                 fprintf(stderr, " ;[%04x]%04x", ad2, read16(ad2));
             else
-                fprintf(stderr, " ;[%04x]%02x", ad2, data[ad2]);
+                fprintf(stderr, " ;[%04x]%02x", ad2, read8(ad2));
         }
     }
     fprintf(stderr, "\n");
@@ -107,7 +107,7 @@ uint8_t VM::get8(const Operand &opr) {
         case Imm: return opr.value;
     }
     int ad = addr(opr);
-    return ad < 0 ? 0 : data[ad];
+    return ad < 0 ? 0 : read8(ad);
 }
 
 uint16_t VM::get16(const Operand &opr) {
@@ -124,7 +124,7 @@ void VM::set8(const Operand &opr, uint8_t value) {
         *r8[opr.value] = value;
     } else {
         int ad = addr(opr);
-        if (ad >= 0) data[ad] = value;
+        if (ad >= 0) write8(ad, value);
     }
 }
 
