@@ -4,12 +4,12 @@
 #include <string.h>
 #include <sys/stat.h>
 
+using namespace PDP11;
+
 bool PDP11::check(uint8_t h[2]) {
     int magic = ::read16(h);
     return magic == 0407 || magic == 0410 || magic == 0411;
 }
-
-using namespace PDP11;
 
 VM::VM() {
 }

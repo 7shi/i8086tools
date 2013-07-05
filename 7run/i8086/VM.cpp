@@ -4,9 +4,9 @@
 #include <string.h>
 #include <sys/stat.h>
 
-const char *i8086::header = " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n";
-
 using namespace i8086;
+
+const char *i8086::header = " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n";
 
 bool VM::ptable[256];
 
