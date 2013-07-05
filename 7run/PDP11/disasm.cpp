@@ -25,8 +25,7 @@ static inline OpCode rmodr(uint8_t *mem, uint16_t addr, int w, const char *mne) 
 }
 
 static inline OpCode branch(uint16_t addr, int w, const char *mne) {
-    uint16_t to = addr + 2 + ((int8_t) (w & 255)) * 2;
-    return OpCode(2, mne, Operand(0, 6, 7, to));
+    return OpCode(2, mne, imm(addr + 2 + ((int8_t) (w & 255)) * 2));
 }
 
 OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {

@@ -21,4 +21,8 @@ namespace PDP11 {
     inline Operand reg(int r) {
         return Operand(0, 0, r & 7);
     }
+    
+    inline Operand imm(int v) {
+        return Operand(0, 6, 7, v);
+    }
 }
