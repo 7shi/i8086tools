@@ -52,21 +52,32 @@ VM::~VM() {
 
 uint16_t VM::getInc(const Operand &opr) {
     uint16_t ret = r[opr.reg];
-    r[opr.reg] += opr.w || opr.reg <= 6 ? 2 : 1;
+    r[opr.reg] += opr.diff();
     return ret;
 }
 
 uint16_t VM::getDec(const Operand &opr) {
-    r[opr.reg] -= opr.w || opr.reg <= 6 ? 2 : 1;
+    r[opr.reg] -= opr.diff();
     return r[opr.reg];
 }
 
-int VM::addr(const Operand &opr) {
+int VM::addr(const Operand &opr, bool nomove) {
     if (opr.reg == 7) {
         switch (opr.mode) {
             case 3: return opr.value;
             case 6: return opr.value;
             case 7: return read16(opr.value);
+        }
+    }
+    if (nomove) {
+        switch (opr.mode) {
+            case 1: return r[opr.reg];
+            case 2: return r[opr.reg];
+            case 3: return read16(r[opr.reg]);
+            case 4: return r[opr.reg] - opr.diff();
+            case 5: return read16(r[opr.reg] - opr.diff());
+            case 6: return r[opr.reg] + opr.value;
+            case 7: return read16(r[opr.reg] + opr.value);
         }
     }
     switch (opr.mode) {
@@ -81,15 +92,15 @@ int VM::addr(const Operand &opr) {
     return -1;
 }
 
-uint8_t VM::get8(const Operand &opr) {
+uint8_t VM::get8(const Operand &opr, bool nomove) {
     if (opr.mode == 0) return r[opr.reg];
-    int ad = addr(opr);
+    int ad = addr(opr, nomove);
     return ad < 0 ? opr.value : read8(ad);
 }
 
-uint16_t VM::get16(const Operand &opr) {
+uint16_t VM::get16(const Operand &opr, bool nomove) {
     if (opr.mode == 0) return r[opr.reg];
-    int ad = addr(opr);
+    int ad = addr(opr, nomove);
     return ad < 0 ? opr.value : read16(ad);
 }
 

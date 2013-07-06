@@ -35,13 +35,13 @@ namespace PDP11 {
 
         uint16_t getInc(const Operand &opr);
         uint16_t getDec(const Operand &opr);
-        uint8_t get8(const Operand &opr);
-        uint16_t get16(const Operand &opr);
+        uint8_t get8(const Operand &opr, bool nomove = false);
+        uint16_t get16(const Operand &opr, bool nomove = false);
         void set8(const Operand &opr, uint8_t value);
         void set16(const Operand &opr, uint16_t value);
 
         void debug(uint16_t ip, const OpCode &op);
-        int addr(const Operand &opr);
+        int addr(const Operand &opr, bool nomobe = false);
         void run1();
     };
 }

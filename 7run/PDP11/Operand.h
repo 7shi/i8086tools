@@ -15,6 +15,10 @@ namespace PDP11 {
         inline bool empty() const {
             return len == -1;
         }
+        
+        inline int diff() const {
+            return w || reg <= 6 ? 2 : 1;
+        }
 
         std::string str() const;
     };
