@@ -27,7 +27,7 @@ void VM::run1() {
         return;
     }
     if (trace >= 2) debug(PC, *op);
-    uint8_t w = ::read16(text + PC);
+    uint16_t w = ::read16(text + PC);
     uint16_t oldpc = PC;
     int dst, src, val;
     uint16_t val16;
