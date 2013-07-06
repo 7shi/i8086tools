@@ -28,6 +28,18 @@ static inline OpCode branch(uint16_t addr, int w, const char *mne) {
     return OpCode(2, mne, imm(addr + 2 + ((int8_t) (w & 255)) * 2));
 }
 
+static inline OpCode srcdstb(uint8_t *mem, uint16_t addr, int w, const char *mne) {
+    OpCode ret = srcdst(mem, addr, w, mne);
+    ret.opr1.w = ret.opr2.w = false;
+    return ret;
+}
+
+static inline OpCode modrb(uint8_t *mem, uint16_t addr, int w, const char *mne) {
+    OpCode ret = modr(mem, addr, w, mne);
+    ret.opr1.w = false;
+    return ret;
+}
+
 OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
     uint16_t w = ::read16(mem);
     switch (w >> 12) {
@@ -201,28 +213,28 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
                 case 045:
                 case 046:
                 case 047: return OpCode(2, "sys", imm(w & 255));
-                case 050: return modr(mem, addr, w, "clrb");
-                case 051: return modr(mem, addr, w, "comb");
-                case 052: return modr(mem, addr, w, "incb");
-                case 053: return modr(mem, addr, w, "decb");
-                case 054: return modr(mem, addr, w, "negb");
-                case 055: return modr(mem, addr, w, "adcb");
-                case 056: return modr(mem, addr, w, "sbcb");
-                case 057: return modr(mem, addr, w, "tstb");
-                case 060: return modr(mem, addr, w, "rorb");
-                case 061: return modr(mem, addr, w, "rolb");
-                case 062: return modr(mem, addr, w, "asrb");
-                case 063: return modr(mem, addr, w, "aslb");
+                case 050: return modrb(mem, addr, w, "clrb");
+                case 051: return modrb(mem, addr, w, "comb");
+                case 052: return modrb(mem, addr, w, "incb");
+                case 053: return modrb(mem, addr, w, "decb");
+                case 054: return modrb(mem, addr, w, "negb");
+                case 055: return modrb(mem, addr, w, "adcb");
+                case 056: return modrb(mem, addr, w, "sbcb");
+                case 057: return modrb(mem, addr, w, "tstb");
+                case 060: return modrb(mem, addr, w, "rorb");
+                case 061: return modrb(mem, addr, w, "rolb");
+                case 062: return modrb(mem, addr, w, "asrb");
+                case 063: return modrb(mem, addr, w, "aslb");
                 case 064: break;
                 case 065: return modr(mem, addr, w, "mfpd");
                 case 066: return modr(mem, addr, w, "mtpd");
             }
             break;
-        case 011: return srcdst(mem, addr, w, "movb");
-        case 012: return srcdst(mem, addr, w, "cmpb");
-        case 013: return srcdst(mem, addr, w, "bitb");
-        case 014: return srcdst(mem, addr, w, "bicb");
-        case 015: return srcdst(mem, addr, w, "bisb");
+        case 011: return srcdstb(mem, addr, w, "movb");
+        case 012: return srcdstb(mem, addr, w, "cmpb");
+        case 013: return srcdstb(mem, addr, w, "bitb");
+        case 014: return srcdstb(mem, addr, w, "bicb");
+        case 015: return srcdstb(mem, addr, w, "bisb");
         case 016: return srcdst(mem, addr, w, "sub");
         case 017:
             switch (w) {

@@ -4,14 +4,15 @@
 using namespace PDP11;
 
 Operand::Operand()
-: len(-1), mode(0), reg(0), value(0) {
+: len(-1), mode(0), reg(0), value(0), w(true) {
 }
 
 Operand::Operand(int len, int mode, int reg, int value)
-: len(len), mode(mode), reg(reg), value(value) {
+: len(len), mode(mode), reg(reg), value(value), w(true) {
 }
 
-Operand::Operand(uint8_t *mem, int pc, int modr) {
+Operand::Operand(uint8_t *mem, int pc, int modr)
+: w(true) {
     mode = (modr >> 3) & 7;
     reg = modr & 7;
     if (reg == 7) {

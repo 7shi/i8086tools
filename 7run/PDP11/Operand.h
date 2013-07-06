@@ -6,6 +6,7 @@ namespace PDP11 {
 
     struct Operand {
         int len, mode, reg, value;
+        bool w;
 
         Operand();
         Operand(int len, int mode, int reg, int value = 0);
