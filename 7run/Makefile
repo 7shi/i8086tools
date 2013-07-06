@@ -10,7 +10,7 @@ SOURCES  = main.cpp utils.cpp \
 	   i8086/VM.cpp i8086/VM.inst.cpp i8086/disasm.cpp \
 	   Minix2/VM.cpp Minix2/VM.signal.cpp \
 	   PDP11/OpCode.cpp PDP11/Operand.cpp \
-	   PDP11/VM.cpp PDP11/disasm.cpp \
+	   PDP11/VM.cpp PDP11/VM.inst.cpp PDP11/disasm.cpp \
 	   UnixV6/VM.cpp
 COMMANDS = bin/aal bin/ar bin/cc bin/nm bin/strip \
 	   bin/crc bin/install bin/m2 \

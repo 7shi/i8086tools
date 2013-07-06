@@ -23,5 +23,25 @@ namespace PDP11 {
                 const std::vector<std::string> &envs);
         virtual void run();
         virtual void disasm();
+
+    protected:
+
+        inline void setZNCV(bool z, bool n, bool c, bool v) {
+            Z = z;
+            N = n;
+            C = c;
+            V = v;
+        }
+
+        uint16_t getInc(const Operand &opr);
+        uint16_t getDec(const Operand &opr);
+        uint8_t get8(const Operand &opr);
+        uint16_t get16(const Operand &opr);
+        void set8(const Operand &opr, uint8_t value);
+        void set16(const Operand &opr, uint16_t value);
+
+        void debug(uint16_t ip, const OpCode &op);
+        int addr(const Operand &opr);
+        void run1();
     };
 }

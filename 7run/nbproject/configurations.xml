@@ -26,6 +26,7 @@
         <in>Operand.h</in>
         <in>VM.cpp</in>
         <in>VM.h</in>
+        <in>VM.inst.cpp</in>
         <in>disasm.cpp</in>
         <in>disasm.h</in>
         <in>regs.h</in>
@@ -111,6 +112,8 @@
       <item path="PDP11/VM.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="PDP11/VM.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="PDP11/VM.inst.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="PDP11/disasm.cpp" ex="false" tool="1" flavor2="0">
       </item>

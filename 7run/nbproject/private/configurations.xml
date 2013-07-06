@@ -26,6 +26,7 @@
         <in>Operand.h</in>
         <in>VM.cpp</in>
         <in>VM.h</in>
+        <in>VM.inst.cpp</in>
         <in>disasm.cpp</in>
         <in>disasm.h</in>
         <in>regs.h</in>
