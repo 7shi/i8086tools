@@ -130,18 +130,18 @@ bool VM::load(const std::string &fn) {
         if (fread(h, sizeof (h), 1, f) && check(h)) {
             tsize = ::read16(h + 2);
             dsize = ::read16(h + 4);
-            //PC = ::read16(h + 10);
+            PC = ::read16(h + 10);
+            cache.clear();
             if (h[0] == 9) { // 0411
-                //cache.clear();
-                //cache.resize(0x10000);
+                cache.resize(0x10000);
                 data = new uint8_t[0x10000];
                 memset(data, 0, 0x10000);
                 fread(text, 1, tsize, f);
                 fread(data, 1, dsize, f);
             } else {
-                //cache.clear();
                 data = text;
                 if (h[0] == 8) { // 0410
+                    cache.resize(0x10000);
                     fread(text, 1, tsize, f);
                     uint16_t doff = (tsize + 0x1fff) & ~0x1fff;
                     fread(text + doff, 1, dsize, f);
@@ -163,7 +163,7 @@ bool VM::load(const std::string &fn) {
             fclose(f);
             return false;
         }
-        //cache.clear();
+        cache.clear();
         data = text;
         fread(text, 1, tsize, f);
         brksize = dsize = tsize;
