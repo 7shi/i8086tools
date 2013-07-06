@@ -35,6 +35,119 @@ void VM::run1() {
     PC += op->len;
     switch (w >> 12) {
         case 000:
+            switch ((w >> 6) & 077) {
+                case 000:
+                    switch (w & 7) {
+                        case 0: // halt
+                        case 1: // wait
+                        case 2: // rti
+                        case 3: // bpt
+                        case 4: // iot
+                        case 5: // reset
+                        case 6: // rtt
+                            break;
+                    }
+                    break;
+                case 001: // jmp
+                case 002:
+                    switch ((w >> 3) & 7) {
+                        case 0: // rts
+                        case 3: // spl
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                            switch (w) {
+                                case 0240: // nop
+                                case 0241: // clc
+                                case 0242: // clv
+                                case 0243: // clvc
+                                case 0244: // clz
+                                case 0245: // clzc
+                                case 0246: // clzv
+                                case 0247: // clzvc
+                                case 0250: // cln
+                                case 0251: // clnc
+                                case 0252: // clnv
+                                case 0253: // clnvc
+                                case 0254: // clnz
+                                case 0255: // clnzc
+                                case 0256: // clnzv
+                                case 0257: // ccc
+                                case 0261: // sec
+                                case 0262: // sev
+                                case 0263: // sevc
+                                case 0264: // sez
+                                case 0265: // sezc
+                                case 0266: // sezv
+                                case 0267: // sezvc
+                                case 0270: // sen
+                                case 0271: // senc
+                                case 0272: // senv
+                                case 0273: // senvc
+                                case 0274: // senz
+                                case 0275: // senzc
+                                case 0276: // senzv
+                                case 0277: // scc
+                                    break;
+                            }
+                    }
+                    break;
+                case 003: // swab
+                case 004:
+                case 005:
+                case 006:
+                case 007: // br
+                case 010:
+                case 011:
+                case 012:
+                case 013: // bne
+                case 014:
+                case 015:
+                case 016:
+                case 017: // beq
+                case 020:
+                case 021:
+                case 022:
+                case 023: // bge
+                case 024:
+                case 025:
+                case 026:
+                case 027: // blt
+                case 030:
+                case 031:
+                case 032:
+                case 033: // bgt
+                case 034:
+                case 035:
+                case 036:
+                case 037: // ble
+                case 040:
+                case 041:
+                case 042:
+                case 043:
+                case 044:
+                case 045:
+                case 046:
+                case 047: // jsr
+                case 050: // clr
+                case 051: // com
+                case 052: // inc
+                case 053: // dec
+                case 054: // neg
+                case 055: // adc
+                case 056: // sbc
+                case 057: // tst
+                case 060: // ror
+                case 061: // rol
+                case 062: // asr
+                case 063: // asl
+                case 064: // mark
+                case 065: // mfpi
+                case 066: // mtpi
+                case 067: // sxt
+                    break;
+            }
             break;
         case 001: // mov: MOVe
             src = get16(op->opr1);
@@ -69,8 +182,75 @@ void VM::run1() {
             setZNCV(val16 == 0, val16 < 0, src + dst >= 0x10000, val != val16);
             return;
         case 007:
+            switch ((w >> 9) & 7) {
+                case 0: // mul
+                case 1: // div
+                case 2: // ash
+                case 3: // ashc
+                case 4: // xor
+                case 7: // sob
+                    break;
+            }
             break;
         case 010:
+            switch ((w >> 6) & 077) {
+                case 000:
+                case 001:
+                case 002:
+                case 003: // bpl
+                case 004:
+                case 005:
+                case 006:
+                case 007: // bmi
+                case 010:
+                case 011:
+                case 012:
+                case 013: // bhi
+                case 014:
+                case 015:
+                case 016:
+                case 017: // blos
+                case 020:
+                case 021:
+                case 022:
+                case 023: // bvc
+                case 024:
+                case 025:
+                case 026:
+                case 027: // bvs
+                case 030:
+                case 031:
+                case 032:
+                case 033: // bcc
+                case 034:
+                case 035:
+                case 036:
+                case 037: // bcs
+                case 040:
+                case 041:
+                case 042:
+                case 043: // emt
+                case 044:
+                case 045:
+                case 046:
+                case 047: // sys
+                case 050: // clrb
+                case 051: // comb
+                case 052: // incb
+                case 053: // decb
+                case 054: // negb
+                case 055: // adcb
+                case 056: // sbcb
+                case 057: // tstb
+                case 060: // rorb
+                case 061: // rolb
+                case 062: // asrb
+                case 063: // aslb
+                case 064: break;
+                case 065: // mfpd
+                case 066: // mtpd
+                    break;
+            }
             break;
         case 011: // movb: MOVe Byte
             src = get8(op->opr1);
