@@ -15,7 +15,7 @@ void VM::debug(uint16_t ip, const OpCode &op) {
     fprintf(stderr,
             "%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-12s %s",
             r[0], r[3], r[1], r[2], r[4], r[5], r[6], r[7],
-            OF ? 'O' : '-', SF ? 'S' : '-', ZF ? 'Z' : '-', CF ? 'C' : '-',
+            "-O"[OF], "-S"[SF], "-Z"[ZF], "-C"[CF],
             ip, hexdump(text + ip, op.len).c_str(), op.str().c_str());
     if (trace >= 3) {
         int ad1 = addr(op.opr1);
