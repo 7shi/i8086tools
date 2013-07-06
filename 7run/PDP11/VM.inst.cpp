@@ -105,6 +105,9 @@ void VM::run1() {
             setZNCV(val16 == 0, val16 < 0, dst < src, val != val16);
             return;
         case 017:
+            switch (w) {
+                case 0170011: return; // setd: SET Double
+            }
             break;
     }
     if (trace < 2) {
