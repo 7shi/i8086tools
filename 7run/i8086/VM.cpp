@@ -141,6 +141,7 @@ void VM::set16(const Operand &opr, uint16_t value) {
 void VM::run(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
+    if (trace >= 2) fprintf(stderr, header);
     int slen = 0;
     for (int i = 0; i < (int) args.size(); i++) {
         slen += args[i].size() + 1;

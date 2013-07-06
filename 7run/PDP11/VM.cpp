@@ -190,6 +190,7 @@ void VM::run(
     for (int i = 0; i < (int) args.size(); i++) {
         slen += args[i].size() + 1;
     }
+    if (trace >= 2) fprintf(stderr, header);
     SP -= (slen + 1) & ~1;
     uint16_t ad1 = SP;
     SP -= (1 + args.size()) * 2;
