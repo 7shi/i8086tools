@@ -42,8 +42,8 @@ bool VM::syscall(int n, uint8_t *args) {
             hasExited = true;
             break;
         case 4:
-            fprintf(stderr, "<write: not implemented>\n");
-            hasExited = true;
+            PC += 4;
+            result = sys_write(r[0], ::read16(args), ::read16(args + 2));
             break;
         case 5:
             fprintf(stderr, "<open: not implemented>\n");
