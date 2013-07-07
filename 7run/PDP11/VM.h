@@ -26,6 +26,15 @@ namespace PDP11 {
 
     protected:
 
+        inline uint32_t getReg32(int reg) {
+            return (r[reg] << 16) | r[(reg + 1) & 7];
+        }
+
+        inline void setReg32(int reg, uint32_t v) {
+            r[reg] = v >> 16;
+            r[(reg + 1) & 7] = v;
+        }
+
         inline void setZNCV(bool z, bool n, bool c, bool v) {
             Z = z;
             N = n;
@@ -33,8 +42,17 @@ namespace PDP11 {
             V = v;
         }
 
-        uint16_t getInc(const Operand &opr);
-        uint16_t getDec(const Operand &opr);
+        inline uint16_t getInc(const Operand &opr) {
+            uint16_t ret = r[opr.reg];
+            r[opr.reg] += opr.diff();
+            return ret;
+        }
+
+        inline uint16_t getDec(const Operand &opr) {
+            r[opr.reg] -= opr.diff();
+            return r[opr.reg];
+        }
+
         uint8_t get8(const Operand &opr, bool nomove = false);
         uint16_t get16(const Operand &opr, bool nomove = false);
         void set8(const Operand &opr, uint8_t value);

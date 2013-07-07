@@ -50,17 +50,6 @@ VM::VM() : start_sp(0) {
 VM::~VM() {
 }
 
-uint16_t VM::getInc(const Operand &opr) {
-    uint16_t ret = r[opr.reg];
-    r[opr.reg] += opr.diff();
-    return ret;
-}
-
-uint16_t VM::getDec(const Operand &opr) {
-    r[opr.reg] -= opr.diff();
-    return r[opr.reg];
-}
-
 int VM::addr(const Operand &opr, bool nomove) {
     if (opr.reg == 7) {
         switch (opr.mode) {
@@ -68,6 +57,7 @@ int VM::addr(const Operand &opr, bool nomove) {
             case 6: return opr.value;
             case 7: return read16(opr.value);
         }
+        return -1;
     }
     if (nomove) {
         switch (opr.mode) {
