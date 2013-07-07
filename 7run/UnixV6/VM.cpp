@@ -30,9 +30,8 @@ bool VM::syscall(int n, uint8_t *args) {
             return ret;
         }
         case 1:
-            fprintf(stderr, "<exit: not implemented>\n");
-            hasExited = true;
-            break;
+            sys_exit((int16_t) r[0]);
+            return true;
         case 2:
             fprintf(stderr, "<fork: not implemented>\n");
             hasExited = true;
