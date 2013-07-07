@@ -111,3 +111,16 @@ void VM::resetsig() {
         }
     }
 }
+
+void VM::swtch(bool reset) {
+    for (int i = 0; i < nsig; i++) {
+        int s = convsig(i);
+        if (s >= 0) {
+            if (reset) {
+                signal(s, SIG_DFL);
+            } else {
+                setsig(s, sigacts[i].handler);
+            }
+        }
+    }
+}

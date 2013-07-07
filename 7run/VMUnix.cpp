@@ -25,7 +25,6 @@ void VMUnix::init() {
 VMUnix::VMUnix() : data(NULL), tsize(0), umask(0) {
     init();
     memset(text, 0, 0x10000);
-    memset(sigacts, 0, sizeof (sigacts));
     files.push_back(new File(0, "stdin"));
     files.push_back(new File(1, "stdout"));
     files.push_back(new File(2, "stderr"));
@@ -34,7 +33,6 @@ VMUnix::VMUnix() : data(NULL), tsize(0), umask(0) {
 VMUnix::VMUnix(const VMUnix &vm) {
     init();
     memcpy(text, vm.text, 0x10000);
-    memcpy(sigacts, vm.sigacts, sizeof(sigacts));
     if (vm.data == vm.text) {
         data = text;
     } else {
@@ -91,15 +89,6 @@ FileBase *VMUnix::file(int fd) {
 }
 
 void VMUnix::swtch(VMUnix *to) {
-    for (int i = 0; i < nsig; i++) {
-        int s = convsig(i);
-        if (s >= 0) {
-            if (!to) {
-                signal(s, SIG_DFL);
-            } else {
-                setsig(s, to->sigacts[i].handler);
-            }
-        }
-    }
+    if (to) to->swtch(); else swtch(true);
     current = to;
 }

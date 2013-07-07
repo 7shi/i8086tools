@@ -13,6 +13,7 @@ namespace UnixV6 {
         virtual bool syscall(int n);
         virtual void setsig(int sig, int h);
         virtual void setstat(uint16_t addr, struct stat *st);
+        virtual void swtch(bool reset = false);
 
     private:
         bool syscall(int n, uint8_t *args);

@@ -35,6 +35,13 @@ public:
     virtual void disasm() = 0;
 
 protected:
+    virtual void setstat(uint16_t addr, struct stat *st) = 0;
+    virtual bool syscall(int n) = 0;
+    virtual int convsig(int sig) = 0;
+    virtual void setsig(int sig, int h) = 0;
+    virtual void swtch(bool reset = false) = 0;
+    
+    void swtch(VMUnix *to);
 
     inline uint8_t read8(uint16_t addr) {
         return data[addr];
@@ -68,8 +75,6 @@ protected:
     int open(const std::string &path, int flag, int mode);
     int close(int fd);
     FileBase *file(int fd);
-    virtual void setstat(uint16_t addr, struct stat *st) = 0;
-    void swtch(VMUnix *to);
 
     void sys_exit(int code);
     //int sys_fork();
@@ -96,17 +101,4 @@ protected:
     //int sys_exec(const char *path, int frame, int fsize);
     int sys_umask(mode_t mask);
     //void sys_sigaction();
-
-    virtual bool syscall(int n) = 0;
-
-    struct sigact {
-        uint16_t handler;
-        uint16_t mask;
-        uint16_t flags;
-    };
-    static const int nsig = 12;
-    sigact sigacts[nsig];
-
-    virtual int convsig(int sig) = 0;
-    virtual void setsig(int sig, int h) = 0;
 };

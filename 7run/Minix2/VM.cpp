@@ -9,9 +9,11 @@
 using namespace Minix2;
 
 VM::VM() {
+    memset(sigacts, 0, sizeof (sigacts));
 }
 
 VM::VM(const VM &vm) : i8086::VM(vm) {
+    memcpy(sigacts, vm.sigacts, sizeof(sigacts));
 }
 
 VM::~VM() {

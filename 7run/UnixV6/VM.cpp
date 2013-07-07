@@ -205,3 +205,7 @@ int VM::convsig(int sig) {
 void VM::setsig(int sig, int h) {
     fprintf(stderr, "[%s] not implemented\n", __func__);
 }
+
+void VM::swtch(bool reset) {
+    fprintf(stderr, "[%s] not implemented\n", __func__);
+}

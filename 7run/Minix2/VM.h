@@ -13,6 +13,7 @@ namespace Minix2 {
         virtual bool syscall(int n);
         virtual void setsig(int sig, int h);
         virtual void setstat(uint16_t addr, struct stat *st);
+        virtual void swtch(bool reset = false);
 
     private:
         int minix_fork(); //  2
@@ -24,5 +25,13 @@ namespace Minix2 {
         void sighandler2(int sig);
         virtual int convsig(int sig);
         void resetsig();
+
+        struct sigact {
+            uint16_t handler;
+            uint16_t mask;
+            uint16_t flags;
+        };
+        static const int nsig = 12;
+        sigact sigacts[nsig];
     };
 }
