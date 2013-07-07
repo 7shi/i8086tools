@@ -10,5 +10,8 @@ namespace UnixV6 {
         virtual bool syscall(int n);
         virtual int convsig(int sig);
         virtual void setsig(int sig, int h);
+        
+    private:
+        bool syscall(int n, uint8_t *args);
     };
 }

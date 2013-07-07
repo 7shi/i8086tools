@@ -1,4 +1,5 @@
 #include "VM.h"
+#include "../PDP11/regs.h"
 #include <stdio.h>
 
 using namespace UnixV6;
@@ -14,12 +15,20 @@ void VM::setstat(uint16_t addr, struct stat *st) {
 }
 
 bool VM::syscall(int n) {
+    return syscall(n, text + PC);
+}
+
+bool VM::syscall(int n, uint8_t *args) {
     int result = 0;
     switch (n) {
         case 0:
-            fprintf(stderr, "<indir: not implemented>\n");
-            hasExited = true;
-            break;
+        {
+            int bak = PC + 2;
+            int p = ::read16(text + PC);
+            bool ret = syscall(read8(p), data + p + 2);
+            PC = bak;
+            return ret;
+        }
         case 1:
             fprintf(stderr, "<exit: not implemented>\n");
             hasExited = true;
