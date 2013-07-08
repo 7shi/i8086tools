@@ -54,8 +54,7 @@ bool VM::syscall(int n) {
             hasExited = true;
             break;
         case 12:
-            fprintf(stderr, "<chdir: not implemented>\n");
-            hasExited = true;
+            result = sys_chdir(str(read16(BX + 8)));
             break;
         case 13:
             result = sys_time();

@@ -178,6 +178,14 @@ int VMUnix::sys_unlink(const char *path) {
     return result;
 }
 
+int VMUnix::sys_chdir(const char *path) {
+    if (trace) fprintf(stderr, "<chdir(\"%s\")", path);
+    std::string path2 = convpath(path);
+    int result = chdir(path2.c_str());
+    if (trace) fprintf(stderr, " => %d>\n", result);
+    return result;
+}
+
 int VMUnix::sys_time() {
     if (trace) fprintf(stderr, "<time()");
     int result = time(NULL);

@@ -93,6 +93,7 @@ protected:
     int sys_creat(const char *path, mode_t mode);
     int sys_link(const char *src, const char *dst);
     int sys_unlink(const char *path);
+    int sys_chdir(const char *path);
     int sys_time();
     int sys_chmod(const char *path, mode_t mode);
     int sys_brk(int nd, int sp);

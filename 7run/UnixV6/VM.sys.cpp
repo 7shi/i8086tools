@@ -65,10 +65,8 @@ bool VM::syscall(int n, uint8_t *args) {
             result = v6_exec(str(::read16(args)), ::read16(args + 2));
             break;
         case 12:
-            //PC += 2;
-            //result = sys_chdir(str(::read16(args)));
-            fprintf(stderr, "<chdir: not implemented>\n");
-            hasExited = true;
+            PC += 2;
+            result = sys_chdir(str(::read16(args)));
             break;
         case 13:
             fprintf(stderr, "<time: not implemented>\n");
