@@ -12,9 +12,10 @@ namespace UnixV6 {
 
     protected:
         virtual bool loadInternal(const std::string &fn, FILE *f);
-        virtual bool syscall(int n);
-        virtual void setsig(int sig, int h);
         virtual void setstat(uint16_t addr, struct stat *st);
+        virtual bool syscall(int n);
+        virtual int convsig(int sig);
+        virtual void setsig(int sig, int h);
         virtual void swtch(bool reset = false);
 
     private:
@@ -25,7 +26,6 @@ namespace UnixV6 {
 
         static void sighandler(int sig);
         void sighandler2(int sig);
-        virtual int convsig(int sig);
         void resetsig();
     };
 }
