@@ -42,8 +42,8 @@ std::string Operand::str() const {
         switch (mode) {
             case 2: return "$" + hex(value);
             case 3: return "*$" + hex(value);
-            case 6: return hex(value);
-            case 7: return "*" + hex(value);
+            case 6: return hex(value, 4);
+            case 7: return "*" + hex(value, 4);
         }
     }
     const std::string &rn = regs[reg];
