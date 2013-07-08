@@ -19,9 +19,14 @@ static inline OpCode modr(uint8_t *mem, uint16_t addr, int w, const char *mne) {
     return OpCode(2 + opr.len, mne, opr);
 }
 
-static inline OpCode rmodr(uint8_t *mem, uint16_t addr, int w, const char *mne) {
+static inline OpCode rdst(uint8_t *mem, uint16_t addr, int w, const char *mne) {
     Operand opr(mem + 2, addr + 2, w);
     return OpCode(2 + opr.len, mne, reg(w >> 6), opr);
+}
+
+static inline OpCode srcr(uint8_t *mem, uint16_t addr, int w, const char *mne) {
+    Operand opr(mem + 2, addr + 2, w);
+    return OpCode(2 + opr.len, mne, opr, reg(w >> 6));
 }
 
 static inline OpCode branch(uint16_t addr, int w, const char *mne) {
@@ -136,7 +141,7 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
                 case 044:
                 case 045:
                 case 046:
-                case 047: return rmodr(mem, addr, w, "jsr");
+                case 047: return rdst(mem, addr, w, "jsr");
                 case 050: return modr(mem, addr, w, "clr");
                 case 051: return modr(mem, addr, w, "com");
                 case 052: return modr(mem, addr, w, "inc");
@@ -163,11 +168,11 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
         case 006: return srcdst(mem, addr, w, "add");
         case 007:
             switch ((w >> 9) & 7) {
-                case 0: return rmodr(mem, addr, w, "mul");
-                case 1: return rmodr(mem, addr, w, "div");
-                case 2: return rmodr(mem, addr, w, "ash");
-                case 3: return rmodr(mem, addr, w, "ashc");
-                case 4: return rmodr(mem, addr, w, "xor");
+                case 0: return srcr(mem, addr, w, "mul");
+                case 1: return srcr(mem, addr, w, "div");
+                case 2: return srcr(mem, addr, w, "ash");
+                case 3: return srcr(mem, addr, w, "ashc");
+                case 4: return rdst(mem, addr, w, "xor");
                 case 7: return OpCode(2, "sob", reg(w >> 6), imm(w & 077));
             }
             break;

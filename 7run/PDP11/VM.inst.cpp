@@ -269,8 +269,8 @@ void VM::run1() {
             switch ((w >> 9) & 7) {
                 case 0: // mul:MULtiply
                 {
-                    int reg = op->opr1.reg;
-                    int src = int16_t(get16(op->opr2));
+                    int src = int16_t(get16(op->opr1));
+                    int reg = op->opr2.reg;
                     val = int(r[reg]) * src;
                     if ((reg & 1) == 0) {
                         setReg32(reg, val);
@@ -282,8 +282,8 @@ void VM::run1() {
                 }
                 case 1: // div: DIVide
                 {
-                    int reg = op->opr1.reg;
-                    int src = int16_t(get16(op->opr2));
+                    int src = int16_t(get16(op->opr1));
+                    int reg = op->opr2.reg;
                     if (src == 0 || abs(int16_t(r[reg])) > abs(src)) {
                         setZNCV(false, false, src == 0, true);
                     } else {
@@ -297,8 +297,8 @@ void VM::run1() {
                 }
                 case 2: // ash: Arithmetic SHift
                 {
-                    int reg = op->opr1.reg;
-                    int src = get16(op->opr2) & 077;
+                    int src = get16(op->opr1) & 077;
+                    int reg = op->opr2.reg;
                     int val0 = int16_t(r[reg]);
                     if (src == 0)
                         setZNCV(val0 == 0, val0 < 0, C, false);
@@ -317,8 +317,8 @@ void VM::run1() {
                 }
                 case 3: // ashc: Arithmetic SHift Combined
                 {
-                    int reg = op->opr1.reg;
-                    int src = get16(op->opr2) & 077;
+                    int src = get16(op->opr1) & 077;
+                    int reg = op->opr2.reg;
                     int val0 = getReg32(reg);
                     if (src == 0)
                         setZNCV(val0 == 0, val0 < 0, C, false);
