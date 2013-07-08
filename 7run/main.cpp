@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     }
 
     VMUnix *vm;
-    if (pdp11 || PDP11::check(buf)) {
+    if (pdp11 || UnixV6::check(buf)) {
         vm = new UnixV6::VM();
     } else {
         vm = new Minix2::VM();

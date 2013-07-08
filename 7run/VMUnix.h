@@ -1,6 +1,7 @@
 #pragma once
 #include "utils.h"
 #include "File.h"
+#include <stdio.h>
 #include <vector>
 #include <list>
 #ifdef WIN32
@@ -27,14 +28,20 @@ public:
     VMUnix();
     VMUnix(const VMUnix &vm);
     virtual ~VMUnix();
-    virtual bool load(const std::string &fn) = 0;
-    virtual void run(
+    bool load(const std::string &fn);
+    void run(
             const std::vector<std::string> &args,
-            const std::vector<std::string> &envs) = 0;
-    virtual void run() = 0;
+            const std::vector<std::string> &envs);
+    void run();
     virtual void disasm() = 0;
 
 protected:
+    virtual bool loadInternal(const std::string &fn, FILE *f) = 0;
+    virtual void showHeader() = 0;
+    virtual void setArgs(
+            const std::vector<std::string> &args,
+            const std::vector<std::string> &envs) = 0;
+    virtual void runInternal() = 0;
     virtual void setstat(uint16_t addr, struct stat *st) = 0;
     virtual bool syscall(int n) = 0;
     virtual int convsig(int sig) = 0;

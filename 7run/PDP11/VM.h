@@ -5,8 +5,6 @@
 namespace PDP11 {
     extern const char *header;
 
-    bool check(uint8_t h[2]);
-
     class VM : public VMUnix {
     protected:
         uint16_t r[8];
@@ -17,14 +15,15 @@ namespace PDP11 {
     public:
         VM();
         virtual ~VM();
-        virtual bool load(const std::string &fn);
-        virtual void run(
-                const std::vector<std::string> &args,
-                const std::vector<std::string> &envs);
-        virtual void run();
         virtual void disasm();
 
     protected:
+        virtual bool loadInternal(const std::string &fn, FILE *f);
+        virtual void showHeader();
+        virtual void setArgs(
+                const std::vector<std::string> &args,
+                const std::vector<std::string> &envs);
+        virtual void runInternal();
 
         inline uint32_t getReg32(int reg) {
             return (r[reg] << 16) | r[(reg + 1) & 7];

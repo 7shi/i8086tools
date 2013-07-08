@@ -10,6 +10,7 @@ namespace Minix2 {
         virtual ~VM();
 
     protected:
+        virtual bool loadInternal(const std::string &fn, FILE *f);
         virtual bool syscall(int n);
         virtual void setsig(int sig, int h);
         virtual void setstat(uint16_t addr, struct stat *st);

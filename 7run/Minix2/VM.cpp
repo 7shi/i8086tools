@@ -13,10 +13,43 @@ VM::VM() {
 }
 
 VM::VM(const VM &vm) : i8086::VM(vm) {
-    memcpy(sigacts, vm.sigacts, sizeof(sigacts));
+    memcpy(sigacts, vm.sigacts, sizeof (sigacts));
 }
 
 VM::~VM() {
+}
+
+bool VM::loadInternal(const std::string &fn, FILE *f) {
+    if (tsize < 0x20) return i8086::VM::loadInternal(fn, f);
+    uint8_t h[0x20];
+    if (fread(h, sizeof (h), 1, f) && h[0] == 1 && h[1] == 3
+            && !fseek(f, h[4], SEEK_SET)) {
+        if (h[3] != 4) {
+            fprintf(stderr, "unknown cpu id: %d\n", h[3]);
+            return false;
+        }
+        tsize = ::read32(h + 8);
+        dsize = ::read32(h + 12);
+        ip = ::read32(h + 20);
+        if (h[2] & 0x20) {
+            cache.clear();
+            cache.resize(0x10000);
+            data = new uint8_t[0x10000];
+            memset(data, 0, 0x10000);
+            fread(text, 1, tsize, f);
+            fread(data, 1, dsize, f);
+        } else {
+            cache.clear();
+            data = text;
+            dsize += tsize;
+            fread(text, 1, dsize, f);
+        }
+        dsize += ::read32(h + 16); // bss
+        brksize = dsize;
+        return true;
+    }
+    fseek(f, 0, SEEK_SET);
+    return i8086::VM::loadInternal(fn, f);
 }
 
 bool VM::syscall(int n) {

@@ -7,12 +7,11 @@
 
 using namespace PDP11;
 
-bool PDP11::check(uint8_t h[2]) {
-    int magic = ::read16(h);
-    return magic == 0407 || magic == 0410 || magic == 0411;
-}
-
 const char *PDP11::header = " r0   r1   r2   r3   r4   r5   sp  flags pc\n";
+
+void VM::showHeader() {
+    fprintf(stderr, header);
+}
 
 void VM::debug(uint16_t ip, const OpCode &op) {
     fprintf(stderr,
@@ -112,76 +111,26 @@ void VM::set16(const Operand &opr, uint16_t value) {
     }
 }
 
-bool VM::load(const std::string &fn) {
-    std::string fn2 = convpath(fn);
-    const char *file = fn2.c_str();
-    struct stat st;
-    if (stat(file, &st)) {
-        fprintf(stderr, "can not stat: %s\n", file);
+bool VM::loadInternal(const std::string &fn, FILE *f) {
+    if (tsize > 0xffff) {
+        fprintf(stderr, "too long raw binary: %s\n", fn.c_str());
         return false;
     }
-    tsize = st.st_size;
-    FILE *f = fopen(file, "rb");
-    if (!f) {
-        fprintf(stderr, "can not open: %s\n", file);
-        return false;
-    }
-    if (tsize >= 0x10) {
-        uint8_t h[0x10];
-        if (fread(h, sizeof (h), 1, f) && check(h)) {
-            tsize = ::read16(h + 2);
-            dsize = ::read16(h + 4);
-            PC = ::read16(h + 10);
-            cache.clear();
-            if (h[0] == 9) { // 0411
-                cache.resize(0x10000);
-                data = new uint8_t[0x10000];
-                memset(data, 0, 0x10000);
-                fread(text, 1, tsize, f);
-                fread(data, 1, dsize, f);
-            } else {
-                data = text;
-                if (h[0] == 8) { // 0410
-                    cache.resize(0x10000);
-                    fread(text, 1, tsize, f);
-                    uint16_t doff = (tsize + 0x1fff) & ~0x1fff;
-                    fread(text + doff, 1, dsize, f);
-                    dsize += doff;
-                } else {
-                    dsize = (tsize += dsize);
-                    fread(text, 1, dsize, f);
-                }
-            }
-            dsize += ::read16(h + 6); // bss
-            brksize = dsize;
-        } else {
-            fseek(f, 0, SEEK_SET);
-        }
-    }
-    if (!data) {
-        if (tsize > 0xffff) {
-            fprintf(stderr, "too long raw binary: %s\n", file);
-            fclose(f);
-            return false;
-        }
-        PC = 0;
-        cache.clear();
-        data = text;
-        fread(text, 1, tsize, f);
-        brksize = dsize = tsize;
-    }
-    fclose(f);
+    PC = 0;
+    cache.clear();
+    data = text;
+    fread(text, 1, tsize, f);
+    brksize = dsize = tsize;
     return true;
 }
 
-void VM::run(
+void VM::setArgs(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
     int slen = 0;
     for (int i = 0; i < (int) args.size(); i++) {
         slen += args[i].size() + 1;
     }
-    if (trace >= 2) fprintf(stderr, header);
     SP -= (slen + 1) & ~1;
     uint16_t ad1 = SP;
     SP -= (1 + args.size()) * 2;
@@ -192,17 +141,10 @@ void VM::run(
         strcpy((char *) data + ad1, args[i].c_str());
         ad1 += args[i].size() + 1;
     }
-    run();
 }
 
-void VM::run() {
-    VMUnix *from = current;
-    //swtch(this);
-    current = this;
-    hasExited = false;
+void VM::runInternal() {
     while (!hasExited) run1();
-    //swtch(from);
-    current = from;
 }
 
 void VM::disasm() {

@@ -11,6 +11,10 @@ const char *i8086::header = " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n"
 
 bool VM::ptable[256];
 
+void VM::showHeader() {
+    fprintf(stderr, header);
+}
+
 void VM::debug(uint16_t ip, const OpCode &op) {
     fprintf(stderr,
             "%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-12s %s",
@@ -138,10 +142,9 @@ void VM::set16(const Operand &opr, uint16_t value) {
     }
 }
 
-void VM::run(
+void VM::setArgs(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
-    if (trace >= 2) fprintf(stderr, header);
     int slen = 0;
     for (int i = 0; i < (int) args.size(); i++) {
         slen += args[i].size() + 1;
@@ -166,74 +169,22 @@ void VM::run(
         ad1 += envs[i].size() + 1;
     }
     write16(ad2 += 2, 0); // envp (last)
-    run();
 }
 
-void VM::run() {
-    VMUnix *from = current;
-    swtch(this);
-    hasExited = false;
+void VM::runInternal() {
     while (!hasExited) run1();
-    swtch(from);
 }
 
-bool VM::load(const std::string &fn) {
-    std::string fn2 = convpath(fn);
-    const char *file = fn2.c_str();
-    struct stat st;
-    if (stat(file, &st)) {
-        fprintf(stderr, "can not stat: %s\n", file);
+bool VM::loadInternal(const std::string &fn, FILE *f) {
+    if (tsize > 0xffff) {
+        fprintf(stderr, "too long raw binary: %s\n", fn.c_str());
         return false;
     }
-    tsize = st.st_size;
-    FILE *f = fopen(file, "rb");
-    if (!f) {
-        fprintf(stderr, "can not open: %s\n", file);
-        return false;
-    }
-    if (tsize >= 0x20) {
-        uint8_t h[0x20];
-        if (fread(h, sizeof (h), 1, f) && h[0] == 1 && h[1] == 3
-                && !fseek(f, h[4], SEEK_SET)) {
-            if (h[3] != 4) {
-                fprintf(stderr, "unknown cpu id: %d\n", h[3]);
-                fclose(f);
-                return false;
-            }
-            tsize = ::read32(h + 8);
-            dsize = ::read32(h + 12);
-            ip = ::read32(h + 20);
-            if (h[2] & 0x20) {
-                cache.clear();
-                cache.resize(0x10000);
-                data = new uint8_t[0x10000];
-                memset(data, 0, 0x10000);
-                fread(text, 1, tsize, f);
-                fread(data, 1, dsize, f);
-            } else {
-                cache.clear();
-                data = text;
-                dsize += tsize;
-                fread(text, 1, dsize, f);
-            }
-            dsize += ::read32(h + 16); // bss
-            brksize = dsize;
-        } else {
-            fseek(f, 0, SEEK_SET);
-        }
-    }
-    if (!data) {
-        if (tsize > 0xffff) {
-            fprintf(stderr, "too long raw binary: %s\n", file);
-            fclose(f);
-            return false;
-        }
-        cache.clear();
-        data = text;
-        fread(text, 1, tsize, f);
-        brksize = dsize = tsize;
-    }
-    fclose(f);
+    ip = 0;
+    cache.clear();
+    data = text;
+    fread(text, 1, tsize, f);
+    brksize = dsize = tsize;
     return true;
 }
 

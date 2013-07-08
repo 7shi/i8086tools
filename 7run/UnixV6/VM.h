@@ -2,6 +2,7 @@
 #include "../PDP11/VM.h"
 
 namespace UnixV6 {
+    bool check(uint8_t h[2]);
 
     class VM : public PDP11::VM {
     public:
@@ -10,6 +11,7 @@ namespace UnixV6 {
         virtual ~VM();
 
     protected:
+        virtual bool loadInternal(const std::string &fn, FILE *f);
         virtual bool syscall(int n);
         virtual void setsig(int sig, int h);
         virtual void setstat(uint16_t addr, struct stat *st);

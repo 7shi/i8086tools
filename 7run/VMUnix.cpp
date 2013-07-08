@@ -57,6 +57,41 @@ VMUnix::~VMUnix() {
     }
 }
 
+bool VMUnix::load(const std::string &fn) {
+    std::string fn2 = convpath(fn);
+    const char *file = fn2.c_str();
+    struct stat st;
+    if (stat(file, &st)) {
+        fprintf(stderr, "can not stat: %s\n", file);
+        return false;
+    }
+    tsize = st.st_size;
+    FILE *f = fopen(file, "rb");
+    if (!f) {
+        fprintf(stderr, "can not open: %s\n", file);
+        return false;
+    }
+    bool ret = loadInternal(fn, f);
+    fclose(f);
+    return ret;
+}
+
+void VMUnix::run(
+        const std::vector<std::string> &args,
+        const std::vector<std::string> &envs) {
+    if (trace >= 2) showHeader();
+    setArgs(args, envs);
+    run();
+}
+
+void VMUnix::run() {
+    VMUnix *from = current;
+    swtch(this);
+    hasExited = false;
+    runInternal();
+    swtch(from);
+}
+
 int VMUnix::getfd() {
     int len = files.size();
     for (int i = 0; i < len; i++) {
@@ -89,6 +124,7 @@ FileBase *VMUnix::file(int fd) {
 }
 
 void VMUnix::swtch(VMUnix *to) {
-    if (to) to->swtch(); else swtch(true);
+    if (to) to->swtch();
+    else swtch(true);
     current = to;
 }
