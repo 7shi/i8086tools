@@ -17,7 +17,7 @@ namespace PDP11 {
         }
         
         inline int diff() const {
-            return w || reg <= 6 ? 2 : 1;
+            return w || (mode && reg >= 6) ? 2 : 1;
         }
 
         std::string str() const;
