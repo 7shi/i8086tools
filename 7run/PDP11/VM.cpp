@@ -62,7 +62,6 @@ VM::~VM() {
 int VM::addr(const Operand &opr, bool nomove) {
     if (opr.reg == 7) {
         switch (opr.mode) {
-            case 1:
             case 3:
             case 6: return opr.value;
             case 7: return read16(opr.value);
@@ -93,13 +92,13 @@ int VM::addr(const Operand &opr, bool nomove) {
 }
 
 uint8_t VM::get8(const Operand &opr, bool nomove) {
-    if (opr.mode == 0) return r[opr.reg];
+    if (opr.mode == 0 && opr.reg != 7) return r[opr.reg];
     int ad = addr(opr, nomove);
     return ad < 0 ? opr.value : read8(ad);
 }
 
 uint16_t VM::get16(const Operand &opr, bool nomove) {
-    if (opr.mode == 0) return r[opr.reg];
+    if (opr.mode == 0 && opr.reg != 7) return r[opr.reg];
     int ad = addr(opr, nomove);
     return ad < 0 ? opr.value : read16(ad);
 }

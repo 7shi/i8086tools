@@ -15,7 +15,7 @@ namespace PDP11 {
         inline bool empty() const {
             return len == -1;
         }
-        
+
         inline int diff() const {
             return w || (mode && reg >= 6) ? 2 : 1;
         }
@@ -26,8 +26,8 @@ namespace PDP11 {
     inline Operand reg(int r) {
         return Operand(0, 0, r & 7);
     }
-    
+
     inline Operand imm(int v) {
-        return Operand(0, 6, 7, v);
+        return Operand(0, 8, 7, v);
     }
 }
