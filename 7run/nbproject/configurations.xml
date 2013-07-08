@@ -18,6 +18,7 @@
         <in>VM.cpp</in>
         <in>VM.h</in>
         <in>VM.signal.cpp</in>
+        <in>VM.sys.cpp</in>
       </df>
       <df name="PDP11">
         <in>OpCode.cpp</in>
@@ -34,6 +35,7 @@
       <df name="UnixV6">
         <in>VM.cpp</in>
         <in>VM.h</in>
+        <in>VM.sys.cpp</in>
       </df>
       <in>File.cpp</in>
       <in>File.h</in>
@@ -101,6 +103,14 @@
           </incDir>
         </ccTool>
       </item>
+      <item path="Minix2/VM.sys.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
+            <pElem>i8086</pElem>
+          </incDir>
+        </ccTool>
+      </item>
       <item path="PDP11/OpCode.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="PDP11/OpCode.h" ex="false" tool="3" flavor2="0">
@@ -124,6 +134,8 @@
       <item path="UnixV6/VM.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="UnixV6/VM.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="UnixV6/VM.sys.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="VMUnix.cpp" ex="false" tool="1" flavor2="0">
         <ccTool>
