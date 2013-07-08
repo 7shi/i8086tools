@@ -11,6 +11,9 @@ namespace UnixV6 {
         virtual ~VM();
 
     protected:
+        virtual void setArgs(
+                const std::vector<std::string> &args,
+                const std::vector<std::string> &envs);
         virtual bool load2(const std::string &fn, FILE *f);
         virtual void setstat(uint16_t addr, struct stat *st);
         virtual bool syscall(int n);

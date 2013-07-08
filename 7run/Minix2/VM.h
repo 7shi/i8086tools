@@ -10,6 +10,9 @@ namespace Minix2 {
         virtual ~VM();
 
     protected:
+        virtual void setArgs(
+                const std::vector<std::string> &args,
+                const std::vector<std::string> &envs);
         virtual bool load2(const std::string &fn, FILE *f);
         virtual bool syscall(int n);
         virtual void setsig(int sig, int h);

@@ -26,9 +26,6 @@ namespace i8086 {
     protected:
         virtual bool load2(const std::string &fn, FILE *f);
         virtual void showHeader();
-        virtual void setArgs(
-                const std::vector<std::string> &args,
-                const std::vector<std::string> &envs);
         virtual void run2();
 
         inline int setf8(int value, bool cf) {

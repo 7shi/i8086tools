@@ -135,25 +135,6 @@ bool VM::load2(const std::string &fn, FILE *f) {
     return true;
 }
 
-void VM::setArgs(
-        const std::vector<std::string> &args,
-        const std::vector<std::string> &envs) {
-    int slen = 0;
-    for (int i = 0; i < (int) args.size(); i++) {
-        slen += args[i].size() + 1;
-    }
-    SP -= (slen + 1) & ~1;
-    uint16_t ad1 = SP;
-    SP -= (1 + args.size()) * 2;
-    uint16_t ad2 = start_sp = SP;
-    write16(SP, args.size()); // argc
-    for (int i = 0; i < (int) args.size(); i++) {
-        write16(ad2 += 2, ad1);
-        strcpy((char *) data + ad1, args[i].c_str());
-        ad1 += args[i].size() + 1;
-    }
-}
-
 void VM::run2() {
     while (!hasExited) run1();
 }

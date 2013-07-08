@@ -21,9 +21,6 @@ namespace PDP11 {
     protected:
         virtual bool load2(const std::string &fn, FILE *f);
         virtual void showHeader();
-        virtual void setArgs(
-                const std::vector<std::string> &args,
-                const std::vector<std::string> &envs);
         virtual void run2();
 
         inline uint32_t getReg32(int reg) {
