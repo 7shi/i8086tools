@@ -344,7 +344,7 @@ void VM::run1() {
                     break;
                 case 7: // sob: Subtract One from register, Branch if not zero
                     r[op->opr1.reg]--;
-                    if (r[op->opr1.reg] != 0) PC = PC + 2 - (w & 077) * 2;
+                    if (r[op->opr1.reg] != 0) PC -= op->opr2.value * 2;
                     return;
             }
             break;
