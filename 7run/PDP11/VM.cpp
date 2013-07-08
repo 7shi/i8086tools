@@ -148,7 +148,7 @@ bool VM::load(const std::string &fn) {
                     fread(text + doff, 1, dsize, f);
                     dsize += doff;
                 } else {
-                    dsize += tsize;
+                    dsize = (tsize += dsize);
                     fread(text, 1, dsize, f);
                 }
             }
@@ -164,6 +164,7 @@ bool VM::load(const std::string &fn) {
             fclose(f);
             return false;
         }
+        PC = 0;
         cache.clear();
         data = text;
         fread(text, 1, tsize, f);
