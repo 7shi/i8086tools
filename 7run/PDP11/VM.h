@@ -18,12 +18,12 @@ namespace PDP11 {
         virtual void disasm();
 
     protected:
-        virtual bool loadInternal(const std::string &fn, FILE *f);
+        virtual bool load2(const std::string &fn, FILE *f);
         virtual void showHeader();
         virtual void setArgs(
                 const std::vector<std::string> &args,
                 const std::vector<std::string> &envs);
-        virtual void runInternal();
+        virtual void run2();
 
         inline uint32_t getReg32(int reg) {
             return (r[reg] << 16) | r[(reg + 1) & 7];

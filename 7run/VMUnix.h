@@ -36,12 +36,12 @@ public:
     virtual void disasm() = 0;
 
 protected:
-    virtual bool loadInternal(const std::string &fn, FILE *f) = 0;
+    virtual bool load2(const std::string &fn, FILE *f) = 0;
     virtual void showHeader() = 0;
     virtual void setArgs(
             const std::vector<std::string> &args,
             const std::vector<std::string> &envs) = 0;
-    virtual void runInternal() = 0;
+    virtual void run2() = 0;
     virtual void setstat(uint16_t addr, struct stat *st) = 0;
     virtual bool syscall(int n) = 0;
     virtual int convsig(int sig) = 0;

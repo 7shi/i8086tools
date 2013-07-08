@@ -16,8 +16,8 @@ VM::VM() {
 VM::~VM() {
 }
 
-bool VM::loadInternal(const std::string &fn, FILE *f) {
-    if (tsize < 0x10) return PDP11::VM::loadInternal(fn, f);
+bool VM::load2(const std::string &fn, FILE *f) {
+    if (tsize < 0x10) return PDP11::VM::load2(fn, f);
     uint8_t h[0x10];
     if (fread(h, sizeof (h), 1, f) && check(h)) {
         tsize = ::read16(h + 2);
@@ -48,7 +48,7 @@ bool VM::loadInternal(const std::string &fn, FILE *f) {
         return true;
     }
     fseek(f, 0, SEEK_SET);
-    return PDP11::VM::loadInternal(fn, f);
+    return PDP11::VM::load2(fn, f);
 }
 
 void VM::setstat(uint16_t addr, struct stat *st) {

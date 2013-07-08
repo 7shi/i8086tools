@@ -11,7 +11,7 @@ namespace UnixV6 {
         virtual ~VM();
 
     protected:
-        virtual bool loadInternal(const std::string &fn, FILE *f);
+        virtual bool load2(const std::string &fn, FILE *f);
         virtual void setstat(uint16_t addr, struct stat *st);
         virtual bool syscall(int n);
         virtual int convsig(int sig);

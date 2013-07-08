@@ -111,7 +111,7 @@ void VM::set16(const Operand &opr, uint16_t value) {
     }
 }
 
-bool VM::loadInternal(const std::string &fn, FILE *f) {
+bool VM::load2(const std::string &fn, FILE *f) {
     if (tsize > 0xffff) {
         fprintf(stderr, "too long raw binary: %s\n", fn.c_str());
         return false;
@@ -143,7 +143,7 @@ void VM::setArgs(
     }
 }
 
-void VM::runInternal() {
+void VM::run2() {
     while (!hasExited) run1();
 }
 

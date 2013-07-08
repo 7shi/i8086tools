@@ -24,12 +24,12 @@ namespace i8086 {
         virtual void disasm();
 
     protected:
-        virtual bool loadInternal(const std::string &fn, FILE *f);
+        virtual bool load2(const std::string &fn, FILE *f);
         virtual void showHeader();
         virtual void setArgs(
                 const std::vector<std::string> &args,
                 const std::vector<std::string> &envs);
-        virtual void runInternal();
+        virtual void run2();
 
         inline int setf8(int value, bool cf) {
             int8_t v = value;

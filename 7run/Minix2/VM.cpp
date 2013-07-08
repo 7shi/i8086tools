@@ -19,8 +19,8 @@ VM::VM(const VM &vm) : i8086::VM(vm) {
 VM::~VM() {
 }
 
-bool VM::loadInternal(const std::string &fn, FILE *f) {
-    if (tsize < 0x20) return i8086::VM::loadInternal(fn, f);
+bool VM::load2(const std::string &fn, FILE *f) {
+    if (tsize < 0x20) return i8086::VM::load2(fn, f);
     uint8_t h[0x20];
     if (fread(h, sizeof (h), 1, f) && h[0] == 1 && h[1] == 3
             && !fseek(f, h[4], SEEK_SET)) {
@@ -49,7 +49,7 @@ bool VM::loadInternal(const std::string &fn, FILE *f) {
         return true;
     }
     fseek(f, 0, SEEK_SET);
-    return i8086::VM::loadInternal(fn, f);
+    return i8086::VM::load2(fn, f);
 }
 
 bool VM::syscall(int n) {

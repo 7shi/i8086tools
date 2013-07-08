@@ -171,11 +171,11 @@ void VM::setArgs(
     write16(ad2 += 2, 0); // envp (last)
 }
 
-void VM::runInternal() {
+void VM::run2() {
     while (!hasExited) run1();
 }
 
-bool VM::loadInternal(const std::string &fn, FILE *f) {
+bool VM::load2(const std::string &fn, FILE *f) {
     if (tsize > 0xffff) {
         fprintf(stderr, "too long raw binary: %s\n", fn.c_str());
         return false;

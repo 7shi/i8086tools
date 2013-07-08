@@ -71,7 +71,7 @@ bool VMUnix::load(const std::string &fn) {
         fprintf(stderr, "can not open: %s\n", file);
         return false;
     }
-    bool ret = loadInternal(fn, f);
+    bool ret = load2(fn, f);
     fclose(f);
     return ret;
 }
@@ -88,7 +88,7 @@ void VMUnix::run() {
     VMUnix *from = current;
     swtch(this);
     hasExited = false;
-    runInternal();
+    run2();
     swtch(from);
 }
 
