@@ -17,6 +17,10 @@ Operand::Operand(uint8_t *mem, int pc, int modr)
     reg = modr & 7;
     if (reg == 7) {
         switch (mode) {
+            case 1:
+                len = 0;
+                value = pc;
+                return;
             case 2:
             case 3:
                 len = 2;

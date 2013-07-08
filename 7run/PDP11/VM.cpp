@@ -52,7 +52,8 @@ VM::~VM() {
 int VM::addr(const Operand &opr, bool nomove) {
     if (opr.reg == 7) {
         switch (opr.mode) {
-            case 3: return opr.value;
+            case 1:
+            case 3:
             case 6: return opr.value;
             case 7: return read16(opr.value);
         }
