@@ -31,5 +31,8 @@ namespace UnixV6 {
         static void sighandler(int sig);
         void sighandler2(int sig);
         void resetsig();
+
+        static const int nsig = 20;
+        uint16_t sighandlers[nsig];
     };
 }

@@ -35,6 +35,7 @@
       <df name="UnixV6">
         <in>VM.cpp</in>
         <in>VM.h</in>
+        <in>VM.signal.cpp</in>
         <in>VM.sys.cpp</in>
       </df>
       <in>File.cpp</in>

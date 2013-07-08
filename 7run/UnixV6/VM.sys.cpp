@@ -227,7 +227,7 @@ int VM::v6_exec(const char *path, int args) { // 11
         errno = EINVAL;
         return -1;
     }
-    //resetsig();
+    resetsig();
     SP = 0x10000 - ((slen + 1) & ~1);
     uint16_t ad1 = SP;
     SP -= (argc + 1) * 2;

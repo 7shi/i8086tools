@@ -87,22 +87,3 @@ void VM::setstat(uint16_t addr, struct stat *st) {
     write16(addr + 32, st->st_mtime >> 16);
     write16(addr + 34, st->st_mtime);
 }
-
-int VM::convsig(int sig) {
-    fprintf(stderr, "[%s] not implemented\n", __func__);
-    return 0;
-}
-
-void VM::setsig(int sig, int h) {
-    fprintf(stderr, "[%s] not implemented\n", __func__);
-}
-
-void VM::swtch(bool reset) {
-    fprintf(stderr, "[%s] not implemented\n", __func__);
-}
-
-int VM::v6_signal(int sig, int h) {
-    fprintf(stderr, "[%s] not implemented\n", __func__);
-    errno = EINVAL;
-    return -1;
-}

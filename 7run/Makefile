@@ -11,7 +11,7 @@ SOURCES  = main.cpp utils.cpp \
 	   Minix2/VM.cpp Minix2/VM.sys.cpp Minix2/VM.signal.cpp \
 	   PDP11/OpCode.cpp PDP11/Operand.cpp \
 	   PDP11/VM.cpp PDP11/VM.inst.cpp PDP11/disasm.cpp \
-	   UnixV6/VM.cpp UnixV6/VM.sys.cpp
+	   UnixV6/VM.cpp UnixV6/VM.sys.cpp UnixV6/VM.signal.cpp
 COMMANDS = bin/aal bin/ar bin/cc bin/nm bin/strip \
 	   bin/crc bin/install bin/m2 \
 	   lib/as lib/ld lib/cv

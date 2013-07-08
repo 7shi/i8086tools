@@ -51,3 +51,7 @@ UnixV6/VM.sys.o: UnixV6/VM.sys.cpp UnixV6/VM.h UnixV6/../PDP11/VM.h \
  UnixV6/../PDP11/../VMUnix.h UnixV6/../PDP11/../utils.h \
  UnixV6/../PDP11/../File.h UnixV6/../PDP11/OpCode.h \
  UnixV6/../PDP11/Operand.h UnixV6/../PDP11/regs.h
+UnixV6/VM.signal.o: UnixV6/VM.signal.cpp UnixV6/VM.h UnixV6/../PDP11/VM.h \
+ UnixV6/../PDP11/../VMUnix.h UnixV6/../PDP11/../utils.h \
+ UnixV6/../PDP11/../File.h UnixV6/../PDP11/OpCode.h \
+ UnixV6/../PDP11/Operand.h UnixV6/../PDP11/regs.h
