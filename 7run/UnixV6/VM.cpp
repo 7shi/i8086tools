@@ -13,6 +13,9 @@ bool UnixV6::check(uint8_t h[2]) {
 VM::VM() {
 }
 
+VM::VM(const VM &vm) : PDP11::VM(vm) {
+}
+
 VM::~VM() {
 }
 
@@ -52,7 +55,19 @@ bool VM::load2(const std::string &fn, FILE *f) {
 }
 
 void VM::setstat(uint16_t addr, struct stat *st) {
-    fprintf(stderr, "[%s] not implemented\n", __func__);
+    memset(data + addr, 0, 36);
+    write16(addr, st->st_dev);
+    write16(addr + 2, st->st_ino);
+    write16(addr + 4, st->st_mode);
+    write8(addr + 6, st->st_nlink);
+    write8(addr + 7, st->st_uid);
+    write8(addr + 8, st->st_gid);
+    write8(addr + 9, st->st_size >> 16);
+    write16(addr + 10, st->st_size);
+    write16(addr + 28, st->st_atime >> 16);
+    write16(addr + 30, st->st_atime);
+    write16(addr + 32, st->st_mtime >> 16);
+    write16(addr + 34, st->st_mtime);
 }
 
 bool VM::syscall(int n) {
@@ -66,54 +81,58 @@ bool VM::syscall(int n, uint8_t *args) {
         {
             int bak = PC + 2;
             int p = ::read16(text + PC);
-            bool ret = syscall(read8(p), data + p + 2);
-            PC = bak;
+            int nn = read8(p);
+            bool ret = syscall(nn, data + p + 2);
+            if (!(nn == 11 && !C)) PC = bak;
             return ret;
         }
         case 1:
             sys_exit((int16_t) r[0]);
             return true;
         case 2:
-            fprintf(stderr, "<fork: not implemented>\n");
-            hasExited = true;
+            result = v6_fork();
             break;
         case 3:
-            fprintf(stderr, "<read: not implemented>\n");
-            hasExited = true;
+            PC += 4;
+            result = sys_read(r[0], ::read16(args), ::read16(args + 2));
             break;
         case 4:
             PC += 4;
             result = sys_write(r[0], ::read16(args), ::read16(args + 2));
             break;
         case 5:
-            fprintf(stderr, "<open: not implemented>\n");
-            hasExited = true;
+            PC += 4;
+            result = sys_open(str(::read16(args)), ::read16(args + 2));
             break;
         case 6:
-            fprintf(stderr, "<close: not implemented>\n");
-            hasExited = true;
+            result = sys_close(r[0]);
             break;
         case 7:
-            fprintf(stderr, "<wait: not implemented>\n");
-            hasExited = true;
+        {
+            int status;
+            result = sys_wait(&status);
+            r[1] = status | 14;
             break;
+        }
         case 8:
-            fprintf(stderr, "<creat: not implemented>\n");
-            hasExited = true;
+            PC += 4;
+            result = sys_creat(str(::read16(args)), ::read16(args + 2));
             break;
         case 9:
-            fprintf(stderr, "<link: not implemented>\n");
-            hasExited = true;
+            PC += 4;
+            result = sys_link(str(::read16(args)), str(::read16(args + 2)));
             break;
         case 10:
-            fprintf(stderr, "<unlink: not implemented>\n");
-            hasExited = true;
+            PC += 2;
+            result = sys_unlink(str(::read16(args)));
             break;
         case 11:
-            fprintf(stderr, "<exec: not implemented>\n");
-            hasExited = true;
+            PC += 4;
+            result = v6_exec(str(::read16(args)), ::read16(args + 2));
             break;
         case 12:
+            //PC += 2;
+            //result = sys_chdir(str(::read16(args)));
             fprintf(stderr, "<chdir: not implemented>\n");
             hasExited = true;
             break;
@@ -126,28 +145,27 @@ bool VM::syscall(int n, uint8_t *args) {
             hasExited = true;
             break;
         case 15:
-            fprintf(stderr, "<chmod: not implemented>\n");
-            hasExited = true;
+            PC += 4;
+            result = sys_chmod(str(::read16(args)), ::read16(args + 2));
             break;
         case 16:
             fprintf(stderr, "<chown: not implemented>\n");
             hasExited = true;
             break;
         case 17:
-            fprintf(stderr, "<break: not implemented>\n");
-            hasExited = true;
+            PC += 2;
+            result = sys_brk(::read16(args), SP);
             break;
         case 18:
-            fprintf(stderr, "<stat: not implemented>\n");
-            hasExited = true;
+            PC += 4;
+            result = sys_stat(str(::read16(args)), ::read16(args + 2));
             break;
         case 19:
-            fprintf(stderr, "<seek: not implemented>\n");
-            hasExited = true;
+            PC += 4;
+            result = v6_seek(r[0], ::read16(args), ::read16(args + 2));
             break;
         case 20:
-            fprintf(stderr, "<getpid: not implemented>\n");
-            hasExited = true;
+            result = sys_getpid();
             break;
         case 21:
             fprintf(stderr, "<mount: not implemented>\n");
@@ -206,6 +224,7 @@ bool VM::syscall(int n, uint8_t *args) {
             hasExited = true;
             break;
         case 41:
+            //result = dup(r[0]);
             fprintf(stderr, "<dup: not implemented>\n");
             hasExited = true;
             break;
@@ -230,12 +249,97 @@ bool VM::syscall(int n, uint8_t *args) {
             hasExited = true;
             break;
         case 48:
-            fprintf(stderr, "<signal: not implemented>\n");
-            hasExited = true;
+            PC += 4;
+            result = v6_signal(::read16(args), ::read16(args + 2));
             break;
     }
     r[0] = (C = (result == -1)) ? errno : result;
     return true;
+}
+
+int VM::v6_fork() { // 2
+    if (trace) fprintf(stderr, "<fork()>\n");
+#ifdef NO_FORK
+    VM vm = *this;
+    vm.run();
+    PC += 2;
+    return vm.pid;
+#else
+    int result = fork();
+    return result <= 0 ? result : (result % 30000) + 1;
+#endif
+}
+
+int VM::v6_exec(const char *path, int args) { // 11
+#if 0
+    FILE *f = fopen("core", "wb");
+    fwrite(data, 1, 0x10000, f);
+    fclose(f);
+#endif
+    if (trace) fprintf(stderr, "<exec(\"%s\"", path);
+    int argc = 0, slen = 0, p;
+    for (; (p = read16(args + argc * 2)); argc++) {
+        const char *arg = str(p);
+        if (trace && argc > 0) fprintf(stderr, ", \"%s\"", arg);
+        slen += strlen(arg) + 1;
+    }
+    if (trace) fprintf(stderr, ")>\n");
+    uint8_t *t = text, *d = data;
+    text = new uint8_t[0x10000];
+    memset(text, 0, 0x10000);
+    data = NULL;
+    if (!load(path)) {
+        delete[] text;
+        text = t;
+        data = d;
+        errno = EINVAL;
+        return -1;
+    }
+    //resetsig();
+    SP = 0x10000 - ((slen + 1) & ~1);
+    uint16_t ad1 = SP;
+    SP -= (argc + 1) * 2;
+    uint16_t ad2 = start_sp = SP;
+    write16(SP, argc);
+    for (int i = 0; i < argc; i++) {
+        write16(ad2 += 2, ad1);
+        const char *arg = (const char *) (d + ::read16(d + args + i * 2));
+        strcpy((char *) data + ad1, arg);
+        ad1 += strlen(arg) + 1;
+    }
+    if (d != t) delete[] d;
+    return 0;
+}
+
+int VM::v6_seek(int fd, off_t o, int w) { // 19
+    if (trace) fprintf(stderr, "<lseek(%d, %ld, %d)", fd, o, w);
+    FileBase *f = file(fd);
+    off_t result = -1;
+    switch (w) {
+        case 0:
+            result = f->lseek(o, SEEK_SET);
+            break;
+        case 1:
+            result = f->lseek(int16_t(uint16_t(o)), SEEK_CUR);
+            break;
+        case 2:
+            result = f->lseek(int16_t(uint16_t(o)), SEEK_END);
+            break;
+        case 3:
+            result = f->lseek(o * 512, SEEK_SET);
+            break;
+        case 4:
+            result = f->lseek(int(int16_t(uint16_t(o))) * 512, SEEK_CUR);
+            break;
+        case 5:
+            result = f->lseek(int(int16_t(uint16_t(o))) * 512, SEEK_END);
+            break;
+        default:
+            errno = EINVAL;
+            break;
+    }
+    if (trace) fprintf(stderr, " => %ld>\n", result);
+    return result;
 }
 
 int VM::convsig(int sig) {
@@ -249,4 +353,10 @@ void VM::setsig(int sig, int h) {
 
 void VM::swtch(bool reset) {
     fprintf(stderr, "[%s] not implemented\n", __func__);
+}
+
+int VM::v6_signal(int sig, int h) {
+    fprintf(stderr, "[%s] not implemented\n", __func__);
+    errno = EINVAL;
+    return -1;
 }

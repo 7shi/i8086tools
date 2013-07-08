@@ -14,6 +14,7 @@ namespace PDP11 {
 
     public:
         VM();
+        VM(const VM &vm);
         virtual ~VM();
         virtual void disasm();
 

@@ -46,6 +46,16 @@ VM::VM() : start_sp(0) {
     Z = N = C = V = false;
 }
 
+VM::VM(const VM &vm) : VMUnix(vm) {
+    memcpy(r, vm.r, sizeof (r));
+    Z = vm.Z;
+    N = vm.N;
+    C = vm.C;
+    V = vm.V;
+    start_sp = vm.start_sp;
+    cache = vm.cache;
+}
+
 VM::~VM() {
 }
 
