@@ -9,7 +9,7 @@ namespace PDP11 {
     protected:
         uint16_t r[8];
         bool Z, N, C, V;
-        uint16_t start_sp;
+        uint16_t start_sp, runmax;
         std::vector<OpCode> cache;
 
     public:

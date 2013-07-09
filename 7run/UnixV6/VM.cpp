@@ -43,6 +43,7 @@ bool VM::load2(const std::string &fn, FILE *f) {
     if (fread(h, sizeof (h), 1, f) && check(h)) {
         tsize = ::read16(h + 2);
         dsize = ::read16(h + 4);
+        uint16_t bss = ::read16(h + 6);
         PC = ::read16(h + 10);
         cache.clear();
         cache.resize(0x10000);
@@ -51,20 +52,21 @@ bool VM::load2(const std::string &fn, FILE *f) {
             memset(data, 0, 0x10000);
             fread(text, 1, tsize, f);
             fread(data, 1, dsize, f);
-        } else {
+            runmax = tsize;
+            brksize = dsize + bss;
+        } else if (h[0] == 8) { // 0410
             data = text;
-            if (h[0] == 8) { // 0410
-                fread(text, 1, tsize, f);
-                uint16_t doff = (tsize + 0x1fff) & ~0x1fff;
-                fread(text + doff, 1, dsize, f);
-                dsize += doff;
-            } else {
-                dsize = (tsize += dsize);
-                fread(text, 1, dsize, f);
-            }
+            fread(text, 1, tsize, f);
+            uint16_t doff = (tsize + 0x1fff) & ~0x1fff;
+            fread(text + doff, 1, dsize, f);
+            runmax = tsize;
+            brksize = doff + dsize + bss;
+        } else { // 0407
+            data = text;
+            runmax = tsize + dsize; // for as
+            fread(text, 1, runmax, f);
+            brksize = runmax + bss;
         }
-        dsize += ::read16(h + 6); // bss
-        brksize = dsize;
         return true;
     }
     fseek(f, 0, SEEK_SET);

@@ -155,7 +155,7 @@ bool VM::load2(const std::string &fn, FILE *f) {
     cache.clear();
     data = text;
     fread(text, 1, tsize, f);
-    brksize = dsize = tsize;
+    brksize = tsize;
     return true;
 }
 

@@ -60,17 +60,15 @@ VMUnix::~VMUnix() {
 bool VMUnix::load(const std::string &fn) {
     std::string fn2 = convpath(fn);
     const char *file = fn2.c_str();
-    struct stat st;
-    if (stat(file, &st)) {
-        fprintf(stderr, "can not stat: %s\n", file);
-        return false;
-    }
-    tsize = st.st_size;
     FILE *f = fopen(file, "rb");
     if (!f) {
         fprintf(stderr, "can not open: %s\n", file);
         return false;
     }
+    struct stat st;
+    fstat(fileno(f), &st);
+    tsize = st.st_size;
+    dsize = 0;
     bool ret = load2(fn, f);
     fclose(f);
     return ret;

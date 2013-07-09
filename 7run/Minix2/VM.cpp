@@ -55,22 +55,21 @@ bool VM::load2(const std::string &fn, FILE *f) {
         }
         tsize = ::read32(h + 8);
         dsize = ::read32(h + 12);
+        uint16_t bss = ::read32(h + 16);
         ip = ::read32(h + 20);
+        cache.clear();
         if (h[2] & 0x20) {
-            cache.clear();
             cache.resize(0x10000);
             data = new uint8_t[0x10000];
             memset(data, 0, 0x10000);
             fread(text, 1, tsize, f);
             fread(data, 1, dsize, f);
+            brksize = dsize + bss;
         } else {
-            cache.clear();
             data = text;
-            dsize += tsize;
-            fread(text, 1, dsize, f);
+            fread(text, 1, tsize + dsize, f);
+            brksize = tsize + dsize + bss;
         }
-        dsize += ::read32(h + 16); // bss
-        brksize = dsize;
         return true;
     }
     fseek(f, 0, SEEK_SET);

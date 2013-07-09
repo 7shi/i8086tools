@@ -41,7 +41,7 @@ void VM::debug(uint16_t pc, const OpCode &op) {
     fprintf(stderr, "\n");
 }
 
-VM::VM() : start_sp(0) {
+VM::VM() : start_sp(0), runmax(0) {
     memset(r, 0, sizeof (r));
     Z = N = C = V = false;
 }
@@ -53,6 +53,7 @@ VM::VM(const VM &vm) : VMUnix(vm) {
     C = vm.C;
     V = vm.V;
     start_sp = vm.start_sp;
+    runmax = vm.runmax;
     cache = vm.cache;
 }
 
@@ -130,7 +131,7 @@ bool VM::load2(const std::string &fn, FILE *f) {
     cache.clear();
     data = text;
     fread(text, 1, tsize, f);
-    brksize = dsize = tsize;
+    runmax = brksize = tsize;
     return true;
 }
 
