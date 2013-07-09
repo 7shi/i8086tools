@@ -11,11 +11,8 @@ void VM::run1() {
     if (cache.empty()) {
         op = &(op1 = disasm1(text + PC, PC));
     } else {
-        if (cache[PC].len > 0) {
-            op = &cache[PC];
-        } else {
-            op = &(cache[PC] = disasm1(text + PC, PC));
-        }
+        op = &cache[PC];
+        if (op->empty()) *op = disasm1(text + PC, PC);
     }
     if (PC + op->len > tsize) {
         fprintf(stderr, "overrun: %04x\n", PC);

@@ -45,8 +45,8 @@ bool VM::load2(const std::string &fn, FILE *f) {
         dsize = ::read16(h + 4);
         PC = ::read16(h + 10);
         cache.clear();
+        cache.resize(0x10000);
         if (h[0] == 9) { // 0411
-            cache.resize(0x10000);
             data = new uint8_t[0x10000];
             memset(data, 0, 0x10000);
             fread(text, 1, tsize, f);
@@ -54,7 +54,6 @@ bool VM::load2(const std::string &fn, FILE *f) {
         } else {
             data = text;
             if (h[0] == 8) { // 0410
-                cache.resize(0x10000);
                 fread(text, 1, tsize, f);
                 uint16_t doff = (tsize + 0x1fff) & ~0x1fff;
                 fread(text + doff, 1, dsize, f);
