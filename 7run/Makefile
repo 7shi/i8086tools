@@ -40,9 +40,11 @@ install: $(TARGET)
 	  sh mkwrap.sh -x $(PREFIX)/bin/$(TARGET) $(V6ROOT) $(PREFIX)/bin/v6 bin/$$cmd; \
 	  cp $(PREFIX)/bin/v6`basename $$cmd` $(V6ROOT)/7bin/`basename $$cmd`; \
 	done
+	(echo '#!/bin/sh' && echo 'PATH="$(M2ROOT)/7bin:$$PATH" "$$@"') > $(PREFIX)/bin/m2path
+	(echo '#!/bin/sh' && echo 'PATH="$(V6ROOT)/7bin:$$PATH" "$$@"') > $(PREFIX)/bin/v6path
 
 uninstall:
-	cd $(PREFIX)/bin && rm -f $(TARGET) $(TARGET).exe
+	cd $(PREFIX)/bin && rm -f $(TARGET) $(TARGET).exe m2path v6path
 	for cmd in $(COMMANDS); do \
 	  rm -f $(PREFIX)/bin/m2`basename $$cmd`; \
 	  rm -f $(M2ROOT)/7bin/`basename $$cmd`; \
