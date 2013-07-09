@@ -45,9 +45,10 @@ uninstall:
 	cd $(PREFIX)/bin && rm -f $(TARGET) $(TARGET).exe
 	for cmd in $(COMMANDS); do \
 	  rm -f $(PREFIX)/bin/m2`basename $$cmd`; \
-	  rm -f $(M2ROOT)/m2bin/`basename $$cmd`; \
+	  rm -f $(M2ROOT)/7bin/`basename $$cmd`; \
+	  rm -f $(V6ROOT)/7bin/`basename $$cmd`; \
 	done
-	-rmdir $(M2ROOT)/m2bin
+	-rmdir $(M2ROOT)/7bin $(V6ROOT)/7bin
 
 depend:
 	rm -f dependencies
