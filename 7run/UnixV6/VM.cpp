@@ -40,37 +40,38 @@ void VM::setArgs(
 bool VM::load2(const std::string &fn, FILE *f) {
     if (tsize < 0x10) return PDP11::VM::load2(fn, f);
     uint8_t h[0x10];
-    if (fread(h, sizeof (h), 1, f) && check(h)) {
-        tsize = ::read16(h + 2);
-        dsize = ::read16(h + 4);
-        uint16_t bss = ::read16(h + 6);
-        PC = ::read16(h + 10);
-        cache.clear();
-        cache.resize(0x10000);
-        if (h[0] == 9) { // 0411
-            data = new uint8_t[0x10000];
-            memset(data, 0, 0x10000);
-            fread(text, 1, tsize, f);
-            fread(data, 1, dsize, f);
-            runmax = tsize;
-            brksize = dsize + bss;
-        } else if (h[0] == 8) { // 0410
-            data = text;
-            fread(text, 1, tsize, f);
-            uint16_t doff = (tsize + 0x1fff) & ~0x1fff;
-            fread(text + doff, 1, dsize, f);
-            runmax = tsize;
-            brksize = doff + dsize + bss;
-        } else { // 0407
-            data = text;
-            runmax = tsize + dsize; // for as
-            fread(text, 1, runmax, f);
-            brksize = runmax + bss;
-        }
-        return true;
+    fread(h, sizeof (h), 1, f);
+    if (!check(h)) {
+        fseek(f, 0, SEEK_SET);
+        return PDP11::VM::load2(fn, f);
     }
-    fseek(f, 0, SEEK_SET);
-    return PDP11::VM::load2(fn, f);
+    tsize = ::read16(h + 2);
+    dsize = ::read16(h + 4);
+    uint16_t bss = ::read16(h + 6);
+    PC = ::read16(h + 10);
+    cache.clear();
+    cache.resize(0x10000);
+    if (h[0] == 9) { // 0411
+        data = new uint8_t[0x10000];
+        memset(data, 0, 0x10000);
+        fread(text, 1, tsize, f);
+        fread(data, 1, dsize, f);
+        runmax = tsize;
+        brksize = dsize + bss;
+    } else if (h[0] == 8) { // 0410
+        data = text;
+        fread(text, 1, tsize, f);
+        uint16_t doff = (tsize + 0x1fff) & ~0x1fff;
+        fread(text + doff, 1, dsize, f);
+        runmax = tsize;
+        brksize = doff + dsize + bss;
+    } else { // 0407
+        data = text;
+        runmax = tsize + dsize; // for as
+        fread(text, 1, runmax, f);
+        brksize = runmax + bss;
+    }
+    return true;
 }
 
 void VM::setstat(uint16_t addr, struct stat *st) {

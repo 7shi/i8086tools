@@ -47,33 +47,34 @@ void VM::setArgs(
 bool VM::load2(const std::string &fn, FILE *f) {
     if (tsize < 0x20) return i8086::VM::load2(fn, f);
     uint8_t h[0x20];
-    if (fread(h, sizeof (h), 1, f) && h[0] == 1 && h[1] == 3
-            && !fseek(f, h[4], SEEK_SET)) {
-        if (h[3] != 4) {
-            fprintf(stderr, "unknown cpu id: %d\n", h[3]);
-            return false;
-        }
-        tsize = ::read32(h + 8);
-        dsize = ::read32(h + 12);
-        uint16_t bss = ::read32(h + 16);
-        ip = ::read32(h + 20);
-        cache.clear();
-        if (h[2] & 0x20) {
-            cache.resize(0x10000);
-            data = new uint8_t[0x10000];
-            memset(data, 0, 0x10000);
-            fread(text, 1, tsize, f);
-            fread(data, 1, dsize, f);
-            brksize = dsize + bss;
-        } else {
-            data = text;
-            fread(text, 1, tsize + dsize, f);
-            brksize = tsize + dsize + bss;
-        }
-        return true;
+    fread(h, sizeof (h), 1, f);
+    if (!(h[0] == 1 && h[1] == 3)) {
+        fseek(f, 0, SEEK_SET);
+        return i8086::VM::load2(fn, f);
     }
-    fseek(f, 0, SEEK_SET);
-    return i8086::VM::load2(fn, f);
+    if (h[3] != 4) {
+        fprintf(stderr, "unknown cpu id: %d\n", h[3]);
+        return false;
+    }
+    fseek(f, h[4], SEEK_SET);
+    tsize = ::read32(h + 8);
+    dsize = ::read32(h + 12);
+    uint16_t bss = ::read32(h + 16);
+    ip = ::read32(h + 20);
+    cache.clear();
+    if (h[2] & 0x20) {
+        cache.resize(0x10000);
+        data = new uint8_t[0x10000];
+        memset(data, 0, 0x10000);
+        fread(text, 1, tsize, f);
+        fread(data, 1, dsize, f);
+        brksize = dsize + bss;
+    } else {
+        data = text;
+        fread(text, 1, tsize + dsize, f);
+        brksize = tsize + dsize + bss;
+    }
+    return true;
 }
 
 void VM::setstat(uint16_t addr, struct stat *st) {
