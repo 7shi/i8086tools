@@ -86,15 +86,21 @@ bool VM::load2(const std::string &fn, FILE *f) {
         PDP11::Symbol sym = {
             readstr(buf, 8), ::read16(buf + 8), ::read16(buf + 10)
         };
-        switch (sym.type) {
-            case 0x1f:
-                syms[0][sym.addr] = sym;
-                break;
-            case 0x02:
-            case 0x22:
+        int t = sym.type;
+        if (t < 6) {
+            t = "uatdbc"[t];
+        } else if (0x20 <= t && t < 0x26) {
+            t = "UATDBC"[t - 0x20];
+        }
+        switch (t) {
+            case 't':
+            case 'T':
                 if (!startsWith(sym.name, "~")) {
                     syms[1][sym.addr] = sym;
                 }
+                break;
+            case 0x1f:
+                syms[0][sym.addr] = sym;
                 break;
         }
     }
