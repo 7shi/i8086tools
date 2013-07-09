@@ -262,7 +262,7 @@ void PDP11::disasm(uint8_t *mem, size_t size) {
             if (len > 6) len = 6;
             std::string hex = hexdump2(mem + index + i, len);
             if (i == 0) {
-                printf("%04x: %-14s %s\n", index, hex.c_str(), ops.c_str());
+                printf("%04x: %-14s  %s\n", index, hex.c_str(), ops.c_str());
             } else {
                 printf("      %-14s\n", hex.c_str());
             }

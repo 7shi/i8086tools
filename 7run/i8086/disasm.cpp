@@ -389,7 +389,7 @@ void i8086::disasm(uint8_t *mem, size_t size) {
             }
         }
         std::string hex = hexdump(mem + index, op.len);
-        printf("%04x: %-12s %s\n", index, hex.c_str(), ops.c_str());
+        printf("%04x: %-12s  %s\n", index, hex.c_str(), ops.c_str());
         index += op.len;
     }
     if (undefined) printf("undefined: %d\n", undefined);
