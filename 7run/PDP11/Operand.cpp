@@ -49,7 +49,7 @@ std::string Operand::str() const {
     if (reg == 7) {
         switch (mode) {
             case 2: return "$" + hex(value);
-            case 3: return "*$" + hex(value);
+            case 3: return "*$" + hex(value, 4);
             case 6: return hex(value, 4);
             case 7: return "*" + hex(value, 4);
             case 8: return hex(value, 4); // imm
