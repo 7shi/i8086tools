@@ -35,7 +35,7 @@ void VM::run1() {
         case 000:
             switch ((w >> 6) & 077) {
                 case 000:
-                    switch (w & 7) {
+                    switch (w & 077) {
                         case 0: // halt
                         case 1: // wait
                         case 2: // rti

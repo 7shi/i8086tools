@@ -51,7 +51,7 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
         case 000:
             switch ((w >> 6) & 077) {
                 case 000:
-                    switch (w & 7) {
+                    switch (w & 077) {
                         case 0: return OpCode(2, "halt");
                         case 1: return OpCode(2, "wait");
                         case 2: return OpCode(2, "rti");
