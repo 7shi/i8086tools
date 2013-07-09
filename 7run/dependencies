@@ -2,7 +2,8 @@
  Minix2/../i8086/../VMUnix.h Minix2/../i8086/../utils.h \
  Minix2/../i8086/../File.h Minix2/../i8086/OpCode.h \
  Minix2/../i8086/Operand.h UnixV6/VM.h UnixV6/../PDP11/VM.h \
- UnixV6/../PDP11/OpCode.h UnixV6/../PDP11/Operand.h
+ UnixV6/../PDP11/OpCode.h UnixV6/../PDP11/Operand.h \
+ UnixV6/../PDP11/disasm.h
 ./utils.o: utils.cpp utils.h
 ./File.o: File.cpp File.h
 ./VMUnix.o: VMUnix.cpp VMUnix.h utils.h File.h
@@ -46,12 +47,15 @@ PDP11/disasm.o: PDP11/disasm.cpp PDP11/disasm.h PDP11/OpCode.h PDP11/Operand.h \
 UnixV6/VM.o: UnixV6/VM.cpp UnixV6/VM.h UnixV6/../PDP11/VM.h \
  UnixV6/../PDP11/../VMUnix.h UnixV6/../PDP11/../utils.h \
  UnixV6/../PDP11/../File.h UnixV6/../PDP11/OpCode.h \
- UnixV6/../PDP11/Operand.h UnixV6/../PDP11/regs.h
+ UnixV6/../PDP11/Operand.h UnixV6/../PDP11/disasm.h \
+ UnixV6/../PDP11/regs.h
 UnixV6/VM.sys.o: UnixV6/VM.sys.cpp UnixV6/VM.h UnixV6/../PDP11/VM.h \
  UnixV6/../PDP11/../VMUnix.h UnixV6/../PDP11/../utils.h \
  UnixV6/../PDP11/../File.h UnixV6/../PDP11/OpCode.h \
- UnixV6/../PDP11/Operand.h UnixV6/../PDP11/regs.h
+ UnixV6/../PDP11/Operand.h UnixV6/../PDP11/disasm.h \
+ UnixV6/../PDP11/regs.h
 UnixV6/VM.signal.o: UnixV6/VM.signal.cpp UnixV6/VM.h UnixV6/../PDP11/VM.h \
  UnixV6/../PDP11/../VMUnix.h UnixV6/../PDP11/../utils.h \
  UnixV6/../PDP11/../File.h UnixV6/../PDP11/OpCode.h \
- UnixV6/../PDP11/Operand.h UnixV6/../PDP11/regs.h
+ UnixV6/../PDP11/Operand.h UnixV6/../PDP11/disasm.h \
+ UnixV6/../PDP11/regs.h

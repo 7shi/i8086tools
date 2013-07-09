@@ -1,5 +1,4 @@
 #include "VM.h"
-#include "disasm.h"
 #include "regs.h"
 #include <stdio.h>
 #include <string.h>
@@ -14,6 +13,10 @@ void VM::showHeader() {
 }
 
 void VM::debug(uint16_t pc, const OpCode &op) {
+    std::map<int, Symbol>::iterator it = syms.find(pc);
+    if (it != syms.end()) {
+        fprintf(stderr, "%s:\n", it->second.name.c_str());
+    }
     fprintf(stderr,
             "%04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-14s %s",
             r[0], r[1], r[2], r[3], r[4], r[5], r[6],
@@ -140,5 +143,5 @@ void VM::run2() {
 }
 
 void VM::disasm() {
-    ::disasm(text, tsize);
+    ::disasm(text, tsize, &syms);
 }

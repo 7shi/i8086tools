@@ -8,6 +8,15 @@
 
 std::string rootpath;
 
+std::string readstr(uint8_t *mem, int max) {
+    std::string ret;
+    char ch;
+    for (int i = 0; i < max && (ch = mem[i]); i++) {
+        ret += ch;
+    }
+    return ret;
+}
+
 std::string hex(int v, int len) {
     char buf[32], format[16] = "%x";
     if (v < 0) {

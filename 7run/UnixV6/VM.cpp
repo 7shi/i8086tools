@@ -71,10 +71,26 @@ bool VM::load2(const std::string &fn, FILE *f) {
         fread(text, 1, runmax, f);
         brksize = runmax + bss;
     }
+    uint16_t ssize = ::read16(h + 8);
+    if (ssize) {
+        if (!::read16(h + 14)) {
+            fseek(f, tsize + dsize, SEEK_CUR);
+        }
+        uint8_t buf[12];
+        for (int i = 0; i < ssize; i += 12) {
+            fread(buf, sizeof (buf), 1, f);
+            PDP11::Symbol sym = {
+                readstr(buf, 8), ::read16(buf + 8), ::read16(buf + 10)
+            };
+            if ((sym.type & 31) == 2 && !startsWith(sym.name, "~")) {
+                syms[sym.addr] = sym;
+            }
+        }
+    }
     return true;
 }
 
-void VM::setstat(uint16_t addr, struct stat *st) {
+void VM::setstat(uint16_t addr, struct stat * st) {
     memset(data + addr, 0, 36);
     write16(addr, st->st_dev);
     write16(addr + 2, st->st_ino);

@@ -1,5 +1,4 @@
 #include "VM.h"
-#include "disasm.h"
 #include "regs.h"
 #include <stdio.h>
 #include <stdlib.h>

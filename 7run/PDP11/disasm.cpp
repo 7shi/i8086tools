@@ -251,10 +251,16 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
     return OpCode(2, "(undefined)");
 }
 
-void PDP11::disasm(uint8_t *mem, size_t size) {
+void PDP11::disasm(uint8_t *mem, size_t size, std::map<int, Symbol> *syms) {
     undefined = 0;
     int index = 0;
     while (index < (int) size) {
+        if (syms) {
+            std::map<int, Symbol>::iterator it = syms->find(index);
+            if (it != syms->end()) {
+                fprintf(stderr, "%s:\n", it->second.name.c_str());
+            }
+        }
         OpCode op = disasm1(mem + index, index);
         std::string ops = op.str();
         for (int i = 0; i < (int) op.len; i += 6) {

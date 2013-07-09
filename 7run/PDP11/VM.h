@@ -1,6 +1,7 @@
 #pragma once
 #include "../VMUnix.h"
 #include "OpCode.h"
+#include "disasm.h"
 
 namespace PDP11 {
     extern const char *header;
@@ -11,6 +12,7 @@ namespace PDP11 {
         bool Z, N, C, V;
         uint16_t start_sp, runmax;
         std::vector<OpCode> cache;
+        std::map<int, Symbol> syms;
 
     public:
         VM();
