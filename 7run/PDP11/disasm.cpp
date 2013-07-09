@@ -1,5 +1,6 @@
 #include "disasm.h"
 #include <stdio.h>
+#include <string.h>
 
 using namespace PDP11;
 
@@ -255,18 +256,32 @@ void PDP11::disasm(uint8_t *mem, size_t size, std::map<int, Symbol> *syms) {
     undefined = 0;
     int index = 0;
     while (index < (int) size) {
-        if (syms) {
-            std::map<int, Symbol>::iterator it0 = syms[0].find(index);
-            std::map<int, Symbol>::iterator it1 = syms[1].find(index);
-            if (it0 != syms[0].end()) {
-                fprintf(stderr, "\n[%s]\n", it0->second.name.c_str());
-            }
-            if (it1 != syms[1].end()) {
-                fprintf(stderr, "%s:\n", it1->second.name.c_str());
-            }
-        }
         OpCode op = disasm1(mem + index, index);
         std::string ops = op.str();
+        if (syms) {
+            std::map<int, Symbol>::iterator it;
+            it = syms[0].find(index);
+            if (it != syms[0].end()) {
+                fprintf(stderr, "\n[%s]\n", it->second.name.c_str());
+            }
+            it = syms[1].find(index);
+            if (it != syms[1].end()) {
+                fprintf(stderr, "%s:\n", it->second.name.c_str());
+            }
+            if (!strcmp(op.mne, "jmp") && op.opr1.isaddr()) {
+                it = syms[1].find(op.opr1.value);
+                if (it != syms[1].end()) {
+                    ops += " ; ";
+                    ops += it->second.name;
+                }
+            } else if (!strcmp(op.mne, "jsr") && op.opr2.isaddr()) {
+                it = syms[1].find(op.opr2.value);
+                if (it != syms[1].end()) {
+                    ops += " ; ";
+                    ops += it->second.name;
+                }
+            }
+        }
         for (int i = 0; i < (int) op.len; i += 6) {
             int len = op.len - i;
             if (len > 6) len = 6;

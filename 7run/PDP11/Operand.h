@@ -12,6 +12,8 @@ namespace PDP11 {
         Operand(int len, int mode, int reg, int value = 0);
         Operand(uint8_t *mem, int pc, int modr);
 
+        std::string str() const;
+
         inline bool empty() const {
             return len == -1;
         }
@@ -20,7 +22,9 @@ namespace PDP11 {
             return w || (mode && reg >= 6) ? 2 : 1;
         }
 
-        std::string str() const;
+        inline bool isaddr() const {
+            return reg == 7 && (mode == 3 || mode == 6);
+        }
     };
 
     inline Operand reg(int r) {
