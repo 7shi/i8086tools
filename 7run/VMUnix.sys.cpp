@@ -115,7 +115,7 @@ int VMUnix::sys_wait(int *status) {
     }
     std::pair<int, int> ec = exitcodes.top();
     exitcodes.pop();
-    *status = (ec.second << 8) | 14;
+    *status = ec.second << 8;
     if (trace) fprintf(stderr, "<wait() => %d>\n", *status);
     return ec.first;
 #else
