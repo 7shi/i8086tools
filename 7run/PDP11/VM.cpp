@@ -13,12 +13,12 @@ void VM::showHeader() {
     fprintf(stderr, header);
 }
 
-void VM::debug(uint16_t ip, const OpCode &op) {
+void VM::debug(uint16_t pc, const OpCode &op) {
     fprintf(stderr,
             "%04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-14s %s",
             r[0], r[1], r[2], r[3], r[4], r[5], r[6],
             "-Z"[Z], "-N"[N], "-C"[C], "-V"[V],
-            PC, hexdump2(text + ip, op.len).c_str(), op.str().c_str());
+            pc, hexdump2(text + pc, op.len).c_str(), op.str().c_str());
     if (trace >= 3) {
         uint16_t r[8];
         memcpy(r, this->r, sizeof (r));

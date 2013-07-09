@@ -55,7 +55,7 @@ namespace PDP11 {
         void set8(const Operand &opr, uint8_t value);
         void set16(const Operand &opr, uint16_t value);
 
-        void debug(uint16_t ip, const OpCode &op);
+        void debug(uint16_t pc, const OpCode &op);
         int addr(const Operand &opr, bool nomobe = false);
         void run1();
     };
