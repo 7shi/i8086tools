@@ -262,11 +262,11 @@ void PDP11::disasm(uint8_t *mem, size_t size, std::map<int, Symbol> *syms) {
             std::map<int, Symbol>::iterator it;
             it = syms[0].find(index);
             if (it != syms[0].end()) {
-                fprintf(stderr, "\n[%s]\n", it->second.name.c_str());
+                printf("\n[%s]\n", it->second.name.c_str());
             }
             it = syms[1].find(index);
             if (it != syms[1].end()) {
-                fprintf(stderr, "%s:\n", it->second.name.c_str());
+                printf("%s:\n", it->second.name.c_str());
             }
             if (!strcmp(op.mne, "jmp") && op.opr1.isaddr()) {
                 it = syms[1].find(op.opr1.value);
