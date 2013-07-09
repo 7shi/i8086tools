@@ -113,6 +113,16 @@ int VMUnix::open(const std::string &path, int flag, int mode) {
     return fd;
 }
 
+int VMUnix::dup(int fd) {
+    FileBase *f = file(fd);
+    if (!f) return -1;
+    
+    FileBase *f2 = f->dup();
+    int fd2 = getfd();
+    files[fd2] = f2;
+    return fd2;
+}
+
 FileBase *VMUnix::file(int fd) {
     if (fd < 0 || fd >= (int) files.size() || !files[fd]) {
         errno = EBADF;

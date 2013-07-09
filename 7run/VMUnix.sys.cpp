@@ -274,6 +274,13 @@ int VMUnix::sys_access(const char *path, mode_t mode) {
     return result;
 }
 
+int VMUnix::sys_dup(int fd) {
+    if (trace) fprintf(stderr, "<dup(%d)", fd);
+    int result = dup(fd);
+    if (trace) fprintf(stderr, " => %d>\n", result);
+    return result;
+}
+
 int VMUnix::sys_getgid() {
     if (trace) fprintf(stderr, "<getgid()");
 #ifdef WIN32

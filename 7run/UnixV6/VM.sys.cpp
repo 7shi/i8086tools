@@ -156,9 +156,7 @@ bool VM::syscall(int n, uint8_t *args) {
             hasExited = true;
             break;
         case 41:
-            //result = dup(r[0]);
-            fprintf(stderr, "<dup: not implemented>\n");
-            hasExited = true;
+            result = sys_dup(r[0]);
             break;
         case 42:
             fprintf(stderr, "<pipe: not implemented>\n");

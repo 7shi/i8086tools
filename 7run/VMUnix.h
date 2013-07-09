@@ -81,6 +81,7 @@ protected:
     int getfd();
     int open(const std::string &path, int flag, int mode);
     int close(int fd);
+    int dup(int fd);
     FileBase *file(int fd);
 
     void sys_exit(int code); // 1
@@ -103,6 +104,7 @@ protected:
     int sys_getuid(); // 24
     int sys_fstat(int fd, int p); // 28
     int sys_access(const char *path, mode_t mode); // 33
+    int sys_dup(int fd); // 41
     int sys_getgid(); // 47
     //void sys_signal(); // 48
     int sys_ioctl(int fd, int rq, int d); // 54
