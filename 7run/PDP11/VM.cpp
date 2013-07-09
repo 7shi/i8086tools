@@ -95,36 +95,6 @@ int VM::addr(const Operand &opr, bool nomove) {
     return -1;
 }
 
-uint8_t VM::get8(const Operand &opr, bool nomove) {
-    if (opr.mode == 0 && opr.reg != 7) return r[opr.reg];
-    int ad = addr(opr, nomove);
-    return ad < 0 ? opr.value : read8(ad);
-}
-
-uint16_t VM::get16(const Operand &opr, bool nomove) {
-    if (opr.mode == 0 && opr.reg != 7) return r[opr.reg];
-    int ad = addr(opr, nomove);
-    return ad < 0 ? opr.value : read16(ad);
-}
-
-void VM::set8(const Operand &opr, uint8_t value) {
-    if (opr.mode == 0) {
-        r[opr.reg] = (int16_t) (int8_t) value;
-    } else {
-        int ad = addr(opr);
-        if (ad >= 0) write8(ad, value);
-    }
-}
-
-void VM::set16(const Operand &opr, uint16_t value) {
-    if (opr.mode == 0) {
-        r[opr.reg] = value;
-    } else {
-        int ad = addr(opr);
-        if (ad >= 0) write16(ad, value);
-    }
-}
-
 bool VM::load2(const std::string &fn, FILE *f) {
     if (tsize > 0xffff) {
         fprintf(stderr, "too long raw binary: %s\n", fn.c_str());

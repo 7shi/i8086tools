@@ -25,6 +25,10 @@ namespace PDP11 {
         virtual void showHeader();
         virtual void run2();
 
+        void debug(uint16_t pc, const OpCode &op);
+        int addr(const Operand &opr, bool nomobe = false);
+        void run1();
+
         inline uint32_t getReg32(int reg) {
             return (r[reg] << 16) | r[(reg + 1) & 7];
         }
@@ -52,13 +56,34 @@ namespace PDP11 {
             return r[opr.reg];
         }
 
-        uint8_t get8(const Operand &opr, bool nomove = false);
-        uint16_t get16(const Operand &opr, bool nomove = false);
-        void set8(const Operand &opr, uint8_t value);
-        void set16(const Operand &opr, uint16_t value);
+        inline uint8_t get8(const Operand &opr, bool nomove = false) {
+            if (opr.mode == 0 && opr.reg != 7) return r[opr.reg];
+            int ad = addr(opr, nomove);
+            return ad < 0 ? opr.value : read8(ad);
+        }
 
-        void debug(uint16_t pc, const OpCode &op);
-        int addr(const Operand &opr, bool nomobe = false);
-        void run1();
+        inline uint16_t get16(const Operand &opr, bool nomove = false) {
+            if (opr.mode == 0 && opr.reg != 7) return r[opr.reg];
+            int ad = addr(opr, nomove);
+            return ad < 0 ? opr.value : read16(ad);
+        }
+
+        inline void set8(const Operand &opr, uint8_t value) {
+            if (opr.mode == 0) {
+                r[opr.reg] = (int16_t) (int8_t) value;
+            } else {
+                int ad = addr(opr);
+                if (ad >= 0) write8(ad, value);
+            }
+        }
+
+        inline void set16(const Operand &opr, uint16_t value) {
+            if (opr.mode == 0) {
+                r[opr.reg] = value;
+            } else {
+                int ad = addr(opr);
+                if (ad >= 0) write16(ad, value);
+            }
+        }
     };
 }
