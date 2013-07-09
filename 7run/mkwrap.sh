@@ -1,4 +1,11 @@
-# sh mkwrap.sh /usr/local/bin/7run /usr/local/minix2 /usr/local/bin/m2 usr/bin/cc
+# sh mkwrap.sh [-x] /usr/local/bin/7run /usr/local/minix2 /usr/local/bin/m2 usr/bin/cc
+
+opt=""
+if [ "x$1" = "x-x" ]
+then
+    opt=$1
+    shift
+fi
 
 # ex. /usr/local/bin/7run
 run=$1
@@ -13,6 +20,12 @@ cmd=$3`basename $4`
 wrap=$2/$4
 
 echo "#!/bin/sh" > $cmd
-echo "exec $run -r $root $wrap \$@" >> $cmd
+if [ "x$opt" = "x-x" ]
+then
+    echo "$run -r $root $wrap \$@" >> $cmd
+    echo "exit 0" >> $cmd
+else
+    echo "exec $run -r $root $wrap \$@" >> $cmd
+fi
 
 chmod 755 $cmd

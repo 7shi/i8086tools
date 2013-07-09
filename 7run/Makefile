@@ -37,7 +37,7 @@ install: $(TARGET)
 	  cp $(PREFIX)/bin/m2`basename $$cmd` $(M2ROOT)/7bin/`basename $$cmd`; \
 	done
 	for cmd in $(V6CMDS); do \
-	  sh mkwrap.sh $(PREFIX)/bin/$(TARGET) $(V6ROOT) $(PREFIX)/bin/v6 bin/$$cmd; \
+	  sh mkwrap.sh -x $(PREFIX)/bin/$(TARGET) $(V6ROOT) $(PREFIX)/bin/v6 bin/$$cmd; \
 	  cp $(PREFIX)/bin/v6`basename $$cmd` $(V6ROOT)/7bin/`basename $$cmd`; \
 	done
 
