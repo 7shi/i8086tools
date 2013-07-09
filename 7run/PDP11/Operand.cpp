@@ -52,7 +52,8 @@ std::string Operand::str() const {
             case 3: return "*$" + hex(value, 4);
             case 6: return hex(value, 4);
             case 7: return "*" + hex(value, 4);
-            case 8: return hex(value, 4); // imm
+            case 8: return hex(value); // imm
+            case 9: return hex(value, 4); // address
         }
     }
     const std::string &rn = regs[reg];

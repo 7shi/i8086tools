@@ -30,7 +30,7 @@ static inline OpCode srcr(uint8_t *mem, uint16_t addr, int w, const char *mne) {
 }
 
 static inline OpCode branch(uint16_t addr, int w, const char *mne) {
-    return OpCode(2, mne, imm(addr + 2 + ((int8_t) (w & 255)) * 2));
+    return OpCode(2, mne, address(addr + 2 + ((int8_t) (w & 255)) * 2));
 }
 
 static inline OpCode srcdstb(uint8_t *mem, uint16_t addr, int w, const char *mne) {

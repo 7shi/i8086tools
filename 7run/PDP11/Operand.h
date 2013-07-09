@@ -30,4 +30,8 @@ namespace PDP11 {
     inline Operand imm(int v) {
         return Operand(0, 8, 7, v);
     }
+
+    inline Operand address(int v) {
+        return Operand(0, 9, 7, v);
+    }
 }
