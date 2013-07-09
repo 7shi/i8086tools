@@ -83,30 +83,30 @@ protected:
     int close(int fd);
     FileBase *file(int fd);
 
-    void sys_exit(int code);
-    //int sys_fork();
-    int sys_read(int fd, int buf, int len);
-    int sys_write(int fd, int buf, int len);
-    int sys_open(const char *path, int flag, mode_t mode = 0);
-    int sys_close(int fd);
-    int sys_wait(int *status);
-    int sys_creat(const char *path, mode_t mode);
-    int sys_link(const char *src, const char *dst);
-    int sys_unlink(const char *path);
-    int sys_chdir(const char *path);
-    int sys_time();
-    int sys_chmod(const char *path, mode_t mode);
-    int sys_brk(int nd, int sp);
-    int sys_stat(const char *path, int p);
-    off_t sys_lseek(int fd, off_t o, int w);
-    int sys_getpid();
-    int sys_getuid();
-    int sys_fstat(int fd, int p);
-    int sys_access(const char *path, mode_t mode);
-    int sys_getgid();
-    //void sys_signal();
-    int sys_ioctl(int fd, int rq, int d);
-    //int sys_exec(const char *path, int frame, int fsize);
-    int sys_umask(mode_t mask);
-    //void sys_sigaction();
+    void sys_exit(int code); // 1
+    //int sys_fork(); // 2
+    int sys_read(int fd, int buf, int len); // 3
+    int sys_write(int fd, int buf, int len); // 4
+    int sys_open(const char *path, int flag, mode_t mode = 0); // 5
+    int sys_close(int fd); // 6
+    int sys_wait(int *status); // 7
+    int sys_creat(const char *path, mode_t mode); // 8
+    int sys_link(const char *src, const char *dst); // 9
+    int sys_unlink(const char *path); // 10
+    int sys_chdir(const char *path); // 12
+    int sys_time(); // 13
+    int sys_chmod(const char *path, mode_t mode); // 15
+    int sys_brk(int nd, int sp); // 17
+    int sys_stat(const char *path, int p); // 18
+    off_t sys_lseek(int fd, off_t o, int w); // 19
+    int sys_getpid(); // 20
+    int sys_getuid(); // 24
+    int sys_fstat(int fd, int p); // 28
+    int sys_access(const char *path, mode_t mode); // 33
+    int sys_getgid(); // 47
+    //void sys_signal(); // 48
+    int sys_ioctl(int fd, int rq, int d); // 54
+    //int sys_exec(const char *path, int frame, int fsize); // 59
+    int sys_umask(mode_t mask); // 60
+    //void sys_sigaction(); // 71
 };
