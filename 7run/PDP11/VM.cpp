@@ -73,10 +73,10 @@ int VM::addr(const Operand &opr, bool nomove) {
             case 1: return r[opr.reg];
             case 2: return r[opr.reg];
             case 3: return read16(r[opr.reg]);
-            case 4: return r[opr.reg] - opr.diff();
-            case 5: return read16(r[opr.reg] - opr.diff());
-            case 6: return r[opr.reg] + opr.value;
-            case 7: return read16(r[opr.reg] + opr.value);
+            case 4: return uint16_t(r[opr.reg] - opr.diff());
+            case 5: return uint16_t(read16(r[opr.reg] - opr.diff()));
+            case 6: return uint16_t(r[opr.reg] + opr.value);
+            case 7: return uint16_t(read16(r[opr.reg] + opr.value));
         }
     }
     switch (opr.mode) {
@@ -85,8 +85,8 @@ int VM::addr(const Operand &opr, bool nomove) {
         case 3: return read16(getInc(opr));
         case 4: return getDec(opr);
         case 5: return read16(getDec(opr));
-        case 6: return r[opr.reg] + opr.value;
-        case 7: return read16(r[opr.reg] + opr.value);
+        case 6: return uint16_t(r[opr.reg] + opr.value);
+        case 7: return uint16_t(read16(r[opr.reg] + opr.value));
     }
     return -1;
 }
