@@ -256,9 +256,13 @@ void PDP11::disasm(uint8_t *mem, size_t size, std::map<int, Symbol> *syms) {
     int index = 0;
     while (index < (int) size) {
         if (syms) {
-            std::map<int, Symbol>::iterator it = syms->find(index);
-            if (it != syms->end()) {
-                fprintf(stderr, "%s:\n", it->second.name.c_str());
+            std::map<int, Symbol>::iterator it0 = syms[0].find(index);
+            std::map<int, Symbol>::iterator it1 = syms[1].find(index);
+            if (it0 != syms[0].end()) {
+                fprintf(stderr, "\n[%s]\n", it0->second.name.c_str());
+            }
+            if (it1 != syms[1].end()) {
+                fprintf(stderr, "%s:\n", it1->second.name.c_str());
             }
         }
         OpCode op = disasm1(mem + index, index);

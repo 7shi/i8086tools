@@ -39,12 +39,14 @@ void VM::setArgs(
 
 bool VM::load2(const std::string &fn, FILE *f) {
     if (tsize < 0x10) return PDP11::VM::load2(fn, f);
+
     uint8_t h[0x10];
     fread(h, sizeof (h), 1, f);
     if (!check(h)) {
         fseek(f, 0, SEEK_SET);
         return PDP11::VM::load2(fn, f);
     }
+
     tsize = ::read16(h + 2);
     dsize = ::read16(h + 4);
     uint16_t bss = ::read16(h + 6);
@@ -71,20 +73,29 @@ bool VM::load2(const std::string &fn, FILE *f) {
         fread(text, 1, runmax, f);
         brksize = runmax + bss;
     }
+
     uint16_t ssize = ::read16(h + 8);
-    if (ssize) {
-        if (!::read16(h + 14)) {
-            fseek(f, tsize + dsize, SEEK_CUR);
-        }
-        uint8_t buf[12];
-        for (int i = 0; i < ssize; i += 12) {
-            fread(buf, sizeof (buf), 1, f);
-            PDP11::Symbol sym = {
-                readstr(buf, 8), ::read16(buf + 8), ::read16(buf + 10)
-            };
-            if ((sym.type & 31) == 2 && !startsWith(sym.name, "~")) {
-                syms[sym.addr] = sym;
-            }
+    if (!ssize) return true;
+
+    if (!::read16(h + 14)) {
+        fseek(f, tsize + dsize, SEEK_CUR);
+    }
+    uint8_t buf[12];
+    for (int i = 0; i < ssize; i += 12) {
+        fread(buf, sizeof (buf), 1, f);
+        PDP11::Symbol sym = {
+            readstr(buf, 8), ::read16(buf + 8), ::read16(buf + 10)
+        };
+        switch (sym.type) {
+            case 0x1f:
+                syms[0][sym.addr] = sym;
+                break;
+            case 0x02:
+            case 0x22:
+                if (!startsWith(sym.name, "~")) {
+                    syms[1][sym.addr] = sym;
+                }
+                break;
         }
     }
     return true;

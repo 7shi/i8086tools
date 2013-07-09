@@ -13,8 +13,8 @@ void VM::showHeader() {
 }
 
 void VM::debug(uint16_t pc, const OpCode &op) {
-    std::map<int, Symbol>::iterator it = syms.find(pc);
-    if (it != syms.end()) {
+    std::map<int, Symbol>::iterator it = syms[1].find(pc);
+    if (it != syms[1].end()) {
         fprintf(stderr, "%s:\n", it->second.name.c_str());
     }
     fprintf(stderr,
@@ -113,5 +113,5 @@ void VM::run2() {
 }
 
 void VM::disasm() {
-    ::disasm(text, tsize, &syms);
+    ::disasm(text, tsize, syms);
 }
