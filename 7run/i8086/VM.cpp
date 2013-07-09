@@ -106,42 +106,6 @@ int VM::addr(const Operand &opr) {
     return -1;
 }
 
-uint8_t VM::get8(const Operand &opr) {
-    switch (opr.type) {
-        case Reg: return *r8[opr.value];
-        case Imm: return opr.value;
-    }
-    int ad = addr(opr);
-    return ad < 0 ? 0 : read8(ad);
-}
-
-uint16_t VM::get16(const Operand &opr) {
-    switch (opr.type) {
-        case Reg: return r[opr.value];
-        case Imm: return opr.value;
-    }
-    int ad = addr(opr);
-    return ad < 0 ? 0 : read16(ad);
-}
-
-void VM::set8(const Operand &opr, uint8_t value) {
-    if (opr.type == Reg) {
-        *r8[opr.value] = value;
-    } else {
-        int ad = addr(opr);
-        if (ad >= 0) write8(ad, value);
-    }
-}
-
-void VM::set16(const Operand &opr, uint16_t value) {
-    if (opr.type == Reg) {
-        r[opr.value] = value;
-    } else {
-        int ad = addr(opr);
-        if (ad >= 0) write16(ad, value);
-    }
-}
-
 void VM::run2() {
     while (!hasExited) run1();
 }

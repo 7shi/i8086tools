@@ -28,6 +28,10 @@ namespace i8086 {
         virtual void showHeader();
         virtual void run2();
 
+        void run1(uint8_t prefix = 0);
+        void debug(uint16_t ip, const OpCode &op);
+        int addr(const Operand &opr);
+
         inline int setf8(int value, bool cf) {
             int8_t v = value;
             OF = value != v;
@@ -48,13 +52,40 @@ namespace i8086 {
             return value;
         }
 
-        uint8_t get8(const Operand &opr);
-        uint16_t get16(const Operand &opr);
-        void set8(const Operand &opr, uint8_t value);
-        void set16(const Operand &opr, uint16_t value);
+        inline uint8_t get8(const Operand &opr) {
+            switch (opr.type) {
+                case Reg: return *r8[opr.value];
+                case Imm: return opr.value;
+            }
+            int ad = addr(opr);
+            return ad < 0 ? 0 : read8(ad);
+        }
 
-        void debug(uint16_t ip, const OpCode &op);
-        int addr(const Operand &opr);
-        void run1(uint8_t prefix = 0);
+        inline uint16_t get16(const Operand &opr) {
+            switch (opr.type) {
+                case Reg: return r[opr.value];
+                case Imm: return opr.value;
+            }
+            int ad = addr(opr);
+            return ad < 0 ? 0 : read16(ad);
+        }
+
+        inline void set8(const Operand &opr, uint8_t value) {
+            if (opr.type == Reg) {
+                *r8[opr.value] = value;
+            } else {
+                int ad = addr(opr);
+                if (ad >= 0) write8(ad, value);
+            }
+        }
+
+        inline void set16(const Operand &opr, uint16_t value) {
+            if (opr.type == Reg) {
+                r[opr.value] = value;
+            } else {
+                int ad = addr(opr);
+                if (ad >= 0) write16(ad, value);
+            }
+        }
     };
 }
