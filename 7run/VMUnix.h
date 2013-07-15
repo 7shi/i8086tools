@@ -1,6 +1,7 @@
 #pragma once
 #include "utils.h"
 #include "File.h"
+#include "VMBase.h"
 #include <stdio.h>
 #include <vector>
 #include <list>
@@ -8,22 +9,16 @@
 #define NO_FORK
 #endif
 
-extern int trace;
-extern int exitcode;
-
-class VMUnix {
-protected:
+class VMUnix : public VMBase {
+public:
     static VMUnix *current;
-    uint8_t *text, *data;
-    size_t tsize, dsize;
-    uint16_t umask, brksize;
-    bool hasExited;
     int pid;
+    uint16_t umask, brksize;
     std::vector<FileBase *> files;
 
 private:
     void init();
-
+    
 public:
     VMUnix();
     VMUnix(const VMUnix &vm);
@@ -33,50 +28,17 @@ public:
             const std::vector<std::string> &args,
             const std::vector<std::string> &envs);
     void run();
-    virtual void disasm() = 0;
+    void swtch(VMUnix *to);
 
-protected:
     virtual bool load2(const std::string &fn, FILE *f) = 0;
-    virtual void showHeader() = 0;
     virtual void setArgs(
             const std::vector<std::string> &args,
             const std::vector<std::string> &envs) = 0;
-    virtual void run2() = 0;
     virtual void setstat(uint16_t addr, struct stat *st) = 0;
     virtual bool syscall(int n) = 0;
     virtual int convsig(int sig) = 0;
     virtual void setsig(int sig, int h) = 0;
     virtual void swtch(bool reset = false) = 0;
-    
-    void swtch(VMUnix *to);
-
-    inline uint8_t read8(uint16_t addr) {
-        return data[addr];
-    }
-
-    inline uint16_t read16(uint16_t addr) {
-        return ::read16(data + addr);
-    }
-
-    inline uint32_t read32(uint16_t addr) {
-        return ::read32(data + addr);
-    }
-
-    inline void write8(uint16_t addr, uint8_t value) {
-        data[addr] = value;
-    }
-
-    inline void write16(uint16_t addr, uint16_t value) {
-        ::write16(data + addr, value);
-    }
-
-    inline void write32(uint16_t addr, uint32_t value) {
-        ::write32(data + addr, value);
-    }
-
-    inline const char *str(uint16_t addr) {
-        return (const char *) (data + addr);
-    }
 
     int getfd();
     int open(const std::string &path, int flag, int mode);

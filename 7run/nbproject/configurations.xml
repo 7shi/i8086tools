@@ -40,6 +40,8 @@
       </df>
       <in>File.cpp</in>
       <in>File.h</in>
+      <in>VMBase.cpp</in>
+      <in>VMBase.h</in>
       <in>VMUnix.cpp</in>
       <in>VMUnix.h</in>
       <in>VMUnix.sys.cpp</in>
@@ -139,6 +141,15 @@
       <item path="UnixV6/VM.signal.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="UnixV6/VM.sys.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="VMBase.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem></pElem>
+          </incDir>
+        </ccTool>
+      </item>
+      <item path="VMBase.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="VMUnix.cpp" ex="false" tool="1" flavor2="0">
         <ccTool>

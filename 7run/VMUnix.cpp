@@ -7,13 +7,9 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-int trace;
-int exitcode;
 VMUnix *VMUnix::current;
 
 void VMUnix::init() {
-    text = new uint8_t[0x10000];
-    hasExited = false;
 #ifdef NO_FORK
     static int pid_max;
     pid = ((getpid() << 4) % 30000) + (++pid_max);
@@ -22,26 +18,17 @@ void VMUnix::init() {
 #endif
 }
 
-VMUnix::VMUnix() : data(NULL), tsize(0), umask(0) {
+VMUnix::VMUnix() : umask(0), brksize(0) {
     init();
-    memset(text, 0, 0x10000);
     files.push_back(new File(0, "stdin"));
     files.push_back(new File(1, "stdout"));
     files.push_back(new File(2, "stderr"));
 }
 
-VMUnix::VMUnix(const VMUnix &vm) {
+VMUnix::VMUnix(const VMUnix &vm) : VMBase(vm) {
     init();
-    memcpy(text, vm.text, 0x10000);
-    if (vm.data == vm.text) {
-        data = text;
-    } else {
-        data = new uint8_t[0x10000];
-        memcpy(data, vm.data, 0x10000);
-    }
-    tsize = vm.tsize;
-    dsize = vm.dsize;
     umask = vm.umask;
+    brksize = vm.brksize;
     files = vm.files;
     for (int i = 0; i < (int) files.size(); i++) {
         FileBase *f = files[i];
@@ -50,8 +37,6 @@ VMUnix::VMUnix(const VMUnix &vm) {
 }
 
 VMUnix::~VMUnix() {
-    if (data != text) delete[] data;
-    delete[] text;
     for (int i = 0; i <= (int) files.size(); i++) {
         close(i);
     }
@@ -116,7 +101,7 @@ int VMUnix::open(const std::string &path, int flag, int mode) {
 int VMUnix::dup(int fd) {
     FileBase *f = file(fd);
     if (!f) return -1;
-    
+
     FileBase *f2 = f->dup();
     int fd2 = getfd();
     files[fd2] = f2;

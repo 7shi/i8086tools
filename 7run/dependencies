@@ -1,61 +1,65 @@
 ./main.o: main.cpp Minix2/VM.h Minix2/../i8086/VM.h \
  Minix2/../i8086/../VMUnix.h Minix2/../i8086/../utils.h \
- Minix2/../i8086/../File.h Minix2/../i8086/OpCode.h \
- Minix2/../i8086/Operand.h UnixV6/VM.h UnixV6/../PDP11/VM.h \
- UnixV6/../PDP11/OpCode.h UnixV6/../PDP11/Operand.h \
+ Minix2/../i8086/../File.h Minix2/../i8086/../VMBase.h \
+ Minix2/../i8086/OpCode.h Minix2/../i8086/Operand.h UnixV6/VM.h \
+ UnixV6/../PDP11/VM.h UnixV6/../PDP11/OpCode.h UnixV6/../PDP11/Operand.h \
  UnixV6/../PDP11/disasm.h
 ./utils.o: utils.cpp utils.h
 ./File.o: File.cpp File.h
-./VMUnix.o: VMUnix.cpp VMUnix.h utils.h File.h
-./VMUnix.sys.o: VMUnix.sys.cpp VMUnix.h utils.h File.h
+./VMBase.o: VMBase.cpp VMBase.h utils.h File.h
+./VMUnix.o: VMUnix.cpp VMUnix.h utils.h File.h VMBase.h
+./VMUnix.sys.o: VMUnix.sys.cpp VMUnix.h utils.h File.h VMBase.h
 i8086/OpCode.o: i8086/OpCode.cpp i8086/OpCode.h i8086/Operand.h \
  i8086/../utils.h
 i8086/Operand.o: i8086/Operand.cpp i8086/Operand.h i8086/../utils.h \
  i8086/disasm.h i8086/OpCode.h
 i8086/VM.o: i8086/VM.cpp i8086/VM.h i8086/../VMUnix.h i8086/../utils.h \
- i8086/../File.h i8086/OpCode.h i8086/Operand.h i8086/disasm.h \
- i8086/regs.h
-i8086/VM.inst.o: i8086/VM.inst.cpp i8086/VM.h i8086/../VMUnix.h \
- i8086/../utils.h i8086/../File.h i8086/OpCode.h i8086/Operand.h \
+ i8086/../File.h i8086/../VMBase.h i8086/OpCode.h i8086/Operand.h \
  i8086/disasm.h i8086/regs.h
+i8086/VM.inst.o: i8086/VM.inst.cpp i8086/VM.h i8086/../VMUnix.h \
+ i8086/../utils.h i8086/../File.h i8086/../VMBase.h i8086/OpCode.h \
+ i8086/Operand.h i8086/disasm.h i8086/regs.h
 i8086/disasm.o: i8086/disasm.cpp i8086/disasm.h i8086/OpCode.h i8086/Operand.h \
  i8086/../utils.h
 Minix2/VM.o: Minix2/VM.cpp Minix2/VM.h Minix2/../i8086/VM.h \
  Minix2/../i8086/../VMUnix.h Minix2/../i8086/../utils.h \
- Minix2/../i8086/../File.h Minix2/../i8086/OpCode.h \
- Minix2/../i8086/Operand.h Minix2/../i8086/regs.h
+ Minix2/../i8086/../File.h Minix2/../i8086/../VMBase.h \
+ Minix2/../i8086/OpCode.h Minix2/../i8086/Operand.h \
+ Minix2/../i8086/regs.h
 Minix2/VM.sys.o: Minix2/VM.sys.cpp Minix2/VM.h Minix2/../i8086/VM.h \
  Minix2/../i8086/../VMUnix.h Minix2/../i8086/../utils.h \
- Minix2/../i8086/../File.h Minix2/../i8086/OpCode.h \
- Minix2/../i8086/Operand.h Minix2/../i8086/regs.h
+ Minix2/../i8086/../File.h Minix2/../i8086/../VMBase.h \
+ Minix2/../i8086/OpCode.h Minix2/../i8086/Operand.h \
+ Minix2/../i8086/regs.h
 Minix2/VM.signal.o: Minix2/VM.signal.cpp Minix2/VM.h Minix2/../i8086/VM.h \
  Minix2/../i8086/../VMUnix.h Minix2/../i8086/../utils.h \
- Minix2/../i8086/../File.h Minix2/../i8086/OpCode.h \
- Minix2/../i8086/Operand.h Minix2/../i8086/regs.h
+ Minix2/../i8086/../File.h Minix2/../i8086/../VMBase.h \
+ Minix2/../i8086/OpCode.h Minix2/../i8086/Operand.h \
+ Minix2/../i8086/regs.h
 PDP11/OpCode.o: PDP11/OpCode.cpp PDP11/OpCode.h PDP11/Operand.h \
  PDP11/../utils.h
 PDP11/Operand.o: PDP11/Operand.cpp PDP11/Operand.h PDP11/../utils.h \
  PDP11/disasm.h PDP11/OpCode.h
 PDP11/VM.o: PDP11/VM.cpp PDP11/VM.h PDP11/../VMUnix.h PDP11/../utils.h \
- PDP11/../File.h PDP11/OpCode.h PDP11/Operand.h PDP11/disasm.h \
- PDP11/regs.h
-PDP11/VM.inst.o: PDP11/VM.inst.cpp PDP11/VM.h PDP11/../VMUnix.h \
- PDP11/../utils.h PDP11/../File.h PDP11/OpCode.h PDP11/Operand.h \
+ PDP11/../File.h PDP11/../VMBase.h PDP11/OpCode.h PDP11/Operand.h \
  PDP11/disasm.h PDP11/regs.h
+PDP11/VM.inst.o: PDP11/VM.inst.cpp PDP11/VM.h PDP11/../VMUnix.h \
+ PDP11/../utils.h PDP11/../File.h PDP11/../VMBase.h PDP11/OpCode.h \
+ PDP11/Operand.h PDP11/disasm.h PDP11/regs.h
 PDP11/disasm.o: PDP11/disasm.cpp PDP11/disasm.h PDP11/OpCode.h PDP11/Operand.h \
  PDP11/../utils.h
 UnixV6/VM.o: UnixV6/VM.cpp UnixV6/VM.h UnixV6/../PDP11/VM.h \
  UnixV6/../PDP11/../VMUnix.h UnixV6/../PDP11/../utils.h \
- UnixV6/../PDP11/../File.h UnixV6/../PDP11/OpCode.h \
- UnixV6/../PDP11/Operand.h UnixV6/../PDP11/disasm.h \
- UnixV6/../PDP11/regs.h
+ UnixV6/../PDP11/../File.h UnixV6/../PDP11/../VMBase.h \
+ UnixV6/../PDP11/OpCode.h UnixV6/../PDP11/Operand.h \
+ UnixV6/../PDP11/disasm.h UnixV6/../PDP11/regs.h
 UnixV6/VM.sys.o: UnixV6/VM.sys.cpp UnixV6/VM.h UnixV6/../PDP11/VM.h \
  UnixV6/../PDP11/../VMUnix.h UnixV6/../PDP11/../utils.h \
- UnixV6/../PDP11/../File.h UnixV6/../PDP11/OpCode.h \
- UnixV6/../PDP11/Operand.h UnixV6/../PDP11/disasm.h \
- UnixV6/../PDP11/regs.h
+ UnixV6/../PDP11/../File.h UnixV6/../PDP11/../VMBase.h \
+ UnixV6/../PDP11/OpCode.h UnixV6/../PDP11/Operand.h \
+ UnixV6/../PDP11/disasm.h UnixV6/../PDP11/regs.h
 UnixV6/VM.signal.o: UnixV6/VM.signal.cpp UnixV6/VM.h UnixV6/../PDP11/VM.h \
  UnixV6/../PDP11/../VMUnix.h UnixV6/../PDP11/../utils.h \
- UnixV6/../PDP11/../File.h UnixV6/../PDP11/OpCode.h \
- UnixV6/../PDP11/Operand.h UnixV6/../PDP11/disasm.h \
- UnixV6/../PDP11/regs.h
+ UnixV6/../PDP11/../File.h UnixV6/../PDP11/../VMBase.h \
+ UnixV6/../PDP11/OpCode.h UnixV6/../PDP11/Operand.h \
+ UnixV6/../PDP11/disasm.h UnixV6/../PDP11/regs.h
