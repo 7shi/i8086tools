@@ -49,7 +49,7 @@ VM::VM() : start_sp(0), runmax(0) {
     Z = N = C = V = false;
 }
 
-VM::VM(const VM &vm) : VMUnix(vm) {
+VM::VM(const VM &vm) : VMBase(vm) {
     memcpy(r, vm.r, sizeof (r));
     Z = vm.Z;
     N = vm.N;
@@ -93,19 +93,6 @@ int VM::addr(const Operand &opr, bool nomove) {
         case 7: return uint16_t(read16(r[opr.reg] + opr.value));
     }
     return -1;
-}
-
-bool VM::load2(const std::string &fn, FILE *f) {
-    if (tsize > 0xffff) {
-        fprintf(stderr, "too long raw binary: %s\n", fn.c_str());
-        return false;
-    }
-    PC = 0;
-    cache.clear();
-    data = text;
-    fread(text, 1, tsize, f);
-    runmax = brksize = tsize;
-    return true;
 }
 
 void VM::run2() {

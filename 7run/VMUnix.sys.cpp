@@ -57,7 +57,7 @@ void VMUnix::sys_exit(int code) {
 #ifdef NO_FORK
     exitcodes.push(std::pair<int, int>(pid, code));
 #endif
-    hasExited = true;
+    vmbase->hasExited = true;
 }
 
 int VMUnix::sys_read(int fd, int buf, int len) {
@@ -65,7 +65,7 @@ int VMUnix::sys_read(int fd, int buf, int len) {
     int max = 0x10000 - buf;
     if (len > max) len = max;
     FileBase *f = file(fd);
-    int result = f ? f->read(data + buf, len) : -1;
+    int result = f ? f->read(vmbase->data + buf, len) : -1;
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
 }
@@ -81,7 +81,7 @@ int VMUnix::sys_write(int fd, int buf, int len) {
             fflush(stdout);
             fflush(stderr);
         }
-        result = f->write(data + buf, len);
+        result = f->write(vmbase->data + buf, len);
     }
     if (trace) fprintf(stderr, " => %d>\n", result);
     return result;
@@ -202,12 +202,12 @@ int VMUnix::sys_chmod(const char *path, mode_t mode) {
 
 int VMUnix::sys_brk(int nd, int sp) {
     if (trace) fprintf(stderr, "<brk(0x%04x)", nd);
-    if (nd < (int) dsize || nd >= ((sp - 0x400) & ~0x3ff)) {
+    if (nd < (int) vmbase->dsize || nd >= ((sp - 0x400) & ~0x3ff)) {
         errno = ENOMEM;
         if (trace) fprintf(stderr, " => ENOMEM>\n");
         return -1;
     }
-    brksize = nd;
+    vmbase->brksize = nd;
     if (trace) fprintf(stderr, " => 0>\n");
     return 0;
 }

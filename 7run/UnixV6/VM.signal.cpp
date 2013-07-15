@@ -17,19 +17,19 @@ void VM::sighandler(int sig) {
 
 void VM::sighandler2(int sig) {
     uint16_t r[8];
-    memcpy(r, this->r, sizeof (r));
-    bool Z = this->Z, N = this->N, C = this->C, V = this->V;
-    write16((this->SP -= 2), PC);
-    this->PC = sighandlers[sig];
-    while (!hasExited && !(this->PC == PC && this->SP == SP)) {
-        run1();
+    memcpy(r, cpu.r, sizeof (r));
+    bool Z = cpu.Z, N = cpu.N, C = cpu.C, V = cpu.V;
+    cpu.write16((cpu.SP -= 2), cpu.PC);
+    cpu.PC = sighandlers[sig];
+    while (!cpu.hasExited && !(cpu.PC == PC && cpu.SP == SP)) {
+        cpu.run1();
     }
-    if (!hasExited) {
-        memcpy(this->r, r, sizeof (r));
-        this->Z = Z;
-        this->N = N;
-        this->C = C;
-        this->V = V;
+    if (!cpu.hasExited) {
+        memcpy(cpu.r, r, sizeof (r));
+        cpu.Z = Z;
+        cpu.N = N;
+        cpu.C = C;
+        cpu.V = V;
     }
 }
 

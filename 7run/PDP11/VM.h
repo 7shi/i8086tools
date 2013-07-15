@@ -1,27 +1,23 @@
 #pragma once
-#include "../VMUnix.h"
+#include "../VMBase.h"
 #include "OpCode.h"
 #include "disasm.h"
 
 namespace PDP11 {
     extern const char *header;
 
-    class VM : public VMUnix {
-    protected:
+    struct VM : public VMBase {
         uint16_t r[8];
         bool Z, N, C, V;
         uint16_t start_sp, runmax;
         std::vector<OpCode> cache;
         std::map<int, Symbol> syms[2];
 
-    public:
         VM();
         VM(const VM &vm);
         virtual ~VM();
         virtual void disasm();
 
-    protected:
-        virtual bool load2(const std::string &fn, FILE *f);
         virtual void showHeader();
         virtual void run2();
 

@@ -1,20 +1,26 @@
 #pragma once
+#include "../VMUnix.h"
 #include "../i8086/VM.h"
 
 namespace Minix2 {
 
-    class VM : public i8086::VM {
+    class VM : public VMUnix {
+    private:
+        i8086::VM cpu;
+
     public:
         VM();
         VM(const VM &vm);
         virtual ~VM();
 
+        virtual void disasm();
+        virtual bool syscall(int n);
+
     protected:
         virtual void setArgs(
                 const std::vector<std::string> &args,
                 const std::vector<std::string> &envs);
-        virtual bool load2(const std::string &fn, FILE *f);
-        virtual bool syscall(int n);
+        virtual bool load2(const std::string &fn, FILE *f, size_t size);
         virtual void setsig(int sig, int h);
         virtual void setstat(uint16_t addr, struct stat *st);
         virtual void swtch(bool reset = false);

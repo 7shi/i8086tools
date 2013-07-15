@@ -74,7 +74,7 @@ VM::VM() : ip(0), start_sp(0) {
     OF = DF = SF = ZF = PF = CF = false;
 }
 
-VM::VM(const VM &vm) : VMUnix(vm) {
+VM::VM(const VM &vm) : VMBase(vm) {
     init();
     memcpy(r, vm.r, sizeof (r));
     ip = vm.ip;
@@ -108,19 +108,6 @@ int VM::addr(const Operand &opr) {
 
 void VM::run2() {
     while (!hasExited) run1();
-}
-
-bool VM::load2(const std::string &fn, FILE *f) {
-    if (tsize > 0xffff) {
-        fprintf(stderr, "too long raw binary: %s\n", fn.c_str());
-        return false;
-    }
-    ip = 0;
-    cache.clear();
-    data = text;
-    fread(text, 1, tsize, f);
-    brksize = tsize;
-    return true;
 }
 
 void VM::disasm() {

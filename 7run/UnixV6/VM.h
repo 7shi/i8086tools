@@ -1,22 +1,28 @@
 #pragma once
+#include "../VMUnix.h"
 #include "../PDP11/VM.h"
 
 namespace UnixV6 {
     bool check(uint8_t h[2]);
 
-    class VM : public PDP11::VM {
+    class VM : public VMUnix {
+    private:
+        PDP11::VM cpu;
+
     public:
         VM();
         VM(const VM &vm);
         virtual ~VM();
 
+        virtual void disasm();
+        virtual bool syscall(int n);
+
     protected:
         virtual void setArgs(
                 const std::vector<std::string> &args,
                 const std::vector<std::string> &envs);
-        virtual bool load2(const std::string &fn, FILE *f);
+        virtual bool load2(const std::string &fn, FILE *f, size_t size);
         virtual void setstat(uint16_t addr, struct stat *st);
-        virtual bool syscall(int n);
         virtual int convsig(int sig);
         virtual void setsig(int sig, int h);
         virtual void swtch(bool reset = false);

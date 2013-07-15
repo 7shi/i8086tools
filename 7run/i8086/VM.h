@@ -1,30 +1,25 @@
 #pragma once
-#include "../VMUnix.h"
+#include "../VMBase.h"
 #include "OpCode.h"
 
 namespace i8086 {
     extern const char *header;
 
-    class VM : public VMUnix {
-    protected:
+    struct VM : public VMBase {
         uint16_t ip, r[8];
-        uint8_t *r8[8];
+        uint8_t * r8[8];
         bool OF, DF, SF, ZF, PF, CF;
         uint16_t start_sp;
         std::vector<OpCode> cache;
 
-    private:
         static bool ptable[256];
         void init();
 
-    public:
         VM();
         VM(const VM &vm);
         virtual ~VM();
         virtual void disasm();
 
-    protected:
-        virtual bool load2(const std::string &fn, FILE *f);
         virtual void showHeader();
         virtual void run2();
 

@@ -10,12 +10,20 @@ bool UnixV6::check(uint8_t h[2]) {
 }
 
 VM::VM() {
+    vmbase = &cpu;
+    cpu.unix = this;
 }
 
-VM::VM(const VM &vm) : PDP11::VM(vm) {
+VM::VM(const VM &vm) : VMUnix(vm), cpu(vm.cpu) {
+    vmbase = &cpu;
+    cpu.unix = this;
 }
 
 VM::~VM() {
+}
+
+void VM::disasm() {
+    cpu.disasm();
 }
 
 void VM::setArgs(
@@ -25,60 +33,67 @@ void VM::setArgs(
     for (int i = 0; i < (int) args.size(); i++) {
         slen += args[i].size() + 1;
     }
-    SP -= (slen + 1) & ~1;
-    uint16_t ad1 = SP;
-    SP -= (1 + args.size()) * 2;
-    uint16_t ad2 = start_sp = SP;
-    write16(SP, args.size()); // argc
+    cpu.SP -= (slen + 1) & ~1;
+    uint16_t ad1 = cpu.SP;
+    cpu.SP -= (1 + args.size()) * 2;
+    uint16_t ad2 = cpu.start_sp = cpu.SP;
+    cpu.write16(cpu.SP, args.size()); // argc
     for (int i = 0; i < (int) args.size(); i++) {
-        write16(ad2 += 2, ad1);
-        strcpy((char *) data + ad1, args[i].c_str());
+        cpu.write16(ad2 += 2, ad1);
+        strcpy((char *) cpu.data + ad1, args[i].c_str());
         ad1 += args[i].size() + 1;
     }
 }
 
-bool VM::load2(const std::string &fn, FILE *f) {
-    if (tsize < 0x10) return PDP11::VM::load2(fn, f);
-
+bool VM::load2(const std::string &fn, FILE *f, size_t size) {
     uint8_t h[0x10];
-    fread(h, sizeof (h), 1, f);
-    if (!check(h)) {
+    if (!fread(h, sizeof (h), 1, f) || !check(h)) {
+        if (size > 0xffff) {
+            fprintf(stderr, "too long raw binary: %s\n", fn.c_str());
+            return false;
+        }
         fseek(f, 0, SEEK_SET);
-        return PDP11::VM::load2(fn, f);
+        fread(cpu.text, 1, size, f);
+        cpu.PC = 0;
+        cpu.cache.clear();
+        cpu.data = cpu.text;
+        cpu.tsize = cpu.runmax = cpu.brksize = cpu.tsize;
+        cpu.dsize = 0;
+        return true;
     }
 
-    tsize = ::read16(h + 2);
-    dsize = ::read16(h + 4);
+    cpu.tsize = ::read16(h + 2);
+    cpu.dsize = ::read16(h + 4);
     uint16_t bss = ::read16(h + 6);
-    PC = ::read16(h + 10);
-    cache.clear();
-    cache.resize(0x10000);
+    cpu.PC = ::read16(h + 10);
+    cpu.cache.clear();
+    cpu.cache.resize(0x10000);
     if (h[0] == 9) { // 0411
-        data = new uint8_t[0x10000];
-        memset(data, 0, 0x10000);
-        fread(text, 1, tsize, f);
-        fread(data, 1, dsize, f);
-        runmax = tsize;
-        brksize = dsize + bss;
+        cpu.data = new uint8_t[0x10000];
+        memset(cpu.data, 0, 0x10000);
+        fread(cpu.text, 1, cpu.tsize, f);
+        fread(cpu.data, 1, cpu.dsize, f);
+        cpu.runmax = cpu.tsize;
+        cpu.brksize = cpu.dsize + bss;
     } else if (h[0] == 8) { // 0410
-        data = text;
-        fread(text, 1, tsize, f);
-        uint16_t doff = (tsize + 0x1fff) & ~0x1fff;
-        fread(text + doff, 1, dsize, f);
-        runmax = tsize;
-        brksize = doff + dsize + bss;
+        cpu.data = cpu.text;
+        fread(cpu.text, 1, cpu.tsize, f);
+        uint16_t doff = (cpu.tsize + 0x1fff) & ~0x1fff;
+        fread(cpu.text + doff, 1, cpu.dsize, f);
+        cpu.runmax = cpu.tsize;
+        cpu.brksize = doff + cpu.dsize + bss;
     } else { // 0407
-        data = text;
-        runmax = tsize + dsize; // for as
-        fread(text, 1, runmax, f);
-        brksize = runmax + bss;
+        cpu.data = cpu.text;
+        cpu.runmax = cpu.tsize + cpu.dsize; // for as
+        fread(cpu.text, 1, cpu.runmax, f);
+        cpu.brksize = cpu.runmax + bss;
     }
 
     uint16_t ssize = ::read16(h + 8);
     if (!ssize) return true;
 
     if (!::read16(h + 14)) {
-        fseek(f, tsize + dsize, SEEK_CUR);
+        fseek(f, cpu.tsize + cpu.dsize, SEEK_CUR);
     }
     uint8_t buf[12];
     for (int i = 0; i < ssize; i += 12) {
@@ -96,11 +111,11 @@ bool VM::load2(const std::string &fn, FILE *f) {
             case 't':
             case 'T':
                 if (!startsWith(sym.name, "~")) {
-                    syms[1][sym.addr] = sym;
+                    cpu.syms[1][sym.addr] = sym;
                 }
                 break;
             case 0x1f:
-                syms[0][sym.addr] = sym;
+                cpu.syms[0][sym.addr] = sym;
                 break;
         }
     }
@@ -108,17 +123,17 @@ bool VM::load2(const std::string &fn, FILE *f) {
 }
 
 void VM::setstat(uint16_t addr, struct stat * st) {
-    memset(data + addr, 0, 36);
-    write16(addr, st->st_dev);
-    write16(addr + 2, st->st_ino);
-    write16(addr + 4, st->st_mode);
-    write8(addr + 6, st->st_nlink);
-    write8(addr + 7, st->st_uid);
-    write8(addr + 8, st->st_gid);
-    write8(addr + 9, st->st_size >> 16);
-    write16(addr + 10, st->st_size);
-    write16(addr + 28, st->st_atime >> 16);
-    write16(addr + 30, st->st_atime);
-    write16(addr + 32, st->st_mtime >> 16);
-    write16(addr + 34, st->st_mtime);
+    memset(cpu.data + addr, 0, 36);
+    cpu.write16(addr, st->st_dev);
+    cpu.write16(addr + 2, st->st_ino);
+    cpu.write16(addr + 4, st->st_mode);
+    cpu.write8(addr + 6, st->st_nlink);
+    cpu.write8(addr + 7, st->st_uid);
+    cpu.write8(addr + 8, st->st_gid);
+    cpu.write8(addr + 9, st->st_size >> 16);
+    cpu.write16(addr + 10, st->st_size);
+    cpu.write16(addr + 28, st->st_atime >> 16);
+    cpu.write16(addr + 30, st->st_atime);
+    cpu.write16(addr + 32, st->st_mtime >> 16);
+    cpu.write16(addr + 34, st->st_mtime);
 }

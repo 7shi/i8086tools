@@ -21,23 +21,23 @@ void VM::sighandler(int sig) {
 }
 
 void VM::sighandler2(int sig) {
-    uint16_t ip = this->ip, r[8];
-    memcpy(r, this->r, sizeof (r));
-    bool OF = this->OF, DF = this->DF, SF = this->SF;
-    bool ZF = this->ZF, PF = this->PF, CF = this->CF;
-    write16((this->SP -= 2), ip);
-    this->ip = sigacts[sig].handler;
-    while (!hasExited && !(this->ip == ip && this->SP == SP)) {
-        run1();
+    uint16_t ip = cpu.ip, r[8];
+    memcpy(r, cpu.r, sizeof (r));
+    bool OF = cpu.OF, DF = cpu.DF, SF = cpu.SF;
+    bool ZF = cpu.ZF, PF = cpu.PF, CF = cpu.CF;
+    cpu.write16((cpu.SP -= 2), ip);
+    cpu.ip = sigacts[sig].handler;
+    while (!cpu.hasExited && !(cpu.ip == ip && cpu.SP == SP)) {
+        cpu.run1();
     }
-    if (!hasExited) {
-        memcpy(this->r, r, sizeof (r));
-        this->OF = OF;
-        this->DF = DF;
-        this->SF = SF;
-        this->ZF = ZF;
-        this->PF = PF;
-        this->CF = CF;
+    if (!cpu.hasExited) {
+        memcpy(cpu.r, r, sizeof (r));
+        cpu.OF = OF;
+        cpu.DF = DF;
+        cpu.SF = SF;
+        cpu.ZF = ZF;
+        cpu.PF = PF;
+        cpu.CF = CF;
     }
 }
 
@@ -52,8 +52,8 @@ int VM::convsig(int sig) {
 }
 
 int VM::minix_signal() { // 48
-    int sig = read16(BX + 4);
-    int sgh = read16(BX + 14);
+    int sig = cpu.read16(cpu.BX + 4);
+    int sgh = cpu.read16(cpu.BX + 14);
     if (trace) fprintf(stderr, "<signal(%d, 0x%04x)>\n", sig, sgh);
     int s = convsig(sig);
     if (s < 0) {
@@ -68,19 +68,19 @@ int VM::minix_signal() { // 48
 }
 
 int VM::minix_sigaction() { // 71
-    int sig = read16(BX + 6);
-    int act = read16(BX + 10);
-    int oact = read16(BX + 12);
+    int sig = cpu.read16(cpu.BX + 6);
+    int act = cpu.read16(cpu.BX + 10);
+    int oact = cpu.read16(cpu.BX + 12);
     if (trace) fprintf(stderr, "<sigaction(%d, 0x%04x, 0x%04x)>\n", sig, act, oact);
     int s = convsig(sig);
     if (s < 0) {
         errno = EINVAL;
         return -1;
     }
-    write16(oact, sigacts[sig].handler);
-    write16(oact + 2, sigacts[sig].mask);
-    write16(oact + 4, sigacts[sig].flags);
-    sigact sa = {read16(act), read16(act + 2), read16(act + 4)};
+    cpu.write16(oact, sigacts[sig].handler);
+    cpu.write16(oact + 2, sigacts[sig].mask);
+    cpu.write16(oact + 4, sigacts[sig].flags);
+    sigact sa = {cpu.read16(act), cpu.read16(act + 2), cpu.read16(act + 4)};
     sigacts[sig] = sa;
     setsig(s, sa.handler);
     return 0;

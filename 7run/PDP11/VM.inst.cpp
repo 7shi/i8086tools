@@ -1,4 +1,5 @@
 #include "VM.h"
+#include "../VMUnix.h"
 #include "regs.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -404,7 +405,7 @@ void VM::run1() {
                 case 045:
                 case 046:
                 case 047:
-                    syscall(w & 255);
+                    unix->syscall(w & 255);
                     return;
                 case 050: // clrb: CLeaR Byte
                     set8(op->opr1, 0);

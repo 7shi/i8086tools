@@ -1,4 +1,5 @@
 #include "VMBase.h"
+#include "VMUnix.h"
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -10,7 +11,7 @@
 int trace;
 int exitcode;
 
-VMBase::VMBase() : data(NULL), tsize(0), hasExited(false) {
+VMBase::VMBase() : data(NULL), tsize(0), brksize(0), hasExited(false) {
     text = new uint8_t[0x10000];
     memset(text, 0, 0x10000);
 }
@@ -26,6 +27,7 @@ VMBase::VMBase(const VMBase &vm) : hasExited(false) {
     }
     tsize = vm.tsize;
     dsize = vm.dsize;
+    brksize = vm.brksize;
 }
 
 VMBase::~VMBase() {

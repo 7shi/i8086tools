@@ -9,26 +9,25 @@
 
 VMUnix *VMUnix::current;
 
-void VMUnix::init() {
+static int createpid() {
 #ifdef NO_FORK
     static int pid_max;
-    pid = ((getpid() << 4) % 30000) + (++pid_max);
+    return ((getpid() << 4) % 30000) + (++pid_max);
 #else
-    pid = (getpid() % 30000) + 1;
+    return (getpid() % 30000) + 1;
 #endif
 }
 
-VMUnix::VMUnix() : umask(0), brksize(0) {
-    init();
+VMUnix::VMUnix() : umask(0) {
+    pid = createpid();
     files.push_back(new File(0, "stdin"));
     files.push_back(new File(1, "stdout"));
     files.push_back(new File(2, "stderr"));
 }
 
-VMUnix::VMUnix(const VMUnix &vm) : VMBase(vm) {
-    init();
+VMUnix::VMUnix(const VMUnix &vm) {
+    pid = createpid();
     umask = vm.umask;
-    brksize = vm.brksize;
     files = vm.files;
     for (int i = 0; i < (int) files.size(); i++) {
         FileBase *f = files[i];
@@ -52,9 +51,7 @@ bool VMUnix::load(const std::string &fn) {
     }
     struct stat st;
     fstat(fileno(f), &st);
-    tsize = st.st_size;
-    dsize = 0;
-    bool ret = load2(fn, f);
+    bool ret = load2(fn, f, st.st_size);
     fclose(f);
     return ret;
 }
@@ -62,7 +59,7 @@ bool VMUnix::load(const std::string &fn) {
 void VMUnix::run(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
-    if (trace >= 2) showHeader();
+    if (trace >= 2) vmbase->showHeader();
     setArgs(args, envs);
     run();
 }
@@ -70,8 +67,8 @@ void VMUnix::run(
 void VMUnix::run() {
     VMUnix *from = current;
     swtch(this);
-    hasExited = false;
-    run2();
+    vmbase->hasExited = false;
+    vmbase->run2();
     swtch(from);
 }
 
