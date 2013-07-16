@@ -1,20 +1,20 @@
 #pragma once
 #include "OS.h"
-#include "../PDP11/VM.h"
+#include "../i8086/VM.h"
 
 namespace UnixV6 {
 
-    class OSPDP11 : public OS {
+    class OSi8086 : public OS {
     public:
         static bool check(uint8_t h[2]);
 
     private:
-        PDP11::VM cpu;
+        i8086::VM cpu;
 
     public:
-        OSPDP11();
-        OSPDP11(const OSPDP11 &os);
-        virtual ~OSPDP11();
+        OSi8086();
+        OSi8086(const OSi8086 &os);
+        virtual ~OSi8086();
 
         virtual bool syscall(int n);
 

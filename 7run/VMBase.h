@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <vector>
 #include <list>
+#include <map>
 #ifdef WIN32
 #define NO_FORK
 #endif
@@ -13,11 +14,17 @@ extern int exitcode;
 
 class UnixBase;
 
+struct Symbol {
+    std::string name;
+    int type, addr;
+};
+
 struct VMBase {
     uint8_t *text, *data;
     size_t tsize, dsize;
     uint16_t brksize;
     bool hasExited;
+    std::map<int, Symbol> syms[2];
     UnixBase *unix;
 
     VMBase();
@@ -30,7 +37,7 @@ struct VMBase {
     virtual void disasm() = 0;
     virtual void showHeader() = 0;
     virtual void run2() = 0;
-    
+
     inline uint8_t read8(uint16_t addr) {
         return data[addr];
     }

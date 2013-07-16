@@ -1,5 +1,6 @@
 #include "Minix2/OS.h"
 #include "UnixV6/OSPDP11.h"
+#include "UnixV6/OSi8086.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -50,8 +51,10 @@ int main(int argc, char *argv[]) {
     }
 
     UnixBase *vm;
-    if (pdp11 || UnixV6::check(buf)) {
+    if (pdp11 || UnixV6::OSPDP11::check(buf)) {
         vm = new UnixV6::OSPDP11();
+    } else if (UnixV6::OSi8086::check(buf)) {
+        vm = new UnixV6::OSi8086();
     } else {
         vm = new Minix2::OS();
     }

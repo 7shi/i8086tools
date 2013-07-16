@@ -2,7 +2,6 @@
 #include "../UnixBase.h"
 
 namespace UnixV6 {
-    bool check(uint8_t h[2]);
 
     class OS : public UnixBase {
     public:
@@ -18,6 +17,7 @@ namespace UnixV6 {
         virtual void setsig(int sig, int h);
         virtual void swtch(bool reset = false);
 
+        void readsym(FILE *f, int ssize);
         int syscall(int *result, int n, int arg0, uint8_t *args);
 
     public:

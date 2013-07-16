@@ -36,6 +36,7 @@
         <in>OS.cpp</in>
         <in>OS.h</in>
         <in>OSPDP11.cpp</in>
+        <in>OSi8086.cpp</in>
       </df>
       <in>File.cpp</in>
       <in>File.h</in>
@@ -154,6 +155,8 @@
       <item path="UnixV6/OS.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="UnixV6/OSPDP11.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="UnixV6/OSi8086.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="VMBase.cpp" ex="false" tool="1" flavor2="0">
         <ccTool>

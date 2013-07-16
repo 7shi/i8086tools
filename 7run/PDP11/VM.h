@@ -11,7 +11,6 @@ namespace PDP11 {
         bool Z, N, C, V;
         uint16_t start_sp, runmax;
         std::vector<OpCode> cache;
-        std::map<int, Symbol> syms[2];
 
         VM();
         VM(const VM &vm);

@@ -22,6 +22,35 @@ void OS::disasm() {
     vm->disasm();
 }
 
+void OS::readsym(FILE *f, int ssize) {
+    if (!ssize) return;
+
+    uint8_t buf[12];
+    for (int i = 0; i < ssize; i += 12) {
+        fread(buf, sizeof (buf), 1, f);
+        Symbol sym = {
+            readstr(buf, 8), ::read16(buf + 8), ::read16(buf + 10)
+        };
+        int t = sym.type;
+        if (t < 6) {
+            t = "uatdbc"[t];
+        } else if (0x20 <= t && t < 0x26) {
+            t = "UATDBC"[t - 0x20];
+        }
+        switch (t) {
+            case 't':
+            case 'T':
+                if (!startsWith(sym.name, "~")) {
+                    vm->syms[1][sym.addr] = sym;
+                }
+                break;
+            case 0x1f:
+                vm->syms[0][sym.addr] = sym;
+                break;
+        }
+    }
+}
+
 void OS::setstat(uint16_t addr, struct stat * st) {
     memset(vm->data + addr, 0, 36);
     vm->write16(addr, st->st_dev);
@@ -210,6 +239,19 @@ int OS::v6_seek(int fd, off_t o, int w) { // 19
     return result;
 }
 
+int OS::v6_signal(int sig, int h) {
+    if (trace) fprintf(stderr, "<signal(%d, 0x%04x)>\n", sig, h);
+    int s = convsig(sig);
+    if (s < 0) {
+        errno = EINVAL;
+        return -1;
+    }
+    int oh = sighandlers[sig];
+    sighandlers[sig] = h;
+    setsig(s, h);
+    return oh;
+}
+
 void OS::sighandler(int sig) {
     OS *cur = dynamic_cast<OS *> (current);
     if (cur) cur->sighandler2(sig);
@@ -223,19 +265,6 @@ int OS::convsig(int sig) {
         case V6_SIGSEG: return SIGSEGV;
     }
     return -1;
-}
-
-int OS::v6_signal(int sig, int h) {
-    if (trace) fprintf(stderr, "<signal(%d, 0x%04x)>\n", sig, h);
-    int s = convsig(sig);
-    if (s < 0) {
-        errno = EINVAL;
-        return -1;
-    }
-    int oh = sighandlers[sig];
-    sighandlers[sig] = h;
-    setsig(s, h);
-    return oh;
 }
 
 void OS::setsig(int sig, int h) {

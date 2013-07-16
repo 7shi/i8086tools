@@ -1,28 +1,27 @@
-#include "OSPDP11.h"
-#include "../PDP11/regs.h"
+#include "OSi8086.h"
+#include "../i8086/regs.h"
 #include <string.h>
 
 using namespace UnixV6;
 
-bool OSPDP11::check(uint8_t h[2]) {
-    int magic = ::read16(h);
-    return magic == 0407 || magic == 0410 || magic == 0411;
+bool OSi8086::check(uint8_t h[2]) {
+    return h[0] == 0xeb && (h[1] == 0x0e || h[1] == 0x10 || h[1] == 0x12);
 }
 
-OSPDP11::OSPDP11() {
+OSi8086::OSi8086() {
     vm = &cpu;
     cpu.unix = this;
 }
 
-OSPDP11::OSPDP11(const OSPDP11 &os) : OS(os), cpu(os.cpu) {
+OSi8086::OSi8086(const OSi8086 &os) : OS(os), cpu(os.cpu) {
     vm = &cpu;
     cpu.unix = this;
 }
 
-OSPDP11::~OSPDP11() {
+OSi8086::~OSi8086() {
 }
 
-void OSPDP11::setArgs(
+void OSi8086::setArgs(
         const std::vector<std::string> &args,
         const std::vector<std::string> &) {
     int slen = 0;
@@ -41,7 +40,7 @@ void OSPDP11::setArgs(
     }
 }
 
-bool OSPDP11::load2(const std::string &fn, FILE *f, size_t size) {
+bool OSi8086::load2(const std::string &fn, FILE *f, size_t size) {
     uint8_t h[0x10];
     if (!fread(h, sizeof (h), 1, f) || !check(h)) {
         return vm->load(fn, f, size);
@@ -53,28 +52,26 @@ bool OSPDP11::load2(const std::string &fn, FILE *f, size_t size) {
     vm->tsize = ::read16(h + 2);
     vm->dsize = ::read16(h + 4);
     uint16_t bss = ::read16(h + 6);
-    cpu.PC = ::read16(h + 10);
+    cpu.ip = ::read16(h + 10);
     cpu.cache.clear();
     cpu.cache.resize(0x10000);
-    if (h[0] == 9) { // 0411
+    if (h[1] == 0x12) { // 0411
         vm->data = new uint8_t[0x10000];
         memset(vm->data, 0, 0x10000);
         fread(vm->text, 1, vm->tsize, f);
         fread(vm->data, 1, vm->dsize, f);
-        cpu.runmax = vm->tsize;
         vm->brksize = vm->dsize + bss;
-    } else if (h[0] == 8) { // 0410
+    } else if (h[0] == 0x10) { // 0410
         vm->data = vm->text;
         fread(vm->text, 1, vm->tsize, f);
         uint16_t doff = (vm->tsize + 0x1fff) & ~0x1fff;
         fread(vm->text + doff, 1, vm->dsize, f);
-        cpu.runmax = vm->tsize;
         vm->brksize = doff + vm->dsize + bss;
     } else { // 0407
         vm->data = vm->text;
-        cpu.runmax = vm->tsize + vm->dsize; // for as
-        fread(vm->text, 1, cpu.runmax, f);
-        vm->brksize = cpu.runmax + bss;
+        int rlen = vm->tsize + vm->dsize;
+        fread(vm->text, 1, rlen, f);
+        vm->brksize = rlen + bss;
     }
 
     uint16_t ssize = ::read16(h + 8);
@@ -87,19 +84,19 @@ bool OSPDP11::load2(const std::string &fn, FILE *f, size_t size) {
     return true;
 }
 
-bool OSPDP11::syscall(int n) {
-    int result, ret = OS::syscall(&result, n, cpu.r[0], vm->text + cpu.PC);
+bool OSi8086::syscall(int n) {
+    int result, ret = OS::syscall(&result, n, cpu.AX, vm->text + cpu.ip);
     if (ret >= 0) {
-        cpu.PC += ret;
-        cpu.r[0] = (cpu.C = (result == -1)) ? errno : result;
+        cpu.ip += ret;
+        cpu.AX = (cpu.CF = (result == -1)) ? errno : result;
     }
     return true;
 }
 
-int OSPDP11::v6_fork() { // 2
+int OSi8086::v6_fork() { // 2
     if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
-    OSPDP11 vm = *this;
+    OSi8086 vm = *this;
     vm.run();
     return vm.pid;
 #else
@@ -108,13 +105,13 @@ int OSPDP11::v6_fork() { // 2
 #endif
 }
 
-int OSPDP11::v6_wait() { // 7
+int OSi8086::v6_wait() { // 7
     int status, result = sys_wait(&status);
-    cpu.r[1] = status | 14;
+    cpu.DX = status | 14;
     return result;
 }
 
-int OSPDP11::v6_exec(const char *path, int argp) { // 11
+int OSi8086::v6_exec(const char *path, int argp) { // 11
 #if 0
     FILE *f = fopen("core", "wb");
     fwrite(data, 1, 0x10000, f);
@@ -141,24 +138,28 @@ int OSPDP11::v6_exec(const char *path, int argp) { // 11
     return 0;
 }
 
-int OSPDP11::v6_brk(int nd) { // 17
+int OSi8086::v6_brk(int nd) { // 17
     return sys_brk(nd, cpu.SP);
 }
 
-void OSPDP11::sighandler2(int sig) {
+void OSi8086::sighandler2(int sig) {
     uint16_t r[8];
     memcpy(r, cpu.r, sizeof (r));
-    bool Z = cpu.Z, N = cpu.N, C = cpu.C, V = cpu.V;
-    cpu.write16((cpu.SP -= 2), cpu.PC);
-    cpu.PC = sighandlers[sig];
-    while (!cpu.hasExited && !(cpu.PC == PC && cpu.SP == SP)) {
+    uint16_t ip = cpu.ip;
+    bool OF = cpu.OF, DF = cpu.DF, SF = cpu.SF;
+    bool ZF = cpu.ZF, PF = cpu.PF, CF = cpu.CF;
+    cpu.write16((cpu.SP -= 2), cpu.ip);
+    cpu.ip = sighandlers[sig];
+    while (!cpu.hasExited && !(cpu.ip == ip && cpu.SP == SP)) {
         cpu.run1();
     }
     if (!cpu.hasExited) {
         memcpy(cpu.r, r, sizeof (r));
-        cpu.Z = Z;
-        cpu.N = N;
-        cpu.C = C;
-        cpu.V = V;
+        cpu.OF = OF;
+        cpu.DF = DF;
+        cpu.SF = SF;
+        cpu.ZF = ZF;
+        cpu.PF = PF;
+        cpu.CF = CF;
     }
 }
