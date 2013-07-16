@@ -28,9 +28,11 @@ namespace UnixV6 {
         virtual void swtch(bool reset = false);
 
     private:
-        bool syscall(int n, uint8_t *args);
+        int syscall(int *result, int n, int arg0, uint8_t *args);
         int v6_fork(); //  2
+        int v6_wait(); // 7
         int v6_exec(const char *path, int argp); // 11
+        int v6_brk(int nd); // 17
         int v6_seek(int fd, off_t o, int w); // 19
         int v6_signal(int sig, int h); // 48
 
