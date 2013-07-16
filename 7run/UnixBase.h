@@ -19,7 +19,7 @@ protected:
 
 public:
     UnixBase();
-    UnixBase(const UnixBase &vm);
+    UnixBase(const UnixBase &os);
     virtual ~UnixBase();
 
     virtual void disasm() = 0;

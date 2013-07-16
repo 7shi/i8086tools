@@ -11,7 +11,7 @@ namespace UnixV6 {
 
     public:
         OS();
-        OS(const OS &vm);
+        OS(const OS &os);
         virtual ~OS();
 
         virtual void disasm();

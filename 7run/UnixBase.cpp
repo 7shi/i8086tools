@@ -25,10 +25,10 @@ UnixBase::UnixBase() : umask(0) {
     files.push_back(new File(2, "stderr"));
 }
 
-UnixBase::UnixBase(const UnixBase &vm) {
+UnixBase::UnixBase(const UnixBase &os) {
     pid = createpid();
-    umask = vm.umask;
-    files = vm.files;
+    umask = os.umask;
+    files = os.files;
     for (int i = 0; i < (int) files.size(); i++) {
         FileBase *f = files[i];
         if (f) ++f->count;

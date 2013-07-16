@@ -10,10 +10,10 @@ OS::OS() {
     memset(sigacts, 0, sizeof (sigacts));
 }
 
-OS::OS(const OS &vm) : UnixBase(vm), cpu(vm.cpu) {
+OS::OS(const OS &os) : UnixBase(os), cpu(os.cpu) {
     vmbase = &cpu;
     cpu.unix = this;
-    memcpy(sigacts, vm.sigacts, sizeof (sigacts));
+    memcpy(sigacts, os.sigacts, sizeof (sigacts));
 }
 
 OS::~OS() {

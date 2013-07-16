@@ -14,7 +14,7 @@ OS::OS() {
     cpu.unix = this;
 }
 
-OS::OS(const OS &vm) : UnixBase(vm), cpu(vm.cpu) {
+OS::OS(const OS &os) : UnixBase(os), cpu(os.cpu) {
     vmbase = &cpu;
     cpu.unix = this;
 }
