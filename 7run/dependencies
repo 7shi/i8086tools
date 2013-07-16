@@ -46,6 +46,8 @@ PDP11/disasm.o: PDP11/disasm.cpp PDP11/disasm.h PDP11/OpCode.h PDP11/Operand.h \
  PDP11/../utils.h PDP11/../VMBase.h PDP11/../File.h
 UnixV6/OS.o: UnixV6/OS.cpp UnixV6/OS.h UnixV6/../UnixBase.h UnixV6/../utils.h \
  UnixV6/../File.h UnixV6/../VMBase.h
+UnixV6/OS.sys.o: UnixV6/OS.sys.cpp UnixV6/OS.h UnixV6/../UnixBase.h \
+ UnixV6/../utils.h UnixV6/../File.h UnixV6/../VMBase.h
 UnixV6/OSPDP11.o: UnixV6/OSPDP11.cpp UnixV6/OSPDP11.h UnixV6/OS.h \
  UnixV6/../UnixBase.h UnixV6/../utils.h UnixV6/../File.h \
  UnixV6/../VMBase.h UnixV6/../PDP11/VM.h UnixV6/../PDP11/OpCode.h \

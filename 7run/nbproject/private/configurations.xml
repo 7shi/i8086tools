@@ -35,6 +35,7 @@
       <df name="UnixV6">
         <in>OS.cpp</in>
         <in>OS.h</in>
+        <in>OS.sys.cpp</in>
         <in>OSPDP11.cpp</in>
         <in>OSPDP11.h</in>
         <in>OSi8086.cpp</in>
