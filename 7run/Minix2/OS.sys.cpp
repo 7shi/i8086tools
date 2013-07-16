@@ -82,8 +82,8 @@ bool OS::syscall(int *result, uint8_t *m) {
             fprintf(stderr, "<chown: not implemented>\n");
             break;
         case 17:
-            *result = sys_brk(read16(m + 10), cpu.SP);
-            if (!*result) write16(m + 18, cpu.brksize);
+            *result = minix_brk(read16(m + 10));
+            if (!*result) write16(m + 18, vm->brksize);
             return true;
         case 18:
             *result = sys_stat(vm->str(read16(m + 10)), read16(m + 12));
@@ -243,6 +243,10 @@ int OS::minix_fork() { // 2
 #endif
 }
 
+int OS::minix_brk(int nd) { // 17
+    return sys_brk(nd, cpu.SP);
+}
+
 int OS::minix_exec(const char *path, int frame, int fsize) { // 59
 #if 0
     FILE *f = fopen("core", "wb");
@@ -250,7 +254,7 @@ int OS::minix_exec(const char *path, int frame, int fsize) { // 59
     fclose(f);
 #endif
     std::vector<uint8_t> f(fsize);
-    memcpy(&f[0], cpu.data + frame, fsize);
+    memcpy(&f[0], vm->data + frame, fsize);
     int argc = read16(&f[0]);
     if (trace) {
         fprintf(stderr, "<exec(\"%s\"", path);
@@ -265,11 +269,11 @@ int OS::minix_exec(const char *path, int frame, int fsize) { // 59
     }
     resetsig();
     cpu.start_sp = cpu.SP = 0x10000 - fsize;
-    memcpy(cpu.data + cpu.start_sp, &f[0], fsize);
+    memcpy(vm->data + cpu.start_sp, &f[0], fsize);
     int ad = cpu.start_sp + 2, p;
     for (int i = 0; i < 2; i++, ad += 2) {
-        for (; (p = cpu.read16(ad)); ad += 2) {
-            cpu.write16(ad, cpu.start_sp + p);
+        for (; (p = vm->read16(ad)); ad += 2) {
+            vm->write16(ad, cpu.start_sp + p);
         }
     }
     return 0;

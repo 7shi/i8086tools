@@ -28,6 +28,7 @@ namespace Minix2 {
     private:
         bool syscall(int *result, uint8_t *m);
         int minix_fork(); //  2
+        int minix_brk(int nd); // 17
         int minix_signal(int sig, int h); // 48
         int minix_exec(const char *path, int frame, int fsize); // 59
         int minix_sigaction(int sig, int act, int oact); // 71
