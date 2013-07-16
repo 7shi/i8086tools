@@ -17,7 +17,7 @@ bool OS::syscall(int n, uint8_t *args) {
         case 0:
         {
             int bak = cpu.PC + 2;
-            int p = ::read16(cpu.text + cpu.PC);
+            int p = read16(cpu.text + cpu.PC);
             int nn = cpu.read8(p);
             bool ret = syscall(nn, cpu.data + p + 2);
             if (!(nn == 11 && !cpu.C)) cpu.PC = bak;
@@ -31,15 +31,15 @@ bool OS::syscall(int n, uint8_t *args) {
             break;
         case 3:
             cpu.PC += 4;
-            result = sys_read(cpu.r[0], ::read16(args), ::read16(args + 2));
+            result = sys_read(cpu.r[0], read16(args), read16(args + 2));
             break;
         case 4:
             cpu.PC += 4;
-            result = sys_write(cpu.r[0], ::read16(args), ::read16(args + 2));
+            result = sys_write(cpu.r[0], read16(args), read16(args + 2));
             break;
         case 5:
             cpu.PC += 4;
-            result = sys_open(str(::read16(args)), ::read16(args + 2));
+            result = sys_open(str(read16(args)), read16(args + 2));
             break;
         case 6:
             result = sys_close(cpu.r[0]);
@@ -53,23 +53,23 @@ bool OS::syscall(int n, uint8_t *args) {
         }
         case 8:
             cpu.PC += 4;
-            result = sys_creat(str(::read16(args)), ::read16(args + 2));
+            result = sys_creat(str(read16(args)), read16(args + 2));
             break;
         case 9:
             cpu.PC += 4;
-            result = sys_link(str(::read16(args)), str(::read16(args + 2)));
+            result = sys_link(str(read16(args)), str(read16(args + 2)));
             break;
         case 10:
             cpu.PC += 2;
-            result = sys_unlink(str(::read16(args)));
+            result = sys_unlink(str(read16(args)));
             break;
         case 11:
             cpu.PC += 4;
-            result = v6_exec(str(::read16(args)), ::read16(args + 2));
+            result = v6_exec(str(read16(args)), read16(args + 2));
             break;
         case 12:
             cpu.PC += 2;
-            result = sys_chdir(str(::read16(args)));
+            result = sys_chdir(str(read16(args)));
             break;
         case 13:
             fprintf(stderr, "<time: not implemented>\n");
@@ -81,7 +81,7 @@ bool OS::syscall(int n, uint8_t *args) {
             break;
         case 15:
             cpu.PC += 4;
-            result = sys_chmod(str(::read16(args)), ::read16(args + 2));
+            result = sys_chmod(str(read16(args)), read16(args + 2));
             break;
         case 16:
             fprintf(stderr, "<chown: not implemented>\n");
@@ -89,15 +89,15 @@ bool OS::syscall(int n, uint8_t *args) {
             break;
         case 17:
             cpu.PC += 2;
-            result = sys_brk(::read16(args), cpu.SP);
+            result = sys_brk(read16(args), cpu.SP);
             break;
         case 18:
             cpu.PC += 4;
-            result = sys_stat(str(::read16(args)), ::read16(args + 2));
+            result = sys_stat(str(read16(args)), read16(args + 2));
             break;
         case 19:
             cpu.PC += 4;
-            result = v6_seek(cpu.r[0], ::read16(args), ::read16(args + 2));
+            result = v6_seek(cpu.r[0], read16(args), read16(args + 2));
             break;
         case 20:
             result = sys_getpid();
@@ -183,7 +183,7 @@ bool OS::syscall(int n, uint8_t *args) {
             break;
         case 48:
             cpu.PC += 4;
-            result = v6_signal(::read16(args), ::read16(args + 2));
+            result = v6_signal(read16(args), read16(args + 2));
             break;
     }
     cpu.r[0] = (cpu.C = (result == -1)) ? errno : result;
@@ -236,7 +236,7 @@ int OS::v6_exec(const char *path, int args) { // 11
     cpu.write16(cpu.SP, argc);
     for (int i = 0; i < argc; i++) {
         cpu.write16(ad2 += 2, ad1);
-        const char *arg = (const char *) (d + ::read16(d + args + i * 2));
+        const char *arg = (const char *) (d + read16(d + args + i * 2));
         strcpy((char *) cpu.data + ad1, arg);
         ad1 += strlen(arg) + 1;
     }
