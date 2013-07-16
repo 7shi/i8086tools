@@ -12,7 +12,7 @@
 class UnixBase {
 protected:
     static UnixBase *current;
-    VMBase *vmbase;
+    VMBase *vm;
     int pid;
     uint16_t umask;
     std::vector<FileBase *> files;

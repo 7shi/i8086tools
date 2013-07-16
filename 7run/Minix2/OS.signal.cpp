@@ -72,10 +72,10 @@ int OS::minix_sigaction(int sig, int act, int oact) { // 71
         errno = EINVAL;
         return -1;
     }
-    vmbase->write16(oact, sigacts[sig].handler);
-    vmbase->write16(oact + 2, sigacts[sig].mask);
-    vmbase->write16(oact + 4, sigacts[sig].flags);
-    sigact sa = {vmbase->read16(act), vmbase->read16(act + 2), vmbase->read16(act + 4)};
+    vm->write16(oact, sigacts[sig].handler);
+    vm->write16(oact + 2, sigacts[sig].mask);
+    vm->write16(oact + 4, sigacts[sig].flags);
+    sigact sa = {vm->read16(act), vm->read16(act + 2), vm->read16(act + 4)};
     sigacts[sig] = sa;
     setsig(s, sa.handler);
     return 0;

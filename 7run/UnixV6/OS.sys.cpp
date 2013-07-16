@@ -2,8 +2,8 @@
 #include "../PDP11/regs.h"
 #include <string.h>
 
-#define str vmbase->str
-#define hasExited vmbase->hasExited
+#define str vm->str
+#define hasExited vm->hasExited
 
 using namespace UnixV6;
 

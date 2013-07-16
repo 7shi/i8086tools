@@ -59,7 +59,7 @@ bool UnixBase::load(const std::string &fn) {
 void UnixBase::run(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
-    if (trace >= 2) vmbase->showHeader();
+    if (trace >= 2) vm->showHeader();
     setArgs(args, envs);
     run();
 }
@@ -67,8 +67,8 @@ void UnixBase::run(
 void UnixBase::run() {
     UnixBase *from = current;
     swtch(this);
-    vmbase->hasExited = false;
-    vmbase->run2();
+    vm->hasExited = false;
+    vm->run2();
     swtch(from);
 }
 

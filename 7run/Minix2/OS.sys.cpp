@@ -2,8 +2,8 @@
 #include "../i8086/regs.h"
 #include <string.h>
 
-#define str vmbase->str
-#define hasExited vmbase->hasExited
+#define str vm->str
+#define hasExited vm->hasExited
 
 using namespace Minix2;
 
