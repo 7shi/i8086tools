@@ -203,44 +203,29 @@ int OS::v6_fork() { // 2
 #endif
 }
 
-int OS::v6_exec(const char *path, int args) { // 11
+int OS::v6_exec(const char *path, int argp) { // 11
 #if 0
     FILE *f = fopen("core", "wb");
     fwrite(data, 1, 0x10000, f);
     fclose(f);
 #endif
     if (trace) fprintf(stderr, "<exec(\"%s\"", path);
-    int argc = 0, slen = 0, p;
-    for (; (p = cpu.read16(args + argc * 2)); argc++) {
-        const char *arg = str(p);
-        if (trace && argc > 0) fprintf(stderr, ", \"%s\"", arg);
-        slen += strlen(arg) + 1;
+    std::vector<std::string> args, envs;
+    int slen = 0, p;
+    while ((p = cpu.read16(argp + args.size() * 2))) {
+        std::string arg = str(p);
+        if (trace && !args.empty()) fprintf(stderr, ", \"%s\"", arg.c_str());
+        slen += arg.size() + 1;
+        args.push_back(arg);
     }
     if (trace) fprintf(stderr, ")>\n");
-    uint8_t *t = cpu.text, *d = cpu.data;
-    cpu.text = new uint8_t[0x10000];
-    memset(cpu.text, 0, 0x10000);
-    cpu.data = NULL;
     if (!load(path)) {
-        delete[] cpu.text;
-        cpu.text = t;
-        cpu.data = d;
         errno = EINVAL;
         return -1;
     }
     resetsig();
-    cpu.SP = 0x10000 - ((slen + 1) & ~1);
-    uint16_t ad1 = cpu.SP;
-    cpu.SP -= (argc + 1) * 2;
-    uint16_t ad2 = cpu.start_sp = cpu.SP;
-    cpu.write16(cpu.SP, argc);
-    for (int i = 0; i < argc; i++) {
-        cpu.write16(ad2 += 2, ad1);
-        const char *arg = (const char *) (d + read16(d + args + i * 2));
-        strcpy((char *) cpu.data + ad1, arg);
-        ad1 += strlen(arg) + 1;
-    }
-    if (d != t) delete[] d;
+    cpu.SP = 0;
+    setArgs(args, envs);
     return 0;
 }
 

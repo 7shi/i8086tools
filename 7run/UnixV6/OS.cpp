@@ -28,7 +28,7 @@ void OS::disasm() {
 
 void OS::setArgs(
         const std::vector<std::string> &args,
-        const std::vector<std::string> &envs) {
+        const std::vector<std::string> &) {
     int slen = 0;
     for (int i = 0; i < (int) args.size(); i++) {
         slen += args[i].size() + 1;
