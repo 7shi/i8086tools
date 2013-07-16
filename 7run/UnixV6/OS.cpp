@@ -1,4 +1,4 @@
-#include "VM.h"
+#include "OS.h"
 #include "../PDP11/regs.h"
 #include <string.h>
 
@@ -9,24 +9,24 @@ bool UnixV6::check(uint8_t h[2]) {
     return magic == 0407 || magic == 0410 || magic == 0411;
 }
 
-VM::VM() {
+OS::OS() {
     vmbase = &cpu;
     cpu.unix = this;
 }
 
-VM::VM(const VM &vm) : UnixBase(vm), cpu(vm.cpu) {
+OS::OS(const OS &vm) : UnixBase(vm), cpu(vm.cpu) {
     vmbase = &cpu;
     cpu.unix = this;
 }
 
-VM::~VM() {
+OS::~OS() {
 }
 
-void VM::disasm() {
+void OS::disasm() {
     cpu.disasm();
 }
 
-void VM::setArgs(
+void OS::setArgs(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
     int slen = 0;
@@ -45,7 +45,7 @@ void VM::setArgs(
     }
 }
 
-bool VM::load2(const std::string &fn, FILE *f, size_t size) {
+bool OS::load2(const std::string &fn, FILE *f, size_t size) {
     uint8_t h[0x10];
     if (!fread(h, sizeof (h), 1, f) || !check(h)) {
         if (size > 0xffff) {
@@ -122,7 +122,7 @@ bool VM::load2(const std::string &fn, FILE *f, size_t size) {
     return true;
 }
 
-void VM::setstat(uint16_t addr, struct stat * st) {
+void OS::setstat(uint16_t addr, struct stat * st) {
     memset(cpu.data + addr, 0, 36);
     cpu.write16(addr, st->st_dev);
     cpu.write16(addr + 2, st->st_ino);

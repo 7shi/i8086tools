@@ -5,14 +5,14 @@
 namespace UnixV6 {
     bool check(uint8_t h[2]);
 
-    class VM : public UnixBase {
+    class OS : public UnixBase {
     private:
         PDP11::VM cpu;
 
     public:
-        VM();
-        VM(const VM &vm);
-        virtual ~VM();
+        OS();
+        OS(const OS &vm);
+        virtual ~OS();
 
         virtual void disasm();
         virtual bool syscall(int n);

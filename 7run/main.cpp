@@ -1,5 +1,5 @@
-#include "Minix2/VM.h"
-#include "UnixV6/VM.h"
+#include "Minix2/OS.h"
+#include "UnixV6/OS.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -51,9 +51,9 @@ int main(int argc, char *argv[]) {
 
     UnixBase *vm;
     if (pdp11 || UnixV6::check(buf)) {
-        vm = new UnixV6::VM();
+        vm = new UnixV6::OS();
     } else {
-        vm = new Minix2::VM();
+        vm = new Minix2::OS();
     }
 
     if (!vm->load(args[0])) {

@@ -1,4 +1,4 @@
-#include "VM.h"
+#include "OS.h"
 #include "../i8086/regs.h"
 #include <stdio.h>
 #include <string.h>
@@ -15,12 +15,12 @@
 
 using namespace Minix2;
 
-void VM::sighandler(int sig) {
-    VM *cur = dynamic_cast<VM *> (current);
+void OS::sighandler(int sig) {
+    OS *cur = dynamic_cast<OS *> (current);
     if (cur) cur->sighandler2(sig);
 }
 
-void VM::sighandler2(int sig) {
+void OS::sighandler2(int sig) {
     uint16_t ip = cpu.ip, r[8];
     memcpy(r, cpu.r, sizeof (r));
     bool OF = cpu.OF, DF = cpu.DF, SF = cpu.SF;
@@ -41,7 +41,7 @@ void VM::sighandler2(int sig) {
     }
 }
 
-int VM::convsig(int sig) {
+int OS::convsig(int sig) {
     switch (sig) {
         case MX_SIGINT: return SIGINT;
         case MX_SIGILL: return SIGILL;
@@ -51,7 +51,7 @@ int VM::convsig(int sig) {
     return -1;
 }
 
-int VM::minix_signal() { // 48
+int OS::minix_signal() { // 48
     int sig = cpu.read16(cpu.BX + 4);
     int sgh = cpu.read16(cpu.BX + 14);
     if (trace) fprintf(stderr, "<signal(%d, 0x%04x)>\n", sig, sgh);
@@ -67,7 +67,7 @@ int VM::minix_signal() { // 48
     return oh;
 }
 
-int VM::minix_sigaction() { // 71
+int OS::minix_sigaction() { // 71
     int sig = cpu.read16(cpu.BX + 6);
     int act = cpu.read16(cpu.BX + 10);
     int oact = cpu.read16(cpu.BX + 12);
@@ -86,7 +86,7 @@ int VM::minix_sigaction() { // 71
     return 0;
 }
 
-void VM::setsig(int sig, int h) {
+void OS::setsig(int sig, int h) {
     switch (h) {
         case MX_SIG_DFL: signal(sig, SIG_DFL);
             break;
@@ -97,7 +97,7 @@ void VM::setsig(int sig, int h) {
     }
 }
 
-void VM::resetsig() {
+void OS::resetsig() {
     for (int i = 0; i < nsig; i++) {
         switch (sigacts[i].handler) {
             case MX_SIG_DFL:
@@ -112,7 +112,7 @@ void VM::resetsig() {
     }
 }
 
-void VM::swtch(bool reset) {
+void OS::swtch(bool reset) {
     for (int i = 0; i < nsig; i++) {
         int s = convsig(i);
         if (s >= 0) {

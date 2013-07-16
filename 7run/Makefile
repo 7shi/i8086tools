@@ -8,10 +8,10 @@ SOURCES  = main.cpp utils.cpp File.cpp \
 	   VMBase.cpp UnixBase.cpp UnixBase.sys.cpp \
 	   i8086/OpCode.cpp i8086/Operand.cpp \
 	   i8086/VM.cpp i8086/VM.inst.cpp i8086/disasm.cpp \
-	   Minix2/VM.cpp Minix2/VM.sys.cpp Minix2/VM.signal.cpp \
+	   Minix2/OS.cpp Minix2/OS.sys.cpp Minix2/OS.signal.cpp \
 	   PDP11/OpCode.cpp PDP11/Operand.cpp \
 	   PDP11/VM.cpp PDP11/VM.inst.cpp PDP11/disasm.cpp \
-	   UnixV6/VM.cpp UnixV6/VM.sys.cpp UnixV6/VM.signal.cpp
+	   UnixV6/OS.cpp UnixV6/OS.sys.cpp UnixV6/OS.signal.cpp
 M2CMDS   = bin/aal bin/ar bin/cc bin/nm bin/strip \
 	   bin/crc bin/install bin/m2 \
 	   lib/as lib/ld lib/cv

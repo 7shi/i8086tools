@@ -1,29 +1,29 @@
-#include "VM.h"
+#include "OS.h"
 #include "../i8086/regs.h"
 #include <string.h>
 
 using namespace Minix2;
 
-VM::VM() {
+OS::OS() {
     vmbase = &cpu;
     cpu.unix = this;
     memset(sigacts, 0, sizeof (sigacts));
 }
 
-VM::VM(const VM &vm) : UnixBase(vm), cpu(vm.cpu) {
+OS::OS(const OS &vm) : UnixBase(vm), cpu(vm.cpu) {
     vmbase = &cpu;
     cpu.unix = this;
     memcpy(sigacts, vm.sigacts, sizeof (sigacts));
 }
 
-VM::~VM() {
+OS::~OS() {
 }
 
-void VM::disasm() {
+void OS::disasm() {
     cpu.disasm();
 }
 
-void VM::setArgs(
+void OS::setArgs(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
     int slen = 0;
@@ -52,7 +52,7 @@ void VM::setArgs(
     cpu.write16(ad2 += 2, 0); // envp (last)
 }
 
-bool VM::load2(const std::string &fn, FILE *f, size_t size) {
+bool OS::load2(const std::string &fn, FILE *f, size_t size) {
     uint8_t h[0x20];
     if (!fread(h, sizeof (h), 1, f) || !(h[0] == 1 && h[1] == 3)) {
         if (size > 0xffff) {
@@ -93,7 +93,7 @@ bool VM::load2(const std::string &fn, FILE *f, size_t size) {
     return true;
 }
 
-void VM::setstat(uint16_t addr, struct stat *st) {
+void OS::setstat(uint16_t addr, struct stat *st) {
     cpu.write16(addr, st->st_dev);
     cpu.write16(addr + 2, st->st_ino);
     cpu.write16(addr + 4, st->st_mode);

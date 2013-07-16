@@ -1,4 +1,4 @@
-#include "VM.h"
+#include "OS.h"
 #include "../PDP11/regs.h"
 #include <string.h>
 #include <signal.h>
@@ -10,12 +10,12 @@
 
 using namespace UnixV6;
 
-void VM::sighandler(int sig) {
-    VM *cur = dynamic_cast<VM *> (current);
+void OS::sighandler(int sig) {
+    OS *cur = dynamic_cast<OS *> (current);
     if (cur) cur->sighandler2(sig);
 }
 
-void VM::sighandler2(int sig) {
+void OS::sighandler2(int sig) {
     uint16_t r[8];
     memcpy(r, cpu.r, sizeof (r));
     bool Z = cpu.Z, N = cpu.N, C = cpu.C, V = cpu.V;
@@ -33,7 +33,7 @@ void VM::sighandler2(int sig) {
     }
 }
 
-int VM::convsig(int sig) {
+int OS::convsig(int sig) {
     switch (sig) {
         case V6_SIGINT: return SIGINT;
         case V6_SIGINS: return SIGILL;
@@ -43,7 +43,7 @@ int VM::convsig(int sig) {
     return -1;
 }
 
-int VM::v6_signal(int sig, int h) {
+int OS::v6_signal(int sig, int h) {
     if (trace) fprintf(stderr, "<signal(%d, 0x%04x)>\n", sig, h);
     int s = convsig(sig);
     if (s < 0) {
@@ -56,7 +56,7 @@ int VM::v6_signal(int sig, int h) {
     return oh;
 }
 
-void VM::setsig(int sig, int h) {
+void OS::setsig(int sig, int h) {
     if (h == 0) {
         signal(sig, SIG_DFL);
     } else if (h & 1) {
@@ -66,7 +66,7 @@ void VM::setsig(int sig, int h) {
     }
 }
 
-void VM::resetsig() {
+void OS::resetsig() {
     for (int i = 0; i < nsig; i++) {
         uint16_t &sgh = sighandlers[i];
         if (sgh && !(sgh & 1)) {
@@ -77,7 +77,7 @@ void VM::resetsig() {
     }
 }
 
-void VM::swtch(bool reset) {
+void OS::swtch(bool reset) {
     for (int i = 0; i < nsig; i++) {
         int s = convsig(i);
         if (s >= 0) {

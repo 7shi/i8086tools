@@ -1,4 +1,4 @@
-#include "VM.h"
+#include "OS.h"
 #include "../i8086/regs.h"
 #include <string.h>
 
@@ -11,7 +11,7 @@ using namespace Minix2;
 #define str cpu.str
 #define hasExited cpu.hasExited
 
-bool VM::syscall(int n) {
+bool OS::syscall(int n) {
     if (n != 0x20) return false;
     int bx = cpu.BX;
     int type = read16(bx + 2), result = 0;
@@ -263,10 +263,10 @@ bool VM::syscall(int n) {
     return true;
 }
 
-int VM::minix_fork() { // 2
+int OS::minix_fork() { // 2
     if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
-    VM vm = *this;
+    OS vm = *this;
     vm.write16(cpu.BX + 2, 0);
     vm.cpu.AX = 0;
     vm.run();
@@ -277,7 +277,7 @@ int VM::minix_fork() { // 2
 #endif
 }
 
-int VM::minix_exec() { // 59
+int OS::minix_exec() { // 59
     const char *path = str(read16(cpu.BX + 10));
     int frame = read16(cpu.BX + 12);
     int fsize = read16(cpu.BX + 6);

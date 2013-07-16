@@ -1,17 +1,17 @@
-#include "VM.h"
+#include "OS.h"
 #include "../PDP11/regs.h"
 #include <string.h>
 
 using namespace UnixV6;
 
-bool VM::syscall(int n) {
+bool OS::syscall(int n) {
     return syscall(n, cpu.text + cpu.PC);
 }
 
 #define str cpu.str
 #define hasExited cpu.hasExited
 
-bool VM::syscall(int n, uint8_t *args) {
+bool OS::syscall(int n, uint8_t *args) {
     int result = 0;
     switch (n) {
         case 0:
@@ -190,10 +190,10 @@ bool VM::syscall(int n, uint8_t *args) {
     return true;
 }
 
-int VM::v6_fork() { // 2
+int OS::v6_fork() { // 2
     if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
-    VM vm = *this;
+    OS vm = *this;
     vm.run();
     cpu.PC += 2;
     return vm.pid;
@@ -203,7 +203,7 @@ int VM::v6_fork() { // 2
 #endif
 }
 
-int VM::v6_exec(const char *path, int args) { // 11
+int OS::v6_exec(const char *path, int args) { // 11
 #if 0
     FILE *f = fopen("core", "wb");
     fwrite(data, 1, 0x10000, f);
@@ -244,7 +244,7 @@ int VM::v6_exec(const char *path, int args) { // 11
     return 0;
 }
 
-int VM::v6_seek(int fd, off_t o, int w) { // 19
+int OS::v6_seek(int fd, off_t o, int w) { // 19
     if (trace) fprintf(stderr, "<lseek(%d, %ld, %d)", fd, o, w);
     FileBase *f = file(fd);
     off_t result = -1;
