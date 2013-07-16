@@ -1,11 +1,11 @@
 #pragma once
-#include "OSBase.h"
+#include "OS.h"
 #include "../PDP11/VM.h"
 
 namespace UnixV6 {
     bool check(uint8_t h[2]);
 
-    class OSPDP11 : public OSBase {
+    class OSPDP11 : public OS {
     private:
         PDP11::VM cpu;
 

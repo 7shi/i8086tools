@@ -14,7 +14,7 @@ OSPDP11::OSPDP11() {
     cpu.unix = this;
 }
 
-OSPDP11::OSPDP11(const OSPDP11 &os) : OSBase(os), cpu(os.cpu) {
+OSPDP11::OSPDP11(const OSPDP11 &os) : OS(os), cpu(os.cpu) {
     vm = &cpu;
     cpu.unix = this;
 }
@@ -111,7 +111,7 @@ bool OSPDP11::load2(const std::string &fn, FILE *f, size_t size) {
 }
 
 bool OSPDP11::syscall(int n) {
-    int result, ret = OSBase::syscall(&result, n, cpu.r[0], cpu.text + cpu.PC);
+    int result, ret = OS::syscall(&result, n, cpu.r[0], cpu.text + cpu.PC);
     if (ret >= 0) {
         cpu.PC += ret;
         cpu.r[0] = (cpu.C = (result == -1)) ? errno : result;

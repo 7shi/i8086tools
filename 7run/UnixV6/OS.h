@@ -4,11 +4,11 @@
 namespace UnixV6 {
     bool check(uint8_t h[2]);
 
-    class OSBase : public UnixBase {
+    class OS : public UnixBase {
     public:
-        OSBase();
-        OSBase(const OSBase &os);
-        virtual ~OSBase();
+        OS();
+        OS(const OS &os);
+        virtual ~OS();
 
         virtual void disasm();
 

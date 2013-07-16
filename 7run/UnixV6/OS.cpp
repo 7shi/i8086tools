@@ -1,4 +1,4 @@
-#include "OSBase.h"
+#include "OS.h"
 #include <string.h>
 #include <signal.h>
 
@@ -9,20 +9,20 @@
 
 using namespace UnixV6;
 
-OSBase::OSBase() {
+OS::OS() {
 }
 
-OSBase::OSBase(const OSBase &os) : UnixBase(os) {
+OS::OS(const OS &os) : UnixBase(os) {
 }
 
-OSBase::~OSBase() {
+OS::~OS() {
 }
 
-void OSBase::disasm() {
+void OS::disasm() {
     vm->disasm();
 }
 
-void OSBase::setstat(uint16_t addr, struct stat * st) {
+void OS::setstat(uint16_t addr, struct stat * st) {
     memset(vm->data + addr, 0, 36);
     vm->write16(addr, st->st_dev);
     vm->write16(addr + 2, st->st_ino);
@@ -38,7 +38,7 @@ void OSBase::setstat(uint16_t addr, struct stat * st) {
     vm->write16(addr + 34, st->st_mtime);
 }
 
-int OSBase::syscall(int *result, int n, int arg0, uint8_t *args) {
+int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
     *result = 0;
     switch (n) {
         case 0:
@@ -179,7 +179,7 @@ int OSBase::syscall(int *result, int n, int arg0, uint8_t *args) {
     return -1;
 }
 
-int OSBase::v6_seek(int fd, off_t o, int w) { // 19
+int OS::v6_seek(int fd, off_t o, int w) { // 19
     if (trace) fprintf(stderr, "<lseek(%d, %ld, %d)", fd, o, w);
     FileBase *f = file(fd);
     off_t result = -1;
@@ -210,12 +210,12 @@ int OSBase::v6_seek(int fd, off_t o, int w) { // 19
     return result;
 }
 
-void OSBase::sighandler(int sig) {
-    OSBase *cur = dynamic_cast<OSBase *> (current);
+void OS::sighandler(int sig) {
+    OS *cur = dynamic_cast<OS *> (current);
     if (cur) cur->sighandler2(sig);
 }
 
-int OSBase::convsig(int sig) {
+int OS::convsig(int sig) {
     switch (sig) {
         case V6_SIGINT: return SIGINT;
         case V6_SIGINS: return SIGILL;
@@ -225,7 +225,7 @@ int OSBase::convsig(int sig) {
     return -1;
 }
 
-int OSBase::v6_signal(int sig, int h) {
+int OS::v6_signal(int sig, int h) {
     if (trace) fprintf(stderr, "<signal(%d, 0x%04x)>\n", sig, h);
     int s = convsig(sig);
     if (s < 0) {
@@ -238,7 +238,7 @@ int OSBase::v6_signal(int sig, int h) {
     return oh;
 }
 
-void OSBase::setsig(int sig, int h) {
+void OS::setsig(int sig, int h) {
     if (h == 0) {
         signal(sig, SIG_DFL);
     } else if (h & 1) {
@@ -248,7 +248,7 @@ void OSBase::setsig(int sig, int h) {
     }
 }
 
-void OSBase::resetsig() {
+void OS::resetsig() {
     for (int i = 0; i < nsig; i++) {
         uint16_t &sgh = sighandlers[i];
         if (sgh && !(sgh & 1)) {
@@ -259,7 +259,7 @@ void OSBase::resetsig() {
     }
 }
 
-void OSBase::swtch(bool reset) {
+void OS::swtch(bool reset) {
     for (int i = 0; i < nsig; i++) {
         int s = convsig(i);
         if (s >= 0) {
