@@ -146,6 +146,9 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
         case 48:
             *result = v6_signal(read16(args), read16(args + 2));
             return 4;
+        default:
+            fprintf(stderr, "<%d: unknown syscall>\n", n);
+            break;
     }
     sys_exit(-1);
     return -1;
