@@ -33,8 +33,6 @@
         <in>regs.h</in>
       </df>
       <df name="UnixV6">
-        <in>OS.cpp</in>
-        <in>OS.h</in>
         <in>OSBase.cpp</in>
         <in>OSBase.h</in>
       </df>
@@ -149,10 +147,6 @@
             <pElem></pElem>
           </incDir>
         </ccTool>
-      </item>
-      <item path="UnixV6/OS.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="UnixV6/OS.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="UnixV6/OSBase.cpp" ex="false" tool="1" flavor2="0">
       </item>

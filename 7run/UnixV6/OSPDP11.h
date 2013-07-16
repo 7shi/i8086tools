@@ -5,14 +5,14 @@
 namespace UnixV6 {
     bool check(uint8_t h[2]);
 
-    class OS : public OSBase {
+    class OSPDP11 : public OSBase {
     private:
         PDP11::VM cpu;
 
     public:
-        OS();
-        OS(const OS &os);
-        virtual ~OS();
+        OSPDP11();
+        OSPDP11(const OSPDP11 &os);
+        virtual ~OSPDP11();
 
         virtual bool syscall(int n);
 

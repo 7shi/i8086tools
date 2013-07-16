@@ -1,4 +1,4 @@
-#include "OS.h"
+#include "OSPDP11.h"
 #include "../PDP11/regs.h"
 #include <string.h>
 
@@ -9,20 +9,20 @@ bool UnixV6::check(uint8_t h[2]) {
     return magic == 0407 || magic == 0410 || magic == 0411;
 }
 
-OS::OS() {
+OSPDP11::OSPDP11() {
     vm = &cpu;
     cpu.unix = this;
 }
 
-OS::OS(const OS &os) : OSBase(os), cpu(os.cpu) {
+OSPDP11::OSPDP11(const OSPDP11 &os) : OSBase(os), cpu(os.cpu) {
     vm = &cpu;
     cpu.unix = this;
 }
 
-OS::~OS() {
+OSPDP11::~OSPDP11() {
 }
 
-void OS::setArgs(
+void OSPDP11::setArgs(
         const std::vector<std::string> &args,
         const std::vector<std::string> &) {
     int slen = 0;
@@ -41,7 +41,7 @@ void OS::setArgs(
     }
 }
 
-bool OS::load2(const std::string &fn, FILE *f, size_t size) {
+bool OSPDP11::load2(const std::string &fn, FILE *f, size_t size) {
     uint8_t h[0x10];
     if (!fread(h, sizeof (h), 1, f) || !check(h)) {
         return vm->load(fn, f, size);
@@ -110,7 +110,7 @@ bool OS::load2(const std::string &fn, FILE *f, size_t size) {
     return true;
 }
 
-bool OS::syscall(int n) {
+bool OSPDP11::syscall(int n) {
     int result, ret = OSBase::syscall(&result, n, cpu.r[0], cpu.text + cpu.PC);
     if (ret >= 0) {
         cpu.PC += ret;
@@ -119,10 +119,10 @@ bool OS::syscall(int n) {
     return true;
 }
 
-int OS::v6_fork() { // 2
+int OSPDP11::v6_fork() { // 2
     if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
-    OS vm = *this;
+    OSPDP11 vm = *this;
     vm.run();
     return vm.pid;
 #else
@@ -131,13 +131,13 @@ int OS::v6_fork() { // 2
 #endif
 }
 
-int OS::v6_wait() { // 7
+int OSPDP11::v6_wait() { // 7
     int status, result = sys_wait(&status);
     cpu.r[1] = status | 14;
     return result;
 }
 
-int OS::v6_exec(const char *path, int argp) { // 11
+int OSPDP11::v6_exec(const char *path, int argp) { // 11
 #if 0
     FILE *f = fopen("core", "wb");
     fwrite(data, 1, 0x10000, f);
@@ -164,11 +164,11 @@ int OS::v6_exec(const char *path, int argp) { // 11
     return 0;
 }
 
-int OS::v6_brk(int nd) { // 17
+int OSPDP11::v6_brk(int nd) { // 17
     return sys_brk(nd, cpu.SP);
 }
 
-void OS::sighandler2(int sig) {
+void OSPDP11::sighandler2(int sig) {
     uint16_t r[8];
     memcpy(r, cpu.r, sizeof (r));
     bool Z = cpu.Z, N = cpu.N, C = cpu.C, V = cpu.V;
