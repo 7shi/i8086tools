@@ -51,14 +51,15 @@ bool OS::load2(const std::string &fn, FILE *f, size_t size) {
         return cpu.load(fn, f, size);
     }
 
+    cpu.release();
+    cpu.text = new uint8_t[0x10000];
+    memset(cpu.text, 0, 0x10000);
     cpu.tsize = ::read16(h + 2);
     cpu.dsize = ::read16(h + 4);
     uint16_t bss = ::read16(h + 6);
     cpu.PC = ::read16(h + 10);
     cpu.cache.clear();
     cpu.cache.resize(0x10000);
-    cpu.text = new uint8_t[0x10000];
-    memset(cpu.text, 0, 0x10000);
     if (h[0] == 9) { // 0411
         cpu.data = new uint8_t[0x10000];
         memset(cpu.data, 0, 0x10000);

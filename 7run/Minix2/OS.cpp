@@ -61,6 +61,9 @@ bool OS::load2(const std::string &fn, FILE *f, size_t size) {
         fprintf(stderr, "unknown cpu id: %d\n", h[3]);
         return false;
     }
+    cpu.release();
+    cpu.text = new uint8_t[0x10000];
+    memset(cpu.text, 0, 0x10000);
     fseek(f, h[4], SEEK_SET);
     cpu.tsize = ::read32(h + 8);
     cpu.dsize = ::read32(h + 12);
