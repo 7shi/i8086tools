@@ -26,10 +26,11 @@ namespace Minix2 {
         virtual void swtch(bool reset = false);
 
     private:
+        bool syscall(uint8_t *m);
         int minix_fork(); //  2
-        int minix_signal(); // 48
-        int minix_exec(); // 59
-        int minix_sigaction(); // 71
+        int minix_signal(int sig, int h); // 48
+        int minix_exec(const char *path, int frame, int fsize); // 59
+        int minix_sigaction(int sig, int act, int oact); // 71
 
         static void sighandler(int sig);
         void sighandler2(int sig);

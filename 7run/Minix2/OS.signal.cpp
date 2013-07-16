@@ -51,26 +51,21 @@ int OS::convsig(int sig) {
     return -1;
 }
 
-int OS::minix_signal() { // 48
-    int sig = cpu.read16(cpu.BX + 4);
-    int sgh = cpu.read16(cpu.BX + 14);
-    if (trace) fprintf(stderr, "<signal(%d, 0x%04x)>\n", sig, sgh);
+int OS::minix_signal(int sig, int h) { // 48
+    if (trace) fprintf(stderr, "<signal(%d, 0x%04x)>\n", sig, h);
     int s = convsig(sig);
     if (s < 0) {
         errno = EINVAL;
         return -1;
     }
     int oh = sigacts[sig].handler;
-    sigacts[sig].handler = sgh;
+    sigacts[sig].handler = h;
     sigacts[sig].mask = sigacts[sig].flags = 0;
-    setsig(s, sgh);
+    setsig(s, h);
     return oh;
 }
 
-int OS::minix_sigaction() { // 71
-    int sig = cpu.read16(cpu.BX + 6);
-    int act = cpu.read16(cpu.BX + 10);
-    int oact = cpu.read16(cpu.BX + 12);
+int OS::minix_sigaction(int sig, int act, int oact) { // 71
     if (trace) fprintf(stderr, "<sigaction(%d, 0x%04x, 0x%04x)>\n", sig, act, oact);
     int s = convsig(sig);
     if (s < 0) {

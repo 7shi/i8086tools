@@ -4,70 +4,68 @@
 
 using namespace Minix2;
 
-#define read16 cpu.read16
-#define read32 cpu.read32
-#define write16 cpu.write16
-#define write32 cpu.write32
 #define str cpu.str
 #define hasExited cpu.hasExited
 
 bool OS::syscall(int n) {
-    if (n != 0x20) return false;
-    int bx = cpu.BX;
-    int type = read16(bx + 2), result = 0;
+    return n == 0x20 ? syscall(cpu.data + cpu.BX) : false;
+}
+
+bool OS::syscall(uint8_t *m) {
+    int type = read16(m + 2), result = 0;
     switch (type) {
         case 1:
-            sys_exit((int16_t) read16(bx + 4));
+            sys_exit((int16_t) read16(m + 4));
             return true;
         case 2:
             result = minix_fork();
             break;
         case 3:
-            result = sys_read(read16(bx + 4), read16(bx + 10), read16(bx + 6));
+            result = sys_read(read16(m + 4), read16(m + 10), read16(m + 6));
             break;
         case 4:
-            result = sys_write(read16(bx + 4), read16(bx + 10), read16(bx + 6));
+            result = sys_write(read16(m + 4), read16(m + 10), read16(m + 6));
             break;
         case 5:
         {
-            int flag = read16(bx + 6);
+            int flag = read16(m + 6);
             if (flag & 64 /*O_CREAT*/) {
-                result = sys_open(str(read16(bx + 10)), flag, read16(bx + 8));
+                result = sys_open(str(read16(m + 10)), flag, read16(m + 8));
             } else {
-                result = sys_open(str(read16(bx + 8)), flag);
+                result = sys_open(str(read16(m + 8)), flag);
             }
             break;
         }
         case 6:
-            result = sys_close(read16(bx + 4));
+            result = sys_close(read16(m + 4));
             break;
         case 7:
         {
             int status;
             result = sys_wait(&status);
-            write16(bx + 4, status);
+            write16(m + 4, status);
             break;
         }
         case 8:
-            result = sys_creat(str(read16(bx + 8)), read16(bx + 6));
+            result = sys_creat(str(read16(m + 8)), read16(m + 6));
             break;
         case 9:
-            result = sys_link(str(read16(bx + 10)), str(read16(bx + 12)));
+            result = sys_link(str(read16(m + 10)), str(read16(m + 12)));
             break;
         case 10:
-            result = sys_unlink(str(read16(bx + 8)));
+            result = sys_unlink(str(read16(m + 8)));
             break;
         case 11:
             fprintf(stderr, "<waitpid: not implemented>\n");
             hasExited = true;
             break;
         case 12:
-            result = sys_chdir(str(read16(bx + 8)));
+            result = sys_chdir(str(read16(m + 8)));
             break;
         case 13:
             result = sys_time();
             if (result >= 0) {
-                write32(bx + 10, result);
+                write32(m + 10, result);
                 result = 0;
             }
             break;
@@ -76,26 +74,26 @@ bool OS::syscall(int n) {
             hasExited = true;
             break;
         case 15:
-            result = sys_chmod(str(read16(bx + 8)), read16(bx + 6));
+            result = sys_chmod(str(read16(m + 8)), read16(m + 6));
             break;
         case 16:
             fprintf(stderr, "<chown: not implemented>\n");
             hasExited = true;
             break;
         case 17:
-            result = sys_brk(read16(bx + 10), cpu.SP);
-            if (!result) write16(bx + 18, cpu.brksize);
+            result = sys_brk(read16(m + 10), cpu.SP);
+            if (!result) write16(m + 18, cpu.brksize);
             break;
         case 18:
-            result = sys_stat(str(read16(bx + 10)), read16(bx + 12));
+            result = sys_stat(str(read16(m + 10)), read16(m + 12));
             break;
         case 19:
         {
-            off_t o = sys_lseek(read16(bx + 4), read32(bx + 10), read16(bx + 6));
+            off_t o = sys_lseek(read16(m + 4), read32(m + 10), read16(m + 6));
             if (o == -1) {
                 result = -1;
             } else {
-                write32(bx + 10, o);
+                write32(m + 10, o);
             }
             break;
         }
@@ -130,7 +128,7 @@ bool OS::syscall(int n) {
             hasExited = true;
             break;
         case 28:
-            result = sys_fstat(read16(bx + 4), read16(bx + 10));
+            result = sys_fstat(read16(m + 4), read16(m + 10));
             break;
         case 29:
             fprintf(stderr, "<pause: not implemented>\n");
@@ -141,7 +139,7 @@ bool OS::syscall(int n) {
             hasExited = true;
             break;
         case 33:
-            result = sys_access(str(read16(bx + 8)), read16(bx + 6));
+            result = sys_access(str(read16(m + 8)), read16(m + 6));
             break;
         case 36:
             fprintf(stderr, "<sync: not implemented>\n");
@@ -183,20 +181,22 @@ bool OS::syscall(int n) {
             result = sys_getgid();
             break;
         case 48:
-            result = minix_signal();
+            result = minix_signal(read16(m + 4), read16(m + 14));
             break;
         case 54:
-            result = sys_ioctl(read16(bx + 4), read16(bx + 8), read16(bx + 18));
+            result = sys_ioctl(read16(m + 4), read16(m + 8), read16(m + 18));
             break;
         case 55:
             fprintf(stderr, "<fcntl: not implemented>\n");
             hasExited = true;
             break;
         case 59:
-            if (!minix_exec()) return true;
+            if (!minix_exec(str(read16(m + 10)), read16(m + 12), read16(m + 6))) {
+                return true;
+            }
             break;
         case 60:
-            result = sys_umask(read16(bx + 4));
+            result = sys_umask(read16(m + 4));
             break;
         case 61:
             fprintf(stderr, "<chroot: not implemented>\n");
@@ -227,7 +227,7 @@ bool OS::syscall(int n) {
             hasExited = true;
             break;
         case 71:
-            result = minix_sigaction();
+            result = minix_sigaction(read16(m + 6), read16(m + 10), read16(m + 12));
             break;
         case 72:
             fprintf(stderr, "<sigsuspend: not implemented>\n");
@@ -258,7 +258,7 @@ bool OS::syscall(int n) {
             hasExited = true;
             return true;
     }
-    write16(bx + 2, result == -1 ? -errno : result);
+    write16(m + 2, result == -1 ? -errno : result);
     cpu.AX = 0;
     return true;
 }
@@ -267,7 +267,7 @@ int OS::minix_fork() { // 2
     if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
     OS vm = *this;
-    vm.write16(cpu.BX + 2, 0);
+    vm.cpu.write16(cpu.BX + 2, 0);
     vm.cpu.AX = 0;
     vm.run();
     return vm.pid;
@@ -277,42 +277,33 @@ int OS::minix_fork() { // 2
 #endif
 }
 
-int OS::minix_exec() { // 59
-    const char *path = str(read16(cpu.BX + 10));
-    int frame = read16(cpu.BX + 12);
-    int fsize = read16(cpu.BX + 6);
+int OS::minix_exec(const char *path, int frame, int fsize) { // 59
 #if 0
     FILE *f = fopen("core", "wb");
     fwrite(data, 1, 0x10000, f);
     fclose(f);
 #endif
-    int argc = read16(frame);
+    std::vector<uint8_t> f(fsize);
+    memcpy(&f[0], cpu.data + frame, fsize);
+    int argc = read16(&f[0]);
     if (trace) {
         fprintf(stderr, "<exec(\"%s\"", path);
         for (int i = 2; i <= argc; i++) {
-            fprintf(stderr, ", \"%s\"", cpu.data + frame + read16(frame + i * 2));
+            fprintf(stderr, ", \"%s\"", &f[read16(&f[i * 2])]);
         }
         fprintf(stderr, ")>\n");
     }
-    uint8_t *t = cpu.text, *d = cpu.data;
-    cpu.text = new uint8_t[0x10000];
-    memset(cpu.text, 0, 0x10000);
-    cpu.data = NULL;
     if (!load(path)) {
-        delete[] cpu.text;
-        cpu.text = t;
-        cpu.data = d;
         errno = EINVAL;
         return -1;
     }
     resetsig();
     cpu.start_sp = cpu.SP = 0x10000 - fsize;
-    memcpy(cpu.data + cpu.start_sp, d + frame, fsize);
-    if (d != t) delete[] d;
+    memcpy(cpu.data + cpu.start_sp, &f[0], fsize);
     int ad = cpu.start_sp + 2, p;
     for (int i = 0; i < 2; i++, ad += 2) {
-        for (; (p = read16(ad)); ad += 2) {
-            write16(ad, cpu.start_sp + p);
+        for (; (p = cpu.read16(ad)); ad += 2) {
+            cpu.write16(ad, cpu.start_sp + p);
         }
     }
     return 0;
