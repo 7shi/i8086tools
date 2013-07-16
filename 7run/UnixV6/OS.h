@@ -3,6 +3,11 @@
 
 namespace UnixV6 {
 
+    struct sysarg {
+        int argc;
+        const char *name;
+    };
+
     class OS : public UnixBase {
     public:
         OS();
@@ -19,6 +24,9 @@ namespace UnixV6 {
 
         void readsym(FILE *f, int ssize);
         int syscall(int *result, int n, int arg0, uint8_t *args);
+        
+        static const int nsys = 49;
+        static sysarg sysargs[nsys];
 
     public:
         virtual int v6_fork() = 0; //  2

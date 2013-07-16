@@ -2,6 +2,58 @@
 
 using namespace UnixV6;
 
+sysarg OS::sysargs[] = {
+    {/* 0*/ 1, "indir"},
+    {/* 1*/ 0, "exit"},
+    {/* 2*/ 0, "fork"},
+    {/* 3*/ 2, "read"},
+    {/* 4*/ 2, "write"},
+    {/* 5*/ 2, "open"},
+    {/* 6*/ 0, "close"},
+    {/* 7*/ 0, "wait"},
+    {/* 8*/ 2, "creat"},
+    {/* 9*/ 2, "link"},
+    {/*10*/ 1, "unlink"},
+    {/*11*/ 2, "exec"},
+    {/*12*/ 1, "chdir"},
+    {/*13*/ 0, "time"},
+    {/*14*/ 3, "mknod"},
+    {/*15*/ 2, "chmod"},
+    {/*16*/ 2, "chown"},
+    {/*17*/ 1, "brk"},
+    {/*18*/ 2, "stat"},
+    {/*19*/ 2, "seek"},
+    {/*20*/ 0, "getpid"},
+    {/*21*/ 3, "mount"},
+    {/*22*/ 1, "umount"},
+    {/*23*/ 0, "setuid"},
+    {/*24*/ 0, "getuid"},
+    {/*25*/ 0, "stime"},
+    {/*26*/ 3, "ptrace"},
+    {/*27*/ 0, NULL},
+    {/*28*/ 1, "fstat"},
+    {/*29*/ 0, NULL},
+    {/*30*/ 1, "smdate"},
+    {/*31*/ 1, "stty"},
+    {/*32*/ 1, "gtty"},
+    {/*33*/ 0, NULL},
+    {/*34*/ 0, "nice"},
+    {/*35*/ 0, "sleep"},
+    {/*36*/ 0, "sync"},
+    {/*37*/ 1, "kill"},
+    {/*38*/ 0, "switch"},
+    {/*39*/ 0, NULL},
+    {/*40*/ 0, NULL},
+    {/*41*/ 0, "dup"},
+    {/*42*/ 0, "pipe"},
+    {/*43*/ 1, "times"},
+    {/*44*/ 4, "prof"},
+    {/*45*/ 0, "tiu"},
+    {/*46*/ 0, "setgid"},
+    {/*47*/ 0, "getgid"},
+    {/*48*/ 2, "signal"},
+};
+
 int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
     *result = 0;
     switch (n) {
@@ -48,18 +100,9 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
         case 12:
             *result = sys_chdir(vm->str(read16(args)));
             return 2;
-        case 13:
-            fprintf(stderr, "<time: not implemented>\n");
-            break;
-        case 14:
-            fprintf(stderr, "<mknod: not implemented>\n");
-            break;
         case 15:
             *result = sys_chmod(vm->str(read16(args)), read16(args + 2));
             return 4;
-        case 16:
-            fprintf(stderr, "<chown: not implemented>\n");
-            break;
         case 17:
             *result = v6_brk(read16(args));
             return 2;
@@ -72,71 +115,18 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
         case 20:
             *result = sys_getpid();
             return 0;
-        case 21:
-            fprintf(stderr, "<mount: not implemented>\n");
-            break;
-        case 22:
-            fprintf(stderr, "<umount: not implemented>\n");
-            break;
-        case 23:
-            fprintf(stderr, "<setuid: not implemented>\n");
-            break;
-        case 24:
-            fprintf(stderr, "<getuid: not implemented>\n");
-            break;
-        case 25:
-            fprintf(stderr, "<stime: not implemented>\n");
-            break;
-        case 26:
-            fprintf(stderr, "<ptrace: not implemented>\n");
-            break;
-        case 28:
-            fprintf(stderr, "<fstat: not implemented>\n");
-            break;
-        case 31:
-            fprintf(stderr, "<stty: not implemented>\n");
-            break;
-        case 32:
-            fprintf(stderr, "<gtty: not implemented>\n");
-            break;
-        case 34:
-            fprintf(stderr, "<nice: not implemented>\n");
-            break;
-        case 35:
-            fprintf(stderr, "<sleep: not implemented>\n");
-            break;
-        case 36:
-            fprintf(stderr, "<sync: not implemented>\n");
-            break;
-        case 37:
-            fprintf(stderr, "<kill: not implemented>\n");
-            break;
-        case 38:
-            fprintf(stderr, "<switch: not implemented>\n");
-            break;
         case 41:
             *result = sys_dup(arg0);
             return 0;
-        case 42:
-            fprintf(stderr, "<pipe: not implemented>\n");
-            break;
-        case 43:
-            fprintf(stderr, "<times: not implemented>\n");
-            break;
-        case 44:
-            fprintf(stderr, "<prof: not implemented>\n");
-            break;
-        case 46:
-            fprintf(stderr, "<setgid: not implemented>\n");
-            break;
-        case 47:
-            fprintf(stderr, "<getgid: not implemented>\n");
-            break;
         case 48:
             *result = v6_signal(read16(args), read16(args + 2));
             return 4;
         default:
-            fprintf(stderr, "<%d: unknown syscall>\n", n);
+            if (n < nsys && sysargs[n].name) {
+                fprintf(stderr, "<%s: not implemented>\n", sysargs[n].name);
+            } else {
+                fprintf(stderr, "<%d: unknown syscall>\n", n);
+            }
             break;
     }
     sys_exit(-1);
