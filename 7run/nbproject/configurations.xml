@@ -37,6 +37,8 @@
         <in>OS.h</in>
         <in>OS.signal.cpp</in>
         <in>OS.sys.cpp</in>
+        <in>OSBase.cpp</in>
+        <in>OSBase.h</in>
       </df>
       <in>File.cpp</in>
       <in>File.h</in>
@@ -157,6 +159,10 @@
       <item path="UnixV6/OS.signal.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="UnixV6/OS.sys.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="UnixV6/OSBase.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="UnixV6/OSBase.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="VMBase.cpp" ex="false" tool="1" flavor2="0">
         <ccTool>

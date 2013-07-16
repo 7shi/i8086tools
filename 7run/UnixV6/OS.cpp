@@ -14,16 +14,12 @@ OS::OS() {
     cpu.unix = this;
 }
 
-OS::OS(const OS &os) : UnixBase(os), cpu(os.cpu) {
+OS::OS(const OS &os) : OSBase(os), cpu(os.cpu) {
     vm = &cpu;
     cpu.unix = this;
 }
 
 OS::~OS() {
-}
-
-void OS::disasm() {
-    vm->disasm();
 }
 
 void OS::setArgs(
@@ -112,20 +108,4 @@ bool OS::load2(const std::string &fn, FILE *f, size_t size) {
         }
     }
     return true;
-}
-
-void OS::setstat(uint16_t addr, struct stat * st) {
-    memset(vm->data + addr, 0, 36);
-    vm->write16(addr, st->st_dev);
-    vm->write16(addr + 2, st->st_ino);
-    vm->write16(addr + 4, st->st_mode);
-    vm->write8(addr + 6, st->st_nlink);
-    vm->write8(addr + 7, st->st_uid);
-    vm->write8(addr + 8, st->st_gid);
-    vm->write8(addr + 9, st->st_size >> 16);
-    vm->write16(addr + 10, st->st_size);
-    vm->write16(addr + 28, st->st_atime >> 16);
-    vm->write16(addr + 30, st->st_atime);
-    vm->write16(addr + 32, st->st_mtime >> 16);
-    vm->write16(addr + 34, st->st_mtime);
 }

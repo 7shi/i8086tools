@@ -11,6 +11,7 @@ SOURCES  = main.cpp utils.cpp File.cpp \
 	   Minix2/OS.cpp Minix2/OS.sys.cpp Minix2/OS.signal.cpp \
 	   PDP11/OpCode.cpp PDP11/Operand.cpp \
 	   PDP11/VM.cpp PDP11/VM.inst.cpp PDP11/disasm.cpp \
+	   UnixV6/OSBase.cpp \
 	   UnixV6/OS.cpp UnixV6/OS.sys.cpp UnixV6/OS.signal.cpp
 M2CMDS   = bin/aal bin/ar bin/cc bin/nm bin/strip \
 	   bin/crc bin/install bin/m2 \

@@ -1,11 +1,11 @@
 #pragma once
-#include "../UnixBase.h"
+#include "OSBase.h"
 #include "../PDP11/VM.h"
 
 namespace UnixV6 {
     bool check(uint8_t h[2]);
 
-    class OS : public UnixBase {
+    class OS : public OSBase {
     private:
         PDP11::VM cpu;
 
@@ -14,7 +14,6 @@ namespace UnixV6 {
         OS(const OS &os);
         virtual ~OS();
 
-        virtual void disasm();
         virtual bool syscall(int n);
 
     protected:
@@ -22,25 +21,14 @@ namespace UnixV6 {
                 const std::vector<std::string> &args,
                 const std::vector<std::string> &envs);
         virtual bool load2(const std::string &fn, FILE *f, size_t size);
-        virtual void setstat(uint16_t addr, struct stat *st);
-        virtual int convsig(int sig);
-        virtual void setsig(int sig, int h);
-        virtual void swtch(bool reset = false);
 
-    private:
-        int syscall(int *result, int n, int arg0, uint8_t *args);
-        int v6_fork(); //  2
-        int v6_wait(); // 7
-        int v6_exec(const char *path, int argp); // 11
-        int v6_brk(int nd); // 17
-        int v6_seek(int fd, off_t o, int w); // 19
-        int v6_signal(int sig, int h); // 48
+    public:
+        virtual int v6_fork(); //  2
+        virtual int v6_wait(); // 7
+        virtual int v6_exec(const char *path, int argp); // 11
+        virtual int v6_brk(int nd); // 17
 
-        static void sighandler(int sig);
-        void sighandler2(int sig);
-        void resetsig();
-
-        static const int nsig = 20;
-        uint16_t sighandlers[nsig];
+    protected:
+        virtual void sighandler2(int sig);
     };
 }
