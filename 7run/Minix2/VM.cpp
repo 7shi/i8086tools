@@ -10,7 +10,7 @@ VM::VM() {
     memset(sigacts, 0, sizeof (sigacts));
 }
 
-VM::VM(const VM &vm) : VMUnix(vm), cpu(vm.cpu) {
+VM::VM(const VM &vm) : UnixBase(vm), cpu(vm.cpu) {
     vmbase = &cpu;
     cpu.unix = this;
     memcpy(sigacts, vm.sigacts, sizeof (sigacts));

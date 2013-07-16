@@ -11,14 +11,14 @@
 extern int trace;
 extern int exitcode;
 
-class VMUnix;
+class UnixBase;
 
 struct VMBase {
     uint8_t *text, *data;
     size_t tsize, dsize;
     uint16_t brksize;
     bool hasExited;
-    VMUnix *unix;
+    UnixBase *unix;
 
     VMBase();
     VMBase(const VMBase &vm);

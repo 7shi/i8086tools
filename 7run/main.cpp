@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    VMUnix *vm;
+    UnixBase *vm;
     if (pdp11 || UnixV6::check(buf)) {
         vm = new UnixV6::VM();
     } else {

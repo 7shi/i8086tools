@@ -14,7 +14,7 @@ VM::VM() {
     cpu.unix = this;
 }
 
-VM::VM(const VM &vm) : VMUnix(vm), cpu(vm.cpu) {
+VM::VM(const VM &vm) : UnixBase(vm), cpu(vm.cpu) {
     vmbase = &cpu;
     cpu.unix = this;
 }

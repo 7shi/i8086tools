@@ -1,5 +1,5 @@
 #include "VM.h"
-#include "../VMUnix.h"
+#include "../UnixBase.h"
 #include "regs.h"
 #include <stdio.h>
 #include <stdlib.h>

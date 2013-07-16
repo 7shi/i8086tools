@@ -1,11 +1,11 @@
 #pragma once
-#include "../VMUnix.h"
+#include "../UnixBase.h"
 #include "../PDP11/VM.h"
 
 namespace UnixV6 {
     bool check(uint8_t h[2]);
 
-    class VM : public VMUnix {
+    class VM : public UnixBase {
     private:
         PDP11::VM cpu;
 

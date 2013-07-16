@@ -9,18 +9,18 @@
 #define NO_FORK
 #endif
 
-class VMUnix {
+class UnixBase {
 protected:
-    static VMUnix *current;
+    static UnixBase *current;
     VMBase *vmbase;
     int pid;
     uint16_t umask;
     std::vector<FileBase *> files;
 
 public:
-    VMUnix();
-    VMUnix(const VMUnix &vm);
-    virtual ~VMUnix();
+    UnixBase();
+    UnixBase(const UnixBase &vm);
+    virtual ~UnixBase();
 
     virtual void disasm() = 0;
     virtual bool syscall(int n) = 0;
@@ -29,7 +29,7 @@ public:
             const std::vector<std::string> &args,
             const std::vector<std::string> &envs);
     void run();
-    void swtch(VMUnix *to);
+    void swtch(UnixBase *to);
 
 protected:
     virtual bool load2(const std::string &fn, FILE *f, size_t size) = 0;

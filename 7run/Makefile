@@ -4,8 +4,8 @@ CXX      = g++
 CXXFLAGS = -Wall -O2 -g
 LDFLAGS  =
 OBJECTS  = $(SOURCES:%.cpp=%.o)
-SOURCES  = main.cpp utils.cpp \
-	   File.cpp VMBase.cpp VMUnix.cpp VMUnix.sys.cpp \
+SOURCES  = main.cpp utils.cpp File.cpp \
+	   VMBase.cpp UnixBase.cpp UnixBase.sys.cpp \
 	   i8086/OpCode.cpp i8086/Operand.cpp \
 	   i8086/VM.cpp i8086/VM.inst.cpp i8086/disasm.cpp \
 	   Minix2/VM.cpp Minix2/VM.sys.cpp Minix2/VM.signal.cpp \

@@ -1,10 +1,10 @@
 #pragma once
-#include "../VMUnix.h"
+#include "../UnixBase.h"
 #include "../i8086/VM.h"
 
 namespace Minix2 {
 
-    class VM : public VMUnix {
+    class VM : public UnixBase {
     private:
         i8086::VM cpu;
 

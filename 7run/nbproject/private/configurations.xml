@@ -40,11 +40,11 @@
       </df>
       <in>File.cpp</in>
       <in>File.h</in>
+      <in>UnixBase.cpp</in>
+      <in>UnixBase.h</in>
+      <in>UnixBase.sys.cpp</in>
       <in>VMBase.cpp</in>
       <in>VMBase.h</in>
-      <in>VMUnix.cpp</in>
-      <in>VMUnix.h</in>
-      <in>VMUnix.sys.cpp</in>
       <in>main.cpp</in>
       <in>utils.cpp</in>
       <in>utils.h</in>

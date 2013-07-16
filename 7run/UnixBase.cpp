@@ -1,4 +1,4 @@
-#include "VMUnix.h"
+#include "UnixBase.h"
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-VMUnix *VMUnix::current;
+UnixBase *UnixBase::current;
 
 static int createpid() {
 #ifdef NO_FORK
@@ -18,14 +18,14 @@ static int createpid() {
 #endif
 }
 
-VMUnix::VMUnix() : umask(0) {
+UnixBase::UnixBase() : umask(0) {
     pid = createpid();
     files.push_back(new File(0, "stdin"));
     files.push_back(new File(1, "stdout"));
     files.push_back(new File(2, "stderr"));
 }
 
-VMUnix::VMUnix(const VMUnix &vm) {
+UnixBase::UnixBase(const UnixBase &vm) {
     pid = createpid();
     umask = vm.umask;
     files = vm.files;
@@ -35,13 +35,13 @@ VMUnix::VMUnix(const VMUnix &vm) {
     }
 }
 
-VMUnix::~VMUnix() {
+UnixBase::~UnixBase() {
     for (int i = 0; i <= (int) files.size(); i++) {
         close(i);
     }
 }
 
-bool VMUnix::load(const std::string &fn) {
+bool UnixBase::load(const std::string &fn) {
     std::string fn2 = convpath(fn);
     const char *file = fn2.c_str();
     FILE *f = fopen(file, "rb");
@@ -56,7 +56,7 @@ bool VMUnix::load(const std::string &fn) {
     return ret;
 }
 
-void VMUnix::run(
+void UnixBase::run(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
     if (trace >= 2) vmbase->showHeader();
@@ -64,15 +64,15 @@ void VMUnix::run(
     run();
 }
 
-void VMUnix::run() {
-    VMUnix *from = current;
+void UnixBase::run() {
+    UnixBase *from = current;
     swtch(this);
     vmbase->hasExited = false;
     vmbase->run2();
     swtch(from);
 }
 
-int VMUnix::getfd() {
+int UnixBase::getfd() {
     int len = files.size();
     for (int i = 0; i < len; i++) {
         if (!files[i]) return i;
@@ -81,7 +81,7 @@ int VMUnix::getfd() {
     return len;
 }
 
-int VMUnix::open(const std::string &path, int flag, int mode) {
+int UnixBase::open(const std::string &path, int flag, int mode) {
 #ifdef WIN32
     flag |= O_BINARY;
 #endif
@@ -95,7 +95,7 @@ int VMUnix::open(const std::string &path, int flag, int mode) {
     return fd;
 }
 
-int VMUnix::dup(int fd) {
+int UnixBase::dup(int fd) {
     FileBase *f = file(fd);
     if (!f) return -1;
 
@@ -105,7 +105,7 @@ int VMUnix::dup(int fd) {
     return fd2;
 }
 
-FileBase *VMUnix::file(int fd) {
+FileBase *UnixBase::file(int fd) {
     if (fd < 0 || fd >= (int) files.size() || !files[fd]) {
         errno = EBADF;
         return NULL;
@@ -113,7 +113,7 @@ FileBase *VMUnix::file(int fd) {
     return files[fd];
 }
 
-void VMUnix::swtch(VMUnix *to) {
+void UnixBase::swtch(UnixBase *to) {
     if (to) to->swtch();
     else swtch(true);
     current = to;
