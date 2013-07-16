@@ -2,14 +2,14 @@
 #include "../PDP11/regs.h"
 #include <string.h>
 
+#define str vmbase->str
+#define hasExited vmbase->hasExited
+
 using namespace UnixV6;
 
 bool OS::syscall(int n) {
     return syscall(n, cpu.text + cpu.PC);
 }
-
-#define str cpu.str
-#define hasExited cpu.hasExited
 
 bool OS::syscall(int n, uint8_t *args) {
     int result = 0;

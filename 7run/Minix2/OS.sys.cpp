@@ -2,10 +2,10 @@
 #include "../i8086/regs.h"
 #include <string.h>
 
-using namespace Minix2;
+#define str vmbase->str
+#define hasExited vmbase->hasExited
 
-#define str cpu.str
-#define hasExited cpu.hasExited
+using namespace Minix2;
 
 bool OS::syscall(int n) {
     return n == 0x20 ? syscall(cpu.data + cpu.BX) : false;
