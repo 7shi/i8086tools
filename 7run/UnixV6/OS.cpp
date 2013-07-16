@@ -109,3 +109,79 @@ bool OS::load2(const std::string &fn, FILE *f, size_t size) {
     }
     return true;
 }
+
+bool OS::syscall(int n) {
+    int result, ret = OSBase::syscall(&result, n, cpu.r[0], cpu.text + cpu.PC);
+    if (ret >= 0) {
+        cpu.PC += ret;
+        cpu.r[0] = (cpu.C = (result == -1)) ? errno : result;
+    }
+    return true;
+}
+
+int OS::v6_fork() { // 2
+    if (trace) fprintf(stderr, "<fork()>\n");
+#ifdef NO_FORK
+    OS vm = *this;
+    vm.run();
+    return vm.pid;
+#else
+    int result = fork();
+    return result <= 0 ? result : (result % 30000) + 1;
+#endif
+}
+
+int OS::v6_wait() { // 7
+    int status, result = sys_wait(&status);
+    cpu.r[1] = status | 14;
+    return result;
+}
+
+int OS::v6_exec(const char *path, int argp) { // 11
+#if 0
+    FILE *f = fopen("core", "wb");
+    fwrite(data, 1, 0x10000, f);
+    fclose(f);
+#endif
+    if (trace) fprintf(stderr, "<exec(\"%s\"", path);
+    std::vector<std::string> args, envs;
+    int slen = 0, p;
+    while ((p = vm->read16(argp + args.size() * 2))) {
+        std::string arg = vm->str(p);
+        if (trace && !args.empty()) fprintf(stderr, ", \"%s\"", arg.c_str());
+        slen += arg.size() + 1;
+        args.push_back(arg);
+    }
+    if (!load(path)) {
+        if (trace) fprintf(stderr, ") => EINVAL>\n");
+        errno = EINVAL;
+        return -1;
+    }
+    resetsig();
+    cpu.SP = 0;
+    setArgs(args, envs);
+    if (trace) fprintf(stderr, ") => 0>\n");
+    return 0;
+}
+
+int OS::v6_brk(int nd) { // 17
+    return sys_brk(nd, cpu.SP);
+}
+
+void OS::sighandler2(int sig) {
+    uint16_t r[8];
+    memcpy(r, cpu.r, sizeof (r));
+    bool Z = cpu.Z, N = cpu.N, C = cpu.C, V = cpu.V;
+    cpu.write16((cpu.SP -= 2), cpu.PC);
+    cpu.PC = sighandlers[sig];
+    while (!cpu.hasExited && !(cpu.PC == PC && cpu.SP == SP)) {
+        cpu.run1();
+    }
+    if (!cpu.hasExited) {
+        memcpy(cpu.r, r, sizeof (r));
+        cpu.Z = Z;
+        cpu.N = N;
+        cpu.C = C;
+        cpu.V = V;
+    }
+}

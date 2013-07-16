@@ -35,8 +35,6 @@
       <df name="UnixV6">
         <in>OS.cpp</in>
         <in>OS.h</in>
-        <in>OS.signal.cpp</in>
-        <in>OS.sys.cpp</in>
         <in>OSBase.cpp</in>
         <in>OSBase.h</in>
       </df>
