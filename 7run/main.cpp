@@ -5,7 +5,7 @@
 #include <string.h>
 
 int main(int argc, char *argv[]) {
-    bool dis = false, pdp11 = false;
+    bool dis = false, pdp11 = false, i8086 = false;
     std::vector<std::string> args;
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -22,6 +22,8 @@ int main(int argc, char *argv[]) {
             dis = true;
         } else if (arg == "-p") {
             pdp11 = true;
+        } else if (arg == "-8") {
+            i8086 = true;
         } else {
             for (; i < argc; i++) {
                 args.push_back(argv[i]);
@@ -31,6 +33,7 @@ int main(int argc, char *argv[]) {
     if (args.empty()) {
         printf("usage: %s [-p] [-d|-v/-s] cmd [args ...]\n", argv[0]);
         printf("    -p: PDP-11 mode\n");
+        printf("    -8: 8086/V6 mode\n");
         printf("    -d: disassemble mode (not run)\n");
         printf("    -m: verbose mode with memory dump\n");
         printf("    -v: verbose mode (output syscall and disassemble)\n");
@@ -53,7 +56,7 @@ int main(int argc, char *argv[]) {
     UnixBase *vm;
     if (pdp11 || UnixV6::OSPDP11::check(buf)) {
         vm = new UnixV6::OSPDP11();
-    } else if (UnixV6::OSi8086::check(buf)) {
+    } else if (i8086 || UnixV6::OSi8086::check(buf)) {
         vm = new UnixV6::OSi8086();
     } else {
         vm = new Minix2::OS();
