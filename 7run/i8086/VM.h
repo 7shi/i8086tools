@@ -18,8 +18,9 @@ namespace i8086 {
         VM();
         VM(const VM &vm);
         virtual ~VM();
-        virtual void disasm();
 
+        virtual bool load(const std::string &fn, FILE *f, size_t size);
+        virtual void disasm();
         virtual void showHeader();
         virtual void run2();
 

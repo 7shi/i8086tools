@@ -11,9 +11,8 @@
 int trace;
 int exitcode;
 
-VMBase::VMBase() : data(NULL), tsize(0), brksize(0), hasExited(false) {
-    text = new uint8_t[0x10000];
-    memset(text, 0, 0x10000);
+VMBase::VMBase()
+: text(NULL), data(NULL), tsize(0), brksize(0), hasExited(false) {
 }
 
 VMBase::VMBase(const VMBase &vm) : hasExited(false) {
@@ -31,6 +30,26 @@ VMBase::VMBase(const VMBase &vm) : hasExited(false) {
 }
 
 VMBase::~VMBase() {
-    if (data != text) delete[] data;
-    delete[] text;
+    release();
+}
+
+void VMBase::release() {
+    if (data && data != text) delete[] data;
+    if (text) delete[] text;
+    text = data = NULL;
+}
+
+bool VMBase::load(const std::string& fn, FILE* f, size_t size) {
+    if (size > 0xffff) {
+        fprintf(stderr, "too long raw binary: %s\n", fn.c_str());
+        return false;
+    }
+    release();
+    text = data = new uint8_t[0x10000];
+    memset(text, 0, 0x10000);
+    fseek(f, 0, SEEK_SET);
+    fread(text, 1, size, f);
+    tsize = brksize = size;
+    dsize = 0;
+    return true;
 }

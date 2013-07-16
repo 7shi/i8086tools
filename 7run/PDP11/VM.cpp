@@ -63,6 +63,13 @@ VM::VM(const VM &vm) : VMBase(vm) {
 VM::~VM() {
 }
 
+bool VM::load(const std::string& fn, FILE* f, size_t size) {
+    if (!VMBase::load(fn, f, size)) return false;
+    PC = 0;
+    cache.clear();
+    return true;
+}
+
 int VM::addr(const Operand &opr, bool nomove) {
     if (opr.reg == 7) {
         switch (opr.mode) {

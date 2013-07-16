@@ -48,18 +48,7 @@ void OS::setArgs(
 bool OS::load2(const std::string &fn, FILE *f, size_t size) {
     uint8_t h[0x10];
     if (!fread(h, sizeof (h), 1, f) || !check(h)) {
-        if (size > 0xffff) {
-            fprintf(stderr, "too long raw binary: %s\n", fn.c_str());
-            return false;
-        }
-        fseek(f, 0, SEEK_SET);
-        fread(cpu.text, 1, size, f);
-        cpu.PC = 0;
-        cpu.cache.clear();
-        cpu.data = cpu.text;
-        cpu.tsize = cpu.runmax = cpu.brksize = cpu.tsize;
-        cpu.dsize = 0;
-        return true;
+        return cpu.load(fn, f, size);
     }
 
     cpu.tsize = ::read16(h + 2);
@@ -68,6 +57,8 @@ bool OS::load2(const std::string &fn, FILE *f, size_t size) {
     cpu.PC = ::read16(h + 10);
     cpu.cache.clear();
     cpu.cache.resize(0x10000);
+    cpu.text = new uint8_t[0x10000];
+    memset(cpu.text, 0, 0x10000);
     if (h[0] == 9) { // 0411
         cpu.data = new uint8_t[0x10000];
         memset(cpu.data, 0, 0x10000);

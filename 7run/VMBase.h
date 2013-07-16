@@ -24,10 +24,13 @@ struct VMBase {
     VMBase(const VMBase &vm);
     virtual ~VMBase();
 
+    void release();
+
+    virtual bool load(const std::string &fn, FILE *f, size_t size);
     virtual void disasm() = 0;
     virtual void showHeader() = 0;
     virtual void run2() = 0;
-
+    
     inline uint8_t read8(uint16_t addr) {
         return data[addr];
     }

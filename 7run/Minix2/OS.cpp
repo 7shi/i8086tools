@@ -55,18 +55,7 @@ void OS::setArgs(
 bool OS::load2(const std::string &fn, FILE *f, size_t size) {
     uint8_t h[0x20];
     if (!fread(h, sizeof (h), 1, f) || !(h[0] == 1 && h[1] == 3)) {
-        if (size > 0xffff) {
-            fprintf(stderr, "too long raw binary: %s\n", fn.c_str());
-            return false;
-        }
-        fseek(f, 0, SEEK_SET);
-        fread(cpu.text, 1, size, f);
-        cpu.ip = 0;
-        cpu.cache.clear();
-        cpu.data = cpu.text;
-        cpu.tsize = cpu.brksize = cpu.tsize;
-        cpu.dsize = 0;
-        return true;
+        return cpu.load(fn, f, size);
     }
     if (h[3] != 4) {
         fprintf(stderr, "unknown cpu id: %d\n", h[3]);
