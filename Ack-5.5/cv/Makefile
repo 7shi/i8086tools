@@ -1,5 +1,5 @@
 TARGET = cv
-SOURCES = cv-pdp.c ../mylib.c
+SOURCES = cv.c ../mylib.c
 OBJECTS = $(SOURCES:.c=.o)
 CFLAGS  = -I../include
 LDFLAGS = -L../lib -lobject
