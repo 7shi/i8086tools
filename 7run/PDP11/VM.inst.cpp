@@ -537,5 +537,5 @@ void VM::run1() {
         debug(oldpc, *op);
     }
     fprintf(stderr, "not implemented\n");
-    hasExited = true;
+    unix->sys_exit(-1);
 }

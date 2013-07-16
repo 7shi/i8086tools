@@ -989,5 +989,5 @@ void VM::run1(uint8_t prefix) {
         debug(oldip, *op);
     }
     fprintf(stderr, "not implemented\n");
-    hasExited = true;
+    unix->sys_exit(-1);
 }

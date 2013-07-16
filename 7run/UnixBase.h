@@ -41,6 +41,7 @@ protected:
     virtual void setsig(int sig, int h) = 0;
     virtual void swtch(bool reset = false) = 0;
 
+public:
     int getfd();
     int open(const std::string &path, int flag, int mode);
     int close(int fd);
