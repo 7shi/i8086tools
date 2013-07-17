@@ -2,6 +2,8 @@
 
 using namespace PDP11;
 
+OpCode PDP11::undefop(1, "(undefined)");
+
 OpCode::OpCode()
 : len(0) {
 }

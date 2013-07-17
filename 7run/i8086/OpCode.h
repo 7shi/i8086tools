@@ -18,6 +18,8 @@ namespace i8086 {
         void swap();
     };
 
+    extern OpCode undefop;
+
     inline OpCode getop(
             size_t len, const char *mne,
             const Operand &opr1 = noopr,
@@ -30,5 +32,9 @@ namespace i8086 {
             const char *mne, const Operand &opr = noopr) {
         OpCode ret = {mne, 1, mne, noopr, opr};
         return ret;
+    }
+
+    inline bool isundef(const OpCode &op) {
+        return op.mne == undefop.mne;
     }
 }

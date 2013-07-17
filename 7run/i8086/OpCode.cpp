@@ -2,6 +2,8 @@
 
 using namespace i8086;
 
+OpCode i8086::undefop = {NULL, 1, "(undefined)", noopr, noopr};
+
 std::string OpCode::str() const {
     std::string mne = this->mne;
     if (prefix) {
