@@ -24,6 +24,7 @@ namespace i8086 {
         virtual void showHeader();
         virtual void run2();
 
+        std::string disstr(const OpCode &op);
         void run1(uint8_t prefix = 0);
         void debug(uint16_t ip, const OpCode &op);
         int addr(const Operand &opr);

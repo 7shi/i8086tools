@@ -118,5 +118,30 @@ void VM::run2() {
 }
 
 void VM::disasm() {
-    ::disasm(text, tsize);
+    int addr = 0, undef = 0;
+    while (addr < (int) tsize) {
+        showsym(addr);
+        OpCode op = disasm1(text, addr, tsize);
+        disout(text, addr, op.len, disstr(op));
+        if (op.undef()) undef++;
+        addr += op.len;
+    }
+    if (undef) printf("undefined: %d\n", undef);
+}
+
+std::string VM::disstr(const OpCode &op) {
+    std::string ret = op.str();
+    if (op.opr1.type == Addr) {
+        std::map<int, Symbol>::iterator it = syms[1].find(op.opr1.value);
+        if (it != syms[1].end()) {
+            ret += " ; " + it->second.name;
+        }
+    }
+    if (op.opr2.type == Addr) {
+        std::map<int, Symbol>::iterator it = syms[1].find(op.opr2.value);
+        if (it != syms[1].end()) {
+            ret += " ; " + it->second.name;
+        }
+    }
+    return ret;
 }
