@@ -1,8 +1,10 @@
 #include "OSi8086.h"
 #include "../i8086/regs.h"
+#include "../i8086/disasm.h"
 #include <string.h>
 
 using namespace UnixV6;
+using namespace i8086;
 
 bool OSi8086::check(uint8_t h[2]) {
     return h[0] == 0xeb && (h[1] == 0x0e || h[1] == 0x10 || h[1] == 0x12);
@@ -22,7 +24,31 @@ OSi8086::~OSi8086() {
 }
 
 void OSi8086::disasm() {
-    vm->disasm();
+    int addr = 0, undef = 0;
+    while (addr < (int) vm->tsize) {
+        vm->showsym(addr);
+        OpCode op = disasm1(vm->text, addr, vm->tsize);
+        std::string ops = cpu.disstr(op);
+        int argc = 0;
+        if (vm->text[addr] == 0xcd) {
+            int n = vm->text[addr + 1];
+            if (n < nsys) {
+                sysarg &sa = sysargs[n];
+                argc = sa.argc;
+                if (sa.name) {
+                    ops += " ; ";
+                    ops += sa.name;
+                }
+            }
+        }
+        disout(vm->text, addr, op.len, ops);
+        if (op.undef()) undef++;
+        addr += op.len;
+        for (int i = 0; i < argc; i++, addr += 2) {
+            ::disout(vm->text, addr, 2, "; arg");
+        }
+    }
+    if (undef) printf("undefined: %d\n", undef);
 }
 
 void OSi8086::setArgs(

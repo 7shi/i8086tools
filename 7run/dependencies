@@ -56,4 +56,5 @@ UnixV6/OSPDP11.o: UnixV6/OSPDP11.cpp UnixV6/OSPDP11.h UnixV6/OS.h \
 UnixV6/OSi8086.o: UnixV6/OSi8086.cpp UnixV6/OSi8086.h UnixV6/OS.h \
  UnixV6/../UnixBase.h UnixV6/../utils.h UnixV6/../File.h \
  UnixV6/../VMBase.h UnixV6/../i8086/VM.h UnixV6/../i8086/OpCode.h \
- UnixV6/../i8086/Operand.h UnixV6/../i8086/regs.h
+ UnixV6/../i8086/Operand.h UnixV6/../i8086/regs.h \
+ UnixV6/../i8086/disasm.h
