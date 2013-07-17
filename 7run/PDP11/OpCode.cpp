@@ -19,3 +19,7 @@ std::string OpCode::str() const {
     if (opr2.empty()) return mne + " " + opr1.str();
     return mne + " " + opr1.str() + ", " + opr2.str();
 }
+
+bool OpCode::undef() const {
+    return mne == undefop.mne;
+}

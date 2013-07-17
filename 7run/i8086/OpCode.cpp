@@ -27,3 +27,7 @@ void OpCode::swap() {
     opr1 = opr2;
     opr2 = tmp;
 }
+
+bool OpCode::undef() const {
+    return mne == undefop.mne;
+}

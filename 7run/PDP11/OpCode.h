@@ -18,12 +18,9 @@ namespace PDP11 {
             return len == 0;
         }
 
+        bool undef() const;
         std::string str() const;
     };
 
     extern OpCode undefop;
-
-    inline bool isundef(const OpCode &op) {
-        return op.mne == undefop.mne;
-    }
 }

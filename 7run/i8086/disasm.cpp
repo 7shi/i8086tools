@@ -44,8 +44,6 @@ static inline OpCode aimm(uint8_t *mem, const char *mne) {
             getop(2, mne, reg(0, false), imm8(mem[1]));
 }
 
-static int undefined;
-
 OpCode i8086::disasm1(uint8_t *mem, uint16_t addr) {
     uint8_t b = mem[0];
     switch (b) {
@@ -348,17 +346,16 @@ OpCode i8086::disasm1(uint8_t *mem, uint16_t addr) {
             return modrm(mem, mne, b & 1);
         }
     }
-    undefined++;
-    return getop(1, "(undefined)");
+    return undefop;
 }
 
-OpCode i8086::disasm1(uint8_t *mem, uint16_t addr, size_t last) {
+OpCode i8086::disasm1(uint8_t *mem, uint16_t addr, size_t size) {
     OpCode op1 = disasm1(mem, addr);
     uint16_t addr2 = addr + op1.len;
-    if (!op1.prefix || addr2 > last) return op1;
+    if (!op1.prefix || addr2 > size) return op1;
 
     OpCode op2 = disasm1(mem + op1.len, addr2);
-    if (op2.prefix || addr2 + op2.len > last) return op1;
+    if (op2.prefix || addr2 + op2.len > size) return op1;
 
     op2.len += op1.len;
     if (!op1.opr2.empty()) {
@@ -374,23 +371,28 @@ OpCode i8086::disasm1(uint8_t *mem, uint16_t addr, size_t last) {
     return op2;
 }
 
-void i8086::disasm(uint8_t *mem, size_t size) {
-    undefined = 0;
-    int index = 0;
-    while (index < (int) size) {
-        OpCode op = disasm1(mem + index, index, size);
-        std::string ops = op.str();
-        if (index + op.len > size) {
-            op.len = size - index;
-            ops = "db ";
-            for (int i = index; i < (int) size; i++) {
-                if (ops.size() != 3) ops += ", ";
-                ops += hex(mem[i], 2);
-            }
+OpCode i8086::disasm1p(uint8_t *mem, uint16_t addr, size_t size) {
+    OpCode op = disasm1(mem, addr, size);
+    std::string ops = op.str();
+    if (addr + op.len > size) {
+        op.len = size - addr;
+        ops = "db ";
+        for (int i = 0; i < (int) op.len; i++) {
+            if (ops.size() != 3) ops += ", ";
+            ops += hex(mem[i], 2);
         }
-        std::string hex = hexdump(mem + index, op.len);
-        printf("%04x: %-12s  %s\n", index, hex.c_str(), ops.c_str());
-        index += op.len;
     }
-    if (undefined) printf("undefined: %d\n", undefined);
+    std::string hex = hexdump(mem, op.len);
+    printf("%04x: %-12s  %s\n", addr, hex.c_str(), ops.c_str());
+    return op;
+}
+
+void i8086::disasm(uint8_t *mem, size_t size) {
+    int addr = 0, undef = 0;
+    while (addr < (int) size) {
+        OpCode op = disasm1p(mem + addr, addr, size);
+        if (op.undef()) undef++;
+        addr += op.len;
+    }
+    if (undef) printf("undefined: %d\n", undef);
 }

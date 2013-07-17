@@ -6,8 +6,6 @@ using namespace PDP11;
 
 std::string PDP11::regs[] = {"r0", "r1", "r2", "r3", "r4", "r5", "sp", "pc"};
 
-static int undefined;
-
 static inline OpCode srcdst(uint8_t *mem, uint16_t addr, int w, const char *mne) {
     Operand opr1(mem + 2, addr + 2, w >> 6);
     int offset = 2 + opr1.len;
@@ -248,51 +246,53 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
             }
             break;
     }
-    undefined++;
-    return OpCode(2, "(undefined)");
+    return undefop;
+}
+
+OpCode PDP11::disasm1p(uint8_t *mem, uint16_t addr, std::map<int, Symbol> *syms) {
+    OpCode op = disasm1(mem, addr);
+    std::string ops = op.str();
+    if (syms) {
+        std::map<int, Symbol>::iterator it;
+        it = syms[0].find(addr);
+        if (it != syms[0].end()) {
+            printf("\n[%s]\n", it->second.name.c_str());
+        }
+        it = syms[1].find(addr);
+        if (it != syms[1].end()) {
+            printf("%s:\n", it->second.name.c_str());
+        }
+        if (!strcmp(op.mne, "jmp") && op.opr1.isaddr()) {
+            it = syms[1].find(op.opr1.value);
+            if (it != syms[1].end()) {
+                ops += " ;" + it->second.name;
+            }
+        } else if (!strcmp(op.mne, "jsr") && op.opr2.isaddr()) {
+            it = syms[1].find(op.opr2.value);
+            if (it != syms[1].end()) {
+                ops += " ;" + it->second.name;
+            }
+        }
+    }
+    for (int i = 0; i < (int) op.len; i += 6) {
+        int len = op.len - i;
+        if (len > 6) len = 6;
+        std::string hex = hexdump2(mem + i, len);
+        if (i == 0) {
+            printf("%04x: %-14s  %s\n", addr, hex.c_str(), ops.c_str());
+        } else {
+            printf("      %-14s\n", hex.c_str());
+        }
+    }
+    return op;
 }
 
 void PDP11::disasm(uint8_t *mem, size_t size, std::map<int, Symbol> *syms) {
-    undefined = 0;
-    int index = 0;
-    while (index < (int) size) {
-        OpCode op = disasm1(mem + index, index);
-        std::string ops = op.str();
-        if (syms) {
-            std::map<int, Symbol>::iterator it;
-            it = syms[0].find(index);
-            if (it != syms[0].end()) {
-                printf("\n[%s]\n", it->second.name.c_str());
-            }
-            it = syms[1].find(index);
-            if (it != syms[1].end()) {
-                printf("%s:\n", it->second.name.c_str());
-            }
-            if (!strcmp(op.mne, "jmp") && op.opr1.isaddr()) {
-                it = syms[1].find(op.opr1.value);
-                if (it != syms[1].end()) {
-                    ops += " ; ";
-                    ops += it->second.name;
-                }
-            } else if (!strcmp(op.mne, "jsr") && op.opr2.isaddr()) {
-                it = syms[1].find(op.opr2.value);
-                if (it != syms[1].end()) {
-                    ops += " ; ";
-                    ops += it->second.name;
-                }
-            }
-        }
-        for (int i = 0; i < (int) op.len; i += 6) {
-            int len = op.len - i;
-            if (len > 6) len = 6;
-            std::string hex = hexdump2(mem + index + i, len);
-            if (i == 0) {
-                printf("%04x: %-14s  %s\n", index, hex.c_str(), ops.c_str());
-            } else {
-                printf("      %-14s\n", hex.c_str());
-            }
-        }
-        index += op.len;
+    int addr = 0, undef = 0;
+    while (addr < (int) size) {
+        OpCode op = disasm1p(mem + addr, addr, syms);
+        if (op.undef()) undef++;
+        addr += op.len;
     }
-    if (undefined) printf("undefined: %d\n", undefined);
+    if (undef) printf("undefined: %d\n", undef);
 }

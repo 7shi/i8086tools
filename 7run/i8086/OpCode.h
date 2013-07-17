@@ -14,6 +14,7 @@ namespace i8086 {
             return len == 0;
         }
 
+        bool undef() const;
         std::string str() const;
         void swap();
     };
@@ -32,9 +33,5 @@ namespace i8086 {
             const char *mne, const Operand &opr = noopr) {
         OpCode ret = {mne, 1, mne, noopr, opr};
         return ret;
-    }
-
-    inline bool isundef(const OpCode &op) {
-        return op.mne == undefop.mne;
     }
 }
