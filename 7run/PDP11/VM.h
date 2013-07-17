@@ -1,7 +1,6 @@
 #pragma once
 #include "../VMBase.h"
 #include "OpCode.h"
-#include "disasm.h"
 
 namespace PDP11 {
     extern const char *header;

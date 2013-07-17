@@ -2,7 +2,7 @@
  Minix2/../File.h Minix2/../VMBase.h Minix2/../i8086/VM.h \
  Minix2/../i8086/OpCode.h Minix2/../i8086/Operand.h UnixV6/OSPDP11.h \
  UnixV6/OS.h UnixV6/../PDP11/VM.h UnixV6/../PDP11/OpCode.h \
- UnixV6/../PDP11/Operand.h UnixV6/../PDP11/disasm.h UnixV6/OSi8086.h
+ UnixV6/../PDP11/Operand.h UnixV6/OSi8086.h
 ./utils.o: utils.cpp utils.h
 ./File.o: File.cpp File.h
 ./VMBase.o: VMBase.cpp VMBase.h utils.h File.h UnixBase.h
@@ -41,7 +41,7 @@ PDP11/VM.o: PDP11/VM.cpp PDP11/VM.h PDP11/../VMBase.h PDP11/../utils.h \
  PDP11/regs.h
 PDP11/VM.inst.o: PDP11/VM.inst.cpp PDP11/VM.h PDP11/../VMBase.h \
  PDP11/../utils.h PDP11/../File.h PDP11/OpCode.h PDP11/Operand.h \
- PDP11/disasm.h PDP11/../UnixBase.h PDP11/regs.h
+ PDP11/../UnixBase.h PDP11/disasm.h PDP11/regs.h
 PDP11/disasm.o: PDP11/disasm.cpp PDP11/disasm.h PDP11/OpCode.h PDP11/Operand.h \
  PDP11/../utils.h PDP11/../VMBase.h PDP11/../File.h
 UnixV6/OS.o: UnixV6/OS.cpp UnixV6/OS.h UnixV6/../UnixBase.h UnixV6/../utils.h \
@@ -51,8 +51,8 @@ UnixV6/OS.sys.o: UnixV6/OS.sys.cpp UnixV6/OS.h UnixV6/../UnixBase.h \
 UnixV6/OSPDP11.o: UnixV6/OSPDP11.cpp UnixV6/OSPDP11.h UnixV6/OS.h \
  UnixV6/../UnixBase.h UnixV6/../utils.h UnixV6/../File.h \
  UnixV6/../VMBase.h UnixV6/../PDP11/VM.h UnixV6/../PDP11/OpCode.h \
- UnixV6/../PDP11/Operand.h UnixV6/../PDP11/disasm.h \
- UnixV6/../PDP11/regs.h
+ UnixV6/../PDP11/Operand.h UnixV6/../PDP11/regs.h \
+ UnixV6/../PDP11/disasm.h
 UnixV6/OSi8086.o: UnixV6/OSi8086.cpp UnixV6/OSi8086.h UnixV6/OS.h \
  UnixV6/../UnixBase.h UnixV6/../utils.h UnixV6/../File.h \
  UnixV6/../VMBase.h UnixV6/../i8086/VM.h UnixV6/../i8086/OpCode.h \

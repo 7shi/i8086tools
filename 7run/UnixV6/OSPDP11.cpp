@@ -1,5 +1,6 @@
 #include "OSPDP11.h"
 #include "../PDP11/regs.h"
+#include "../PDP11/disasm.h"
 #include <string.h>
 
 using namespace UnixV6;
