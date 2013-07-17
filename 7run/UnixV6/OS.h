@@ -5,7 +5,7 @@ namespace UnixV6 {
 
     struct sysarg {
         int argc;
-        const char *name;
+        std::string name;
     };
 
     class OS : public UnixBase {

@@ -30,22 +30,20 @@ void OSi8086::disasm() {
         OpCode op = disasm1(vm->text, addr, vm->tsize);
         std::string ops = cpu.disstr(op);
         int argc = 0;
-        if (vm->text[addr] == 0xcd) {
-            int n = vm->text[addr + 1];
-            if (n < nsys) {
-                sysarg &sa = sysargs[n];
-                argc = sa.argc;
-                if (sa.name) {
-                    ops += " ; ";
-                    ops += sa.name;
-                }
+        if (vm->text[addr + 1] == 0x89) {
+            int n = vm->text[addr];
+            if (n < nsys && !sysargs[n].name.empty()) {
+                argc = sysargs[n].argc;
+                ops += " ; " + sysargs[n].name;
             }
         }
         disout(vm->text, addr, op.len, ops);
         if (op.undef()) undef++;
         addr += op.len;
-        for (int i = 0; i < argc; i++, addr += 2) {
-            ::disout(vm->text, addr, 2, "; arg");
+        if (argc > 0) {
+            int len = argc << 1;
+            ::disout(vm->text, addr, len, "; args");
+            addr += len;
         }
     }
     if (undef) printf("undefined: %d\n", undef);

@@ -30,20 +30,20 @@ sysarg OS::sysargs[] = {
     {/*24*/ 0, "getuid"},
     {/*25*/ 0, "stime"},
     {/*26*/ 3, "ptrace"},
-    {/*27*/ 0, NULL},
+    {/*27*/ 0, ""},
     {/*28*/ 1, "fstat"},
-    {/*29*/ 0, NULL},
+    {/*29*/ 0, ""},
     {/*30*/ 1, "smdate"},
     {/*31*/ 1, "stty"},
     {/*32*/ 1, "gtty"},
-    {/*33*/ 0, NULL},
+    {/*33*/ 0, ""},
     {/*34*/ 0, "nice"},
     {/*35*/ 0, "sleep"},
     {/*36*/ 0, "sync"},
     {/*37*/ 1, "kill"},
     {/*38*/ 0, "switch"},
-    {/*39*/ 0, NULL},
-    {/*40*/ 0, NULL},
+    {/*39*/ 0, ""},
+    {/*40*/ 0, ""},
     {/*41*/ 0, "dup"},
     {/*42*/ 0, "pipe"},
     {/*43*/ 1, "times"},
@@ -122,8 +122,8 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
             *result = v6_signal(read16(args), read16(args + 2));
             return 4;
         default:
-            if (n < nsys && sysargs[n].name) {
-                fprintf(stderr, "<%s: not implemented>\n", sysargs[n].name);
+            if (n < nsys && !sysargs[n].name.empty()) {
+                fprintf(stderr, "<%s: not implemented>\n", sysargs[n].name.c_str());
             } else {
                 fprintf(stderr, "<%d: unknown syscall>\n", n);
             }
