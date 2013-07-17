@@ -352,7 +352,8 @@ OpCode i8086::disasm1(uint8_t *text, uint16_t addr) {
 OpCode i8086::disasm1(uint8_t *text, uint16_t addr, size_t size) {
     OpCode op1 = disasm1(text, addr);
     uint16_t addr2 = addr + op1.len;
-    if (!op1.prefix || addr2 > size) return op1;
+    if (addr2 > size) return undefop;
+    if (!op1.prefix) return op1;
 
     OpCode op2 = disasm1(text, addr2);
     if (op2.prefix || addr2 + op2.len > size) return op1;
@@ -371,28 +372,26 @@ OpCode i8086::disasm1(uint8_t *text, uint16_t addr, size_t size) {
     return op2;
 }
 
-OpCode i8086::disasm1p(uint8_t *text, uint16_t addr, size_t size) {
-    OpCode op = disasm1(text, addr, size);
-    std::string ops = op.str();
-    if (addr + op.len > size) {
-        op.len = size - addr;
-        ops = "db ";
-        for (int i = addr; i < (int) size; i++) {
-            if (ops.size() != 3) ops += ", ";
-            ops += hex(text[i], 2);
-        }
-    }
-    std::string hex = hexdump(text + addr, op.len);
-    printf("%04x: %-12s  %s\n", addr, hex.c_str(), ops.c_str());
-    return op;
-}
-
 void i8086::disasm(uint8_t *text, size_t size) {
     int addr = 0, undef = 0;
     while (addr < (int) size) {
-        OpCode op = disasm1p(text, addr, size);
+        OpCode op = disasm1(text, addr, size);
+        disout(text, addr, op.len, op.str());
         if (op.undef()) undef++;
         addr += op.len;
     }
     if (undef) printf("undefined: %d\n", undef);
+}
+
+void i8086::disout(uint8_t *text, uint16_t addr, int len, const std::string &ops) {
+    for (int i = 0; i < len; i += 6) {
+        int left = len - i;
+        if (left > 6) left = 6;
+        std::string hex = hexdump(text + addr + i, left);
+        if (i == 0) {
+            printf("%04x: %-12s  %s\n", addr, hex.c_str(), ops.c_str());
+        } else {
+            printf("      %-12s\n", hex.c_str());
+        }
+    }
 }
