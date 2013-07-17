@@ -45,10 +45,8 @@ void OSPDP11::disasm() {
         disout(vm->text, addr, op.len, ops);
         if (op.undef()) undef++;
         addr += op.len;
-        if (argc > 0) {
-            int len = argc << 1;
-            ::disout(vm->text, addr, len, "; args");
-            addr += len;
+        for (int i = 0; i < argc; i++, addr += 2) {
+            ::disout(vm->text, addr, 2, "; arg");
         }
     }
     if (undef) printf("undefined: %d\n", undef);
