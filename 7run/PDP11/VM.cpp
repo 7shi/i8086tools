@@ -120,14 +120,13 @@ void VM::disasm() {
 
 std::string VM::disstr(const OpCode &op) {
     std::string ret = op.str();
-    std::map<int, Symbol>::iterator it;
     if (!strcmp(op.mne, "jmp") && op.opr1.isaddr()) {
-        it = syms[1].find(op.opr1.value);
+        std::map<int, Symbol>::iterator it = syms[1].find(op.opr1.value);
         if (it != syms[1].end()) {
             ret += " ; " + it->second.name;
         }
     } else if (!strcmp(op.mne, "jsr") && op.opr2.isaddr()) {
-        it = syms[1].find(op.opr2.value);
+        std::map<int, Symbol>::iterator it = syms[1].find(op.opr2.value);
         if (it != syms[1].end()) {
             ret += " ; " + it->second.name;
         }
