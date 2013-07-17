@@ -22,9 +22,9 @@ namespace PDP11 {
         virtual void run2();
 
         std::string disstr(const OpCode &op);
+        void run1();
         void debug(uint16_t pc, const OpCode &op);
         int addr(const Operand &opr, bool nomobe = false);
-        void run1();
 
         inline uint32_t getReg32(int reg) {
             return (r[reg] << 16) | r[(reg + 1) & 7];
