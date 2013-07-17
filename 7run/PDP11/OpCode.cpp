@@ -2,7 +2,7 @@
 
 using namespace PDP11;
 
-OpCode PDP11::undefop(1, "(undefined)");
+OpCode PDP11::undefop(2, "(undefined)");
 
 OpCode::OpCode()
 : len(0) {
