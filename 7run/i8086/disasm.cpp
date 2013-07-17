@@ -44,8 +44,8 @@ static inline OpCode aimm(uint8_t *mem, const char *mne) {
             getop(2, mne, reg(0, false), imm8(mem[1]));
 }
 
-OpCode i8086::disasm1(uint8_t *mem, uint16_t addr) {
-    uint8_t b = mem[0];
+OpCode i8086::disasm1(uint8_t *text, uint16_t addr) {
+    uint8_t *mem = text + addr, b = mem[0];
     switch (b) {
         case 0x00:
         case 0x01:
@@ -349,12 +349,12 @@ OpCode i8086::disasm1(uint8_t *mem, uint16_t addr) {
     return undefop;
 }
 
-OpCode i8086::disasm1(uint8_t *mem, uint16_t addr, size_t size) {
-    OpCode op1 = disasm1(mem, addr);
+OpCode i8086::disasm1(uint8_t *text, uint16_t addr, size_t size) {
+    OpCode op1 = disasm1(text, addr);
     uint16_t addr2 = addr + op1.len;
     if (!op1.prefix || addr2 > size) return op1;
 
-    OpCode op2 = disasm1(mem + op1.len, addr2);
+    OpCode op2 = disasm1(text, addr2);
     if (op2.prefix || addr2 + op2.len > size) return op1;
 
     op2.len += op1.len;
@@ -371,26 +371,26 @@ OpCode i8086::disasm1(uint8_t *mem, uint16_t addr, size_t size) {
     return op2;
 }
 
-OpCode i8086::disasm1p(uint8_t *mem, uint16_t addr, size_t size) {
-    OpCode op = disasm1(mem, addr, size);
+OpCode i8086::disasm1p(uint8_t *text, uint16_t addr, size_t size) {
+    OpCode op = disasm1(text, addr, size);
     std::string ops = op.str();
     if (addr + op.len > size) {
         op.len = size - addr;
         ops = "db ";
-        for (int i = 0; i < (int) op.len; i++) {
+        for (int i = addr; i < (int) size; i++) {
             if (ops.size() != 3) ops += ", ";
-            ops += hex(mem[i], 2);
+            ops += hex(text[i], 2);
         }
     }
-    std::string hex = hexdump(mem, op.len);
+    std::string hex = hexdump(text + addr, op.len);
     printf("%04x: %-12s  %s\n", addr, hex.c_str(), ops.c_str());
     return op;
 }
 
-void i8086::disasm(uint8_t *mem, size_t size) {
+void i8086::disasm(uint8_t *text, size_t size) {
     int addr = 0, undef = 0;
     while (addr < (int) size) {
-        OpCode op = disasm1p(mem + addr, addr, size);
+        OpCode op = disasm1p(text, addr, size);
         if (op.undef()) undef++;
         addr += op.len;
     }

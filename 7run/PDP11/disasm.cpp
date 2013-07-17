@@ -44,7 +44,8 @@ static inline OpCode modrb(uint8_t *mem, uint16_t addr, int w, const char *mne) 
     return ret;
 }
 
-OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
+OpCode PDP11::disasm1(uint8_t *text, uint16_t addr) {
+    uint8_t *mem = text + addr;
     uint16_t w = ::read16(mem);
     switch (w >> 12) {
         case 000:
@@ -249,8 +250,8 @@ OpCode PDP11::disasm1(uint8_t *mem, uint16_t addr) {
     return undefop;
 }
 
-OpCode PDP11::disasm1p(uint8_t *mem, uint16_t addr, std::map<int, Symbol> *syms) {
-    OpCode op = disasm1(mem, addr);
+OpCode PDP11::disasm1p(uint8_t *text, uint16_t addr, std::map<int, Symbol> *syms) {
+    OpCode op = disasm1(text, addr);
     std::string ops = op.str();
     if (syms) {
         std::map<int, Symbol>::iterator it;
@@ -277,7 +278,7 @@ OpCode PDP11::disasm1p(uint8_t *mem, uint16_t addr, std::map<int, Symbol> *syms)
     for (int i = 0; i < (int) op.len; i += 6) {
         int len = op.len - i;
         if (len > 6) len = 6;
-        std::string hex = hexdump2(mem + i, len);
+        std::string hex = hexdump2(text + addr + i, len);
         if (i == 0) {
             printf("%04x: %-14s  %s\n", addr, hex.c_str(), ops.c_str());
         } else {
@@ -287,10 +288,10 @@ OpCode PDP11::disasm1p(uint8_t *mem, uint16_t addr, std::map<int, Symbol> *syms)
     return op;
 }
 
-void PDP11::disasm(uint8_t *mem, size_t size, std::map<int, Symbol> *syms) {
+void PDP11::disasm(uint8_t *text, size_t size, std::map<int, Symbol> *syms) {
     int addr = 0, undef = 0;
     while (addr < (int) size) {
-        OpCode op = disasm1p(mem + addr, addr, syms);
+        OpCode op = disasm1p(text, addr, syms);
         if (op.undef()) undef++;
         addr += op.len;
     }

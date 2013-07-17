@@ -9,12 +9,12 @@ using namespace i8086;
 void VM::run1(uint8_t prefix) {
     OpCode *op, op1;
     if (cache.empty()) {
-        op = &(op1 = disasm1(text + ip, ip, tsize));
+        op = &(op1 = disasm1(text, ip, tsize));
     } else {
         if (cache[ip].len > 0) {
             op = &cache[ip];
         } else {
-            op = &(cache[ip] = disasm1(text + ip, ip, tsize));
+            op = &(cache[ip] = disasm1(text, ip, tsize));
         }
     }
     if (ip + op->len > tsize) {
