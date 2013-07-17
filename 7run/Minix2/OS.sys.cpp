@@ -34,9 +34,9 @@ bool OS::syscall(int *result, uint8_t *m) {
         {
             int flag = read16(m + 6);
             if (flag & 64 /*O_CREAT*/) {
-                *result = sys_open(vm->str(read16(m + 10)), flag, read16(m + 8));
+                *result = sys_open(vm->str16(m + 10), flag, read16(m + 8));
             } else {
-                *result = sys_open(vm->str(read16(m + 8)), flag);
+                *result = sys_open(vm->str16(m + 8), flag);
             }
             return true;
         }
@@ -51,19 +51,19 @@ bool OS::syscall(int *result, uint8_t *m) {
             return true;
         }
         case 8:
-            *result = sys_creat(vm->str(read16(m + 8)), read16(m + 6));
+            *result = sys_creat(vm->str16(m + 8), read16(m + 6));
             return true;
         case 9:
-            *result = sys_link(vm->str(read16(m + 10)), vm->str(read16(m + 12)));
+            *result = sys_link(vm->str16(m + 10), vm->str16(m + 12));
             return true;
         case 10:
-            *result = sys_unlink(vm->str(read16(m + 8)));
+            *result = sys_unlink(vm->str16(m + 8));
             return true;
         case 11:
             fprintf(stderr, "<waitpid: not implemented>\n");
             break;
         case 12:
-            *result = sys_chdir(vm->str(read16(m + 8)));
+            *result = sys_chdir(vm->str16(m + 8));
             return true;
         case 13:
             *result = sys_time();
@@ -76,7 +76,7 @@ bool OS::syscall(int *result, uint8_t *m) {
             fprintf(stderr, "<mknod: not implemented>\n");
             break;
         case 15:
-            *result = sys_chmod(vm->str(read16(m + 8)), read16(m + 6));
+            *result = sys_chmod(vm->str16(m + 8), read16(m + 6));
             return true;
         case 16:
             fprintf(stderr, "<chown: not implemented>\n");
@@ -86,7 +86,7 @@ bool OS::syscall(int *result, uint8_t *m) {
             if (!*result) write16(m + 18, vm->brksize);
             return true;
         case 18:
-            *result = sys_stat(vm->str(read16(m + 10)), read16(m + 12));
+            *result = sys_stat(vm->str16(m + 10), read16(m + 12));
             return true;
         case 19:
         {
@@ -132,7 +132,7 @@ bool OS::syscall(int *result, uint8_t *m) {
             fprintf(stderr, "<utime: not implemented>\n");
             break;
         case 33:
-            *result = sys_access(vm->str(read16(m + 8)), read16(m + 6));
+            *result = sys_access(vm->str16(m + 8), read16(m + 6));
             return true;
         case 36:
             fprintf(stderr, "<sync: not implemented>\n");
@@ -174,7 +174,7 @@ bool OS::syscall(int *result, uint8_t *m) {
             fprintf(stderr, "<fcntl: not implemented>\n");
             break;
         case 59:
-            *result = minix_exec(vm->str(read16(m + 10)), read16(m + 12), read16(m + 6));
+            *result = minix_exec(vm->str16(m + 10), read16(m + 12), read16(m + 6));
             return *result;
         case 60:
             *result = sys_umask(read16(m + 4));

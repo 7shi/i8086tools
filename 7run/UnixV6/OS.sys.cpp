@@ -77,7 +77,7 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
             *result = sys_write(arg0, read16(args), read16(args + 2));
             return 4;
         case 5:
-            *result = sys_open(vm->str(read16(args)), read16(args + 2));
+            *result = sys_open(vm->str16(args), read16(args + 2));
             return 4;
         case 6:
             *result = sys_close(arg0);
@@ -86,28 +86,28 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
             *result = v6_wait();
             return 0;
         case 8:
-            *result = sys_creat(vm->str(read16(args)), read16(args + 2));
+            *result = sys_creat(vm->str16(args), read16(args + 2));
             return 4;
         case 9:
-            *result = sys_link(vm->str(read16(args)), vm->str(read16(args + 2)));
+            *result = sys_link(vm->str16(args), vm->str16(args + 2));
             return 4;
         case 10:
-            *result = sys_unlink(vm->str(read16(args)));
+            *result = sys_unlink(vm->str16(args));
             return 2;
         case 11:
-            *result = v6_exec(vm->str(read16(args)), read16(args + 2));
+            *result = v6_exec(vm->str16(args), read16(args + 2));
             return *result ? 4 : 0;
         case 12:
-            *result = sys_chdir(vm->str(read16(args)));
+            *result = sys_chdir(vm->str16(args));
             return 2;
         case 15:
-            *result = sys_chmod(vm->str(read16(args)), read16(args + 2));
+            *result = sys_chmod(vm->str16(args), read16(args + 2));
             return 4;
         case 17:
             *result = v6_brk(read16(args));
             return 2;
         case 18:
-            *result = sys_stat(vm->str(read16(args)), read16(args + 2));
+            *result = sys_stat(vm->str16(args), read16(args + 2));
             return 4;
         case 19:
             *result = v6_seek(arg0, read16(args), read16(args + 2));

@@ -65,4 +65,8 @@ struct VMBase {
     inline const char *str(uint16_t addr) {
         return (const char *) (data + addr);
     }
+
+    inline const char *str16(uint8_t *addr) {
+        return (const char *) (data + ::read16(addr));
+    }
 };
