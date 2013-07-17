@@ -3,6 +3,7 @@
 #include <string.h>
 
 using namespace UnixV6;
+using namespace PDP11;
 
 bool OSPDP11::check(uint8_t h[2]) {
     int magic = ::read16(h);
@@ -23,7 +24,33 @@ OSPDP11::~OSPDP11() {
 }
 
 void OSPDP11::disasm() {
-    vm->disasm();
+    int addr = 0, undef = 0;
+    while (addr < (int) vm->tsize) {
+        vm->showsym(addr);
+        OpCode op = disasm1(vm->text, addr);
+        std::string ops = cpu.disstr(op);
+        int argc = 0;
+        if (vm->text[addr + 1] == 0x89) {
+            int n = vm->text[addr];
+            if (n < nsys) {
+                sysarg &sa = sysargs[n];
+                argc = sa.argc;
+                if (sa.name) {
+                    ops += " ; ";
+                    ops += sa.name;
+                }
+            }
+        }
+        disout(vm->text, addr, op.len, ops);
+        if (op.undef()) undef++;
+        addr += op.len;
+        if (argc > 0) {
+            int len = argc << 1;
+            ::disout(vm->text, addr, len, "; args");
+            addr += len;
+        }
+    }
+    if (undef) printf("undefined: %d\n", undef);
 }
 
 void OSPDP11::setArgs(
