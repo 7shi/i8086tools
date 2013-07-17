@@ -21,6 +21,7 @@ namespace PDP11 {
         virtual void showHeader();
         virtual void run2();
 
+        std::string disstr(const OpCode &op);
         void debug(uint16_t pc, const OpCode &op);
         int addr(const Operand &opr, bool nomobe = false);
         void run1();

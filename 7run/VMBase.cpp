@@ -39,6 +39,18 @@ void VMBase::release() {
     text = data = NULL;
 }
 
+void VMBase::showsym(uint16_t addr) {
+    std::map<int, Symbol>::iterator it;
+    it = syms[0].find(addr);
+    if (it != syms[0].end()) {
+        printf("\n[%s]\n", it->second.name.c_str());
+    }
+    it = syms[1].find(addr);
+    if (it != syms[1].end()) {
+        printf("%s:\n", it->second.name.c_str());
+    }
+}
+
 bool VMBase::load(const std::string& fn, FILE* f, size_t size) {
     if (size > 0xffff) {
         fprintf(stderr, "too long raw binary: %s\n", fn.c_str());

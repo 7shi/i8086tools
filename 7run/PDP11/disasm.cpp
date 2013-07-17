@@ -250,50 +250,26 @@ OpCode PDP11::disasm1(uint8_t *text, uint16_t addr) {
     return undefop;
 }
 
-OpCode PDP11::disasm1p(uint8_t *text, uint16_t addr, std::map<int, Symbol> *syms) {
-    OpCode op = disasm1(text, addr);
-    std::string ops = op.str();
-    if (syms) {
-        std::map<int, Symbol>::iterator it;
-        it = syms[0].find(addr);
-        if (it != syms[0].end()) {
-            printf("\n[%s]\n", it->second.name.c_str());
-        }
-        it = syms[1].find(addr);
-        if (it != syms[1].end()) {
-            printf("%s:\n", it->second.name.c_str());
-        }
-        if (!strcmp(op.mne, "jmp") && op.opr1.isaddr()) {
-            it = syms[1].find(op.opr1.value);
-            if (it != syms[1].end()) {
-                ops += " ;" + it->second.name;
-            }
-        } else if (!strcmp(op.mne, "jsr") && op.opr2.isaddr()) {
-            it = syms[1].find(op.opr2.value);
-            if (it != syms[1].end()) {
-                ops += " ;" + it->second.name;
-            }
-        }
+void PDP11::disasm(uint8_t *text, size_t size) {
+    int addr = 0, undef = 0;
+    while (addr < (int) size) {
+        OpCode op = disasm1(text, addr);
+        disout(text, addr, op.len, op.str());
+        if (op.undef()) undef++;
+        addr += op.len;
     }
-    for (int i = 0; i < (int) op.len; i += 6) {
-        int len = op.len - i;
-        if (len > 6) len = 6;
-        std::string hex = hexdump2(text + addr + i, len);
+    if (undef) printf("undefined: %d\n", undef);
+}
+
+void PDP11::disout(uint8_t *text, uint16_t addr, int len, const std::string &ops) {
+    for (int i = 0; i < len; i += 6) {
+        int left = len - i;
+        if (left > 6) left = 6;
+        std::string hex = hexdump2(text + addr + i, left);
         if (i == 0) {
             printf("%04x: %-14s  %s\n", addr, hex.c_str(), ops.c_str());
         } else {
             printf("      %-14s\n", hex.c_str());
         }
     }
-    return op;
-}
-
-void PDP11::disasm(uint8_t *text, size_t size, std::map<int, Symbol> *syms) {
-    int addr = 0, undef = 0;
-    while (addr < (int) size) {
-        OpCode op = disasm1p(text, addr, syms);
-        if (op.undef()) undef++;
-        addr += op.len;
-    }
-    if (undef) printf("undefined: %d\n", undef);
 }
