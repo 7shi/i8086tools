@@ -21,6 +21,10 @@ OSi8086::OSi8086(const OSi8086 &os) : OS(os), cpu(os.cpu) {
 OSi8086::~OSi8086() {
 }
 
+void OSi8086::disasm() {
+    vm->disasm();
+}
+
 void OSi8086::setArgs(
         const std::vector<std::string> &args,
         const std::vector<std::string> &) {

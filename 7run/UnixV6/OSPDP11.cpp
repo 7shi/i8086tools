@@ -22,6 +22,10 @@ OSPDP11::OSPDP11(const OSPDP11 &os) : OS(os), cpu(os.cpu) {
 OSPDP11::~OSPDP11() {
 }
 
+void OSPDP11::disasm() {
+    vm->disasm();
+}
+
 void OSPDP11::setArgs(
         const std::vector<std::string> &args,
         const std::vector<std::string> &) {

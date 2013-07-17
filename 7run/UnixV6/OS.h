@@ -14,8 +14,6 @@ namespace UnixV6 {
         OS(const OS &os);
         virtual ~OS();
 
-        virtual void disasm();
-
     protected:
         virtual void setstat(uint16_t addr, struct stat *st);
         virtual int convsig(int sig);

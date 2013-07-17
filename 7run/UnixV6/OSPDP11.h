@@ -16,6 +16,7 @@ namespace UnixV6 {
         OSPDP11(const OSPDP11 &os);
         virtual ~OSPDP11();
 
+        virtual void disasm();
         virtual bool syscall(int n);
 
     protected:

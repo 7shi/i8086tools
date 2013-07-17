@@ -16,6 +16,7 @@ namespace UnixV6 {
         OSi8086(const OSi8086 &os);
         virtual ~OSi8086();
 
+        virtual void disasm();
         virtual bool syscall(int n);
 
     protected:

@@ -18,10 +18,6 @@ OS::OS(const OS &os) : UnixBase(os) {
 OS::~OS() {
 }
 
-void OS::disasm() {
-    vm->disasm();
-}
-
 void OS::readsym(FILE *f, int ssize) {
     if (!ssize) return;
 
