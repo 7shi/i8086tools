@@ -29,21 +29,19 @@ void OSi8086::disasm() {
         vm->showsym(addr);
         OpCode op = disasm1(vm->text, addr, vm->tsize);
         std::string ops = cpu.disstr(op);
-        int argc = 0;
-        if (vm->text[addr + 1] == 0x89) {
-            int n = vm->text[addr];
-            if (n < nsys && !sysargs[n].name.empty()) {
-                argc = sysargs[n].argc;
-                ops += " ; " + sysargs[n].name;
-            }
-        }
         disout(vm->text, addr, op.len, ops);
         if (op.undef()) undef++;
         addr += op.len;
-        if (argc > 0) {
-            int len = argc << 1;
-            ::disout(vm->text, addr, len, "; args");
-            addr += len;
+        if (op.len == 2 && read16(vm->text + addr - 2) == 0x07cd) {
+            int n = vm->text[addr];
+            if (n < nsys && !sysargs[n].name.empty()) {
+                ::disout(vm->text, addr, 1, "; sys " + sysargs[n].name);
+                addr++;
+                int argc = sysargs[n].argc;
+                for (int i = 0; i < argc; i++, addr += 2) {
+                    ::disout(vm->text, addr, 2, "; arg");
+                }
+            }
         }
     }
     if (undef) printf("undefined: %d\n", undef);
@@ -113,7 +111,9 @@ bool OSi8086::load2(const std::string &fn, FILE *f, size_t size) {
 }
 
 bool OSi8086::syscall(int n) {
-    int result, ret = OS::syscall(&result, n, cpu.AX, vm->text + cpu.ip);
+    if (n != 7)return false;
+    int result, nn = vm->text[cpu.ip++];
+    int ret = OS::syscall(&result, nn, cpu.AX, vm->text + cpu.ip);
     if (ret >= 0) {
         cpu.ip += ret;
         cpu.AX = (cpu.CF = (result == -1)) ? errno : result;
