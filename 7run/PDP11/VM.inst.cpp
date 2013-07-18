@@ -498,12 +498,12 @@ void VM::run1() {
         case 011: // movb: MOVe Byte
             src = get8(op->opr1);
             set8(op->opr2, src);
-            setZNCV(src == 0, int8_t(uint8_t(src)) < 0, C, false);
+            setZNCV(src == 0, int8_t(src) < 0, C, false);
             return;
         case 012: // cmpb: CoMPare Byte
             src = get8(op->opr1);
             dst = get8(op->opr2);
-            val8 = val = int8_t(uint8_t(src)) - int8_t(uint8_t(dst));
+            val8 = val = int8_t(src) - int8_t(dst);
             setZNCV(val8 == 0, val8 < 0, src < dst, val != val8);
             return;
         case 013: // bitb: BIt Test Byte
