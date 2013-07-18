@@ -43,6 +43,7 @@ install: $(TARGET)
 	done
 	(echo '#!/bin/sh' && echo 'PATH="$(M2ROOT)/7bin:$$PATH" "$$@"') > $(PREFIX)/bin/m2path
 	(echo '#!/bin/sh' && echo 'PATH="$(V6ROOT)/7bin:$$PATH" "$$@"') > $(PREFIX)/bin/v6path
+	cd $(PREFIX)/bin && chmod 755 m2path v6path
 
 uninstall:
 	cd $(PREFIX)/bin && rm -f $(TARGET) $(TARGET).exe m2path v6path
