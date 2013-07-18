@@ -29,8 +29,8 @@ void VM::run1() {
     uint16_t w = ::read16(text + PC);
     uint16_t oldpc = PC;
     int dst, src, val;
-    uint16_t val16;
-    uint8_t val8;
+    int16_t val16;
+    int8_t val8;
     PC += op->len;
     switch (w >> 12) {
         case 000:
