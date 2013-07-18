@@ -3,6 +3,7 @@
 #include "File.h"
 #include "VMBase.h"
 #include <stdio.h>
+#include <sys/stat.h>
 #include <vector>
 #include <list>
 #ifdef WIN32

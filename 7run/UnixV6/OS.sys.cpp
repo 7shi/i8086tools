@@ -1,4 +1,5 @@
 #include "OS.h"
+#include <errno.h>
 
 using namespace UnixV6;
 

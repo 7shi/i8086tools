@@ -1,6 +1,7 @@
 #include "OS.h"
 #include "../i8086/regs.h"
 #include <string.h>
+#include <errno.h>
 
 using namespace Minix2;
 

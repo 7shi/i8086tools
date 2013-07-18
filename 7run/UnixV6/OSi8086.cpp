@@ -2,6 +2,7 @@
 #include "../i8086/regs.h"
 #include "../i8086/disasm.h"
 #include <string.h>
+#include <errno.h>
 
 using namespace UnixV6;
 using namespace i8086;

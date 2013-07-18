@@ -2,6 +2,7 @@
 #include "../PDP11/regs.h"
 #include "../PDP11/disasm.h"
 #include <string.h>
+#include <errno.h>
 
 using namespace UnixV6;
 using namespace PDP11;
