@@ -116,11 +116,12 @@ int UnixBase::sys_wait(int *status) {
     std::pair<int, int> ec = exitcodes.top();
     exitcodes.pop();
     *status = ec.second << 8;
-    if (trace) fprintf(stderr, "<wait() => %d>\n", *status);
+    if (trace) fprintf(stderr, "<wait() => %d, %d>\n", ec.first, *status);
     return ec.first;
 #else
     int result = wait(status);
-    if (trace) fprintf(stderr, "<wait() => 0x%04x>\n", *status);
+    if (result > 0) result = (result % 30000) + 1;
+    if (trace) fprintf(stderr, "<wait() => %d, %d>\n", result, *status);
     return result;
 #endif
 }
