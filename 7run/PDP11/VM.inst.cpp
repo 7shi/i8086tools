@@ -234,12 +234,12 @@ void VM::run1() {
         case 001: // mov: MOVe
             src = get16(op->opr1);
             set16(op->opr2, src);
-            setZNCV(src == 0, int16_t(uint16_t(src)) < 0, C, false);
+            setZNCV(src == 0, int16_t(src) < 0, C, false);
             return;
         case 002: // cmp: CoMPare
             src = get16(op->opr1);
             dst = get16(op->opr2);
-            val16 = val = int16_t(uint16_t(src)) - int16_t(uint16_t(dst));
+            val16 = val = int16_t(src) - int16_t(dst);
             setZNCV(val16 == 0, val16 < 0, src < dst, val != val16);
             return;
         case 003: // bit: BIt Test
@@ -259,7 +259,7 @@ void VM::run1() {
         case 006: // add: ADD
             src = get16(op->opr1);
             dst = get16(op->opr2, true);
-            val16 = val = int16_t(uint16_t(src)) + int16_t(uint16_t(dst));
+            val16 = val = int16_t(src) + int16_t(dst);
             set16(op->opr2, val16);
             setZNCV(val16 == 0, val16 < 0, src + dst >= 0x10000, val != val16);
             return;
@@ -523,7 +523,7 @@ void VM::run1() {
         case 016: // sub: SUBtract
             src = get16(op->opr1);
             dst = get16(op->opr2);
-            val16 = val = int16_t(uint16_t(dst)) - int16_t(uint16_t(src));
+            val16 = val = int16_t(dst) - int16_t(src);
             set16(op->opr2, val16);
             setZNCV(val16 == 0, val16 < 0, dst < src, val != val16);
             return;
