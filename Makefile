@@ -12,3 +12,4 @@ clean:
 	$(MAKE) $@ -C tools
 	$(MAKE) $@ -C tests
 	$(MAKE) $@ -C Ack-5.5
+	$(MAKE) $@ -C 8086v6
