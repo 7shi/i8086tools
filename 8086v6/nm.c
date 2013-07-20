@@ -59,7 +59,8 @@ char **argv;
 		exit();
 	}
 	read(fi, buf, 020);
-	if(buf[0]!=0407 && buf[0]!=0410 && buf[0]!=0411) {
+	if(buf[0]!=0407 && buf[0]!=0410 && buf[0]!=0411 &&
+			buf[0]!=07353 && buf[0]!=010353 && buf[0]!=011353) {
 		printf("bad format\n");
 		exit();
 	}

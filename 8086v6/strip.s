@@ -43,6 +43,12 @@ loop:
 	beq	1f
 	cmp	buf,magic2
 	beq	1f
+	cmp	buf,magic3
+	beq	1f
+	cmp	buf,magic4
+	beq	1f
+	cmp	buf,magic5
+	beq	1f
 	jsr	r5,mesg; <improper format: \0>; .even
 	br	unloop
 1:
@@ -131,6 +137,9 @@ qnl:
 magic:	407
 magic1:	410
 magic2:	411
+magic3:	07353
+magic4:	10353
+magic5:	11353
 
 .bss
 fi:	.=.+2
