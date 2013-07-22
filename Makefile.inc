@@ -10,4 +10,8 @@ V6ROOT = $(PREFIX)/v6root
 V6BIN  = $(V6ROOT)/bin
 V6LIB  = $(V6ROOT)/lib
 
+ACKROOT= $(PREFIX)/8086v6-ack
+ACKBIN = $(ACKROOT)/bin
+ACKLIB = $(ACKROOT)/lib
+
 MINGW  = #i686-mingw32-

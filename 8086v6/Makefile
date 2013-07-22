@@ -1,5 +1,5 @@
 include ../Makefile.inc
-TARGET = nm strip
+TARGET = nm strip cc
 
 all: $(TARGET)
 
@@ -13,8 +13,12 @@ strip: strip.s
 	mv a.out $@
 	v6strip $@
 
+cc: cc.c
+	m2cc -s -o $@ $<
+
 install: $(TARGET)
-	install -c $(TARGET) $(V6BIN)
+	install -c nm strip $(V6BIN)
+	install -c cc $(ACKBIN)
 
 clean:
 	rm -f $(TARGET)
