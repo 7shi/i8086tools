@@ -1,3 +1,3 @@
 call _main
-int 7
-.data1 1
+push ax
+call _exit

@@ -1,16 +1,16 @@
 include ../Makefile.inc
 TARGET = crt0.o libc.a
+CC = 8086v6-cc
+AS = m2as
+AR = m2aal
 
 all: $(TARGET)
 
 crt0.o: crt0.s
-	8086v6-cc -c $<
+	$(CC) -c $<
 
-libc.a: cret.o
-	m2aal r $@ $^
-
-cret.o: cret.s
-	m2cc -c $<
+libc.a: cret.o write.o exit.o
+	$(AR) r $@ $^
 
 install: $(TARGET)
 	install -c $(TARGET) $(ACKLIB)
