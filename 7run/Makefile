@@ -44,9 +44,11 @@ install: $(TARGET)
 	(echo '#!/bin/sh' && echo 'PATH="$(M2ROOT)/7bin:$$PATH" "$$@"') > $(PREFIX)/bin/m2path
 	(echo '#!/bin/sh' && echo 'PATH="$(V6ROOT)/7bin:$$PATH" "$$@"') > $(PREFIX)/bin/v6path
 	cd $(PREFIX)/bin && chmod 755 m2path v6path
+	sh mkwrap.sh $(PREFIX)/bin/$(TARGET) $(ACKROOT) $(PREFIX)/bin/8086v6- bin/cc
+	sh mkwrap.sh $(PREFIX)/bin/$(TARGET) $(ACKROOT) $(PREFIX)/bin/8086v6- lib/cv
 
 uninstall:
-	cd $(PREFIX)/bin && rm -f $(TARGET) $(TARGET).exe m2path v6path
+	cd $(PREFIX)/bin && rm -f $(TARGET) $(TARGET).exe m2path v6path 8086v6-cc 8086v6-cv
 	for cmd in $(M2CMDS); do \
 	  rm -f $(PREFIX)/bin/m2`basename $$cmd`; \
 	  rm -f $(M2ROOT)/7bin/`basename $$cmd`; \

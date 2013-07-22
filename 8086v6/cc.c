@@ -28,11 +28,11 @@
 #define LD		"/usr/lib/ld"
 #define CV		"/usr/lib/cv"
 #define LIBDIR		"/usr/lib"
-#define CRT		"/usr/lib/ncrtso.o"
+#define CRT		"/lib/crt0.o"
 #define PEM		"/usr/lib/npem"
 #define PRT		"/usr/lib/nprtso.o"
 #define M2RT		"/usr/lib/nm2rtso.o"
-#define LIBC            "/usr/lib/libd.a", "/usr/lib/libc.a"
+#define LIBC            "/lib/libc.a", "/lib/liba.a"
 #define LIBP		"/usr/lib/libp.a", "/usr/lib/libc.a"
 #define LIBM2		"/usr/lib/libm2.a", "/usr/lib/libc.a"
 #define END             "/usr/lib/libe.a", "/usr/lib/end.a"
@@ -114,7 +114,7 @@ struct passinfo passinfo[] = {
 
 #define	PREP_FLAGS	"-D_EM_WSIZE=2", "-D_EM_PSIZE=2", "-D_EM_SSIZE=2", \
 			"-D_EM_LSIZE=4", "-D_EM_FSIZE=4", "-D_EM_DSIZE=8", \
-			"-D__ACK__", "-D__minix", "-D__i86"
+			"-D__ACK__", "-D__8086V6", "-D__i86"
 
 struct pass preprocessor = { "cpp",
 			    { PREP_FLAGS }
@@ -140,7 +140,7 @@ struct compile passes[] = {
 		{ "cg", {0}, {0} },
 		{ "as", {"-"}, {0} },
 		{ "ld", {CRT}, /* changed */
-			  {LIBC, "*",  END}},
+			  {LIBC/*, "*",  END*/}},
 		{ "cv", {0}, {0} }
 	},
 	DEFLANG
