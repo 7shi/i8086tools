@@ -17,6 +17,7 @@ cc: cc.c
 	m2cc -s -o $@ $<
 
 install: $(TARGET)
+	mkdir -p $(V6BIN) $(ACKBIN)
 	install -c nm strip $(V6BIN)
 	install -c cc $(ACKBIN)
 
