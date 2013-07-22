@@ -36,7 +36,7 @@ void OS::readsym(FILE *f, int ssize) {
         switch (t) {
             case 't':
             case 'T':
-                if (!startsWith(sym.name, "~")) {
+                if (!sym.name.empty() && !startsWith(sym.name, "~")) {
                     vm->syms[1][sym.addr] = sym;
                 }
                 break;
