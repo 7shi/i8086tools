@@ -1,4 +1,8 @@
 TARGETS = dis88 lib ld ar cv
 
 all clean:
-	for dir in $(TARGETS); do ($(MAKE) $@ -C $$dir || exit 1); done
+	$(MAKE) $@ -C dis88
+	$(MAKE) $@ -C lib
+	$(MAKE) $@ -C ld
+	$(MAKE) $@ -C ar
+	$(MAKE) $@ -C cv

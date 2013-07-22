@@ -7,7 +7,7 @@ LDFLAGS = -L../lib -lobject
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	gcc -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -f $(TARGET) $(TARGET).exe $(OBJECTS)

@@ -1,27 +1,35 @@
+/* This file is in the public domain. */
+
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
 
-#define EBSS 0x421c
+#ifdef WIN32
+#  ifdef DEBUG_LD
+#    define EBSS 0x421c
 static char mem[0xe000];
+#  else
+#    define EBSS 0
+static char mem[0x10000];
+#  endif
 static char *cur   = mem + EBSS;
 static char *start = mem + EBSS;
 static char *end   = mem + sizeof(mem);
 
 int brk(char *p) {
-#ifdef DEBUG
+#  ifdef DEBUG
 	fprintf(stderr, "<brk(0x%04x)", p - mem);
-#endif
+#  endif
 	if (p < start || p >= end) {
-#ifdef DEBUG
+#  ifdef DEBUG
 		fprintf(stderr, " => ENOMEM>\n");
-#endif
+#  endif
 		return -1;
 	}
 	cur = p;
-#ifdef DEBUG
+#  ifdef DEBUG
 	fprintf(stderr, " => 0>\n");
-#endif
+#  endif
 	return 0;
 }
 
@@ -30,6 +38,7 @@ char *sbrk(int d) {
 	if (!brk(cur + d)) return old;
 	return (char *)-1;
 }
+#endif
 
 int myopen(const char *path, int flag, int mode) {
 #ifdef WIN32

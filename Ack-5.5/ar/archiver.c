@@ -89,6 +89,9 @@ typedef char BOOL;
 #define S_ISGID 0002000
 #endif
 
+#define open myopen
+#define lseek mylseek
+
 BOOL verbose;
 BOOL app_fl;
 BOOL ex_fl;

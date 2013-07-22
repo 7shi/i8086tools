@@ -1,5 +1,5 @@
 TARGET = cv
-SOURCES = cv.c ../mylib.c
+SOURCES = cv.c
 OBJECTS = $(SOURCES:.c=.o)
 CFLAGS  = -I../include
 LDFLAGS = -L../lib -lobject
@@ -7,7 +7,7 @@ LDFLAGS = -L../lib -lobject
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	gcc -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -f $(TARGET) $(TARGET).exe $(OBJECTS)
