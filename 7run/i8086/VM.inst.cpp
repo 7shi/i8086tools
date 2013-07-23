@@ -236,8 +236,9 @@ void VM::run1(uint8_t prefix) {
         case 0x55:
         case 0x56:
         case 0x57:
+            val = r[opr1];
             SP -= 2;
-            write16(SP, r[opr1]);
+            write16(SP, val);
             return;
         case 0x58: // pop reg16
         case 0x59:
