@@ -1,19 +1,11 @@
-.extern .cret, .sret, .dsret, .csb2
-.cret:
-	mov sp, bp
-	pop bp
-	ret
-
-.sret:
-	lea sp, -2(bp)
-	pop si
-	pop bp
-	ret
+.extern .dsret, .sret, .cret, .csb2
 
 .dsret:
-	lea sp, -4(bp)
 	pop di
+.sret:
 	pop si
+.cret:
+	mov sp, bp
 	pop bp
 	ret
 
