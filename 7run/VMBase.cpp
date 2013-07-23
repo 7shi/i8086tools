@@ -51,6 +51,13 @@ void VMBase::showsym(uint16_t addr) {
     }
 }
 
+void VMBase::debugsym(uint16_t pc) {
+    std::map<int, Symbol>::iterator it = syms[1].find(pc);
+    if (it != syms[1].end()) {
+        fprintf(stderr, "%s:\n", it->second.name.c_str());
+    }
+}
+
 bool VMBase::load(const std::string& fn, FILE* f, size_t size) {
     if (size > 0xffff) {
         fprintf(stderr, "too long raw binary: %s\n", fn.c_str());

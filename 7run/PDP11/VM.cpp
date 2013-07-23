@@ -14,10 +14,7 @@ void VM::showHeader() {
 }
 
 void VM::debug(uint16_t pc, const OpCode &op) {
-    std::map<int, Symbol>::iterator it = syms[1].find(pc);
-    if (it != syms[1].end()) {
-        fprintf(stderr, "%s:\n", it->second.name.c_str());
-    }
+    debugsym(pc);
     fprintf(stderr,
             "%04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-14s %s",
             r[0], r[1], r[2], r[3], r[4], r[5], r[6],

@@ -33,6 +33,7 @@ struct VMBase {
 
     void release();
     void showsym(uint16_t addr);
+    void debugsym(uint16_t pc);
 
     virtual bool load(const std::string &fn, FILE *f, size_t size);
     virtual void disasm() = 0;

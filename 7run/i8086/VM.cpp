@@ -16,6 +16,7 @@ void VM::showHeader() {
 }
 
 void VM::debug(uint16_t ip, const OpCode &op) {
+    debugsym(ip);
     fprintf(stderr,
             "%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c %04x:%-12s %s",
             r[0], r[3], r[1], r[2], r[4], r[5], r[6], r[7],
