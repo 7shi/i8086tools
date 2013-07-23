@@ -221,7 +221,7 @@ int t_flag = 0;
 int noexec = 0;
 int fp_lib = 1;
 int E_flag = 0;
-int i_flag = 1;
+int i_flag = 0;
 
 
 USTRING curfil;
