@@ -9,7 +9,7 @@ all: $(TARGET)
 crt0.o: crt0.s
 	$(CC) -c $<
 
-libc.a: cret.o write.o exit.o
+libc.a: cret.o write.o exit.o strlen.o puts.o putc.o
 	$(AR) r $@ $^
 
 install: $(TARGET)
