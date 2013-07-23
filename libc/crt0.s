@@ -1,6 +1,7 @@
 start:
 	pop ax
-	push sp
+	mov dx, sp
+	push dx
 	push ax
 	call _main
 	push ax
