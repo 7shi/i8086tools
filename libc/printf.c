@@ -1,7 +1,7 @@
 static int print10(int v) {
 	char buf[16], *end = buf + sizeof(buf), *p = end;
 	int len, minus = v < 0;
-	if (minus) v = -v;
+	if (minus) v = -v; else if (v == 0) *(--p) = '0';
 	while (v) {
 		*(--p) = '0' + (v % 10);
 		v /= 10;
