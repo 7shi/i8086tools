@@ -1,4 +1,4 @@
-.extern .cret, .sret, .dsret
+.extern .cret, .sret, .dsret, .csb2
 .cret:
 	mov sp, bp
 	pop bp
@@ -16,3 +16,14 @@
 	pop si
 	pop bp
 	ret
+
+.csb2:
+	mov dx, (bx)
+	mov cx, 2(bx)
+0:	add bx, #4
+	cmp ax, (bx)
+	jnz 1f
+	mov dx, 2(bx)
+	jmp (dx)
+1:	loop 0b
+	jmp (dx)
