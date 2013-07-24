@@ -13,3 +13,4 @@ clean:
 	$(MAKE) $@ -C Ack-5.5
 	$(MAKE) $@ -C 8086v6
 	$(MAKE) $@ -C libc
+	$(MAKE) $@ -C trans
