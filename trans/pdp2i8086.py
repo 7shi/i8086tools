@@ -61,7 +61,9 @@ def convr(r):
              "r4": "di",
              "r5": "bp",
              "r6": "sp",
-             "sp": "sp" }[r]
+             "sp": "sp",
+             "r7": "ip",
+             "pc": "ip"}[r]
 
 write = sys.stdout.write
 
@@ -114,7 +116,7 @@ for line in lines:
             dst = toks[i]
             i += 1
             if dst == "(":
-                dst += toks[i] + toks[i + 1]
+                dst += convr(toks[i]) + toks[i + 1]
                 i += 2
                 if dst == "(sp)":
                     write("mov bx, sp; ")
