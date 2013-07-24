@@ -2,11 +2,14 @@
 # This file is in the public domain.
 import sys
 
-if len(sys.argv) != 2:
+target = "hello.s"
+if len(sys.argv) == 2:
+    target = sys.argv[1]
+elif len(sys.argv) > 2:
     print "usage: pdp2i8086.py pdp11.s"
     sys.exit(1)
 
-with open(sys.argv[1]) as f:
+with open(target) as f:
     lines = f.readlines()
 
 def isspace(ch):
