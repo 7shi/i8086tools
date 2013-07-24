@@ -109,8 +109,12 @@ for line in lines:
             src = toks[i]
             i += 1
             if src == "$":
-                src = "#" + toks[i]
+                tok = toks[i]
                 i += 1
+                if tok.isdigit():
+                    src = "#0x%x" % int(tok, 8)
+                else:
+                    src = "#" + tok
             i += 1
             dst = toks[i]
             i += 1
