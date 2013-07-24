@@ -21,6 +21,7 @@ class Lexer:
     def __init__(self, s):
         self.p = 0
         self.s = s
+        self.read()
 
     def canread(self):
         return self.p < len(self.s)
@@ -33,25 +34,20 @@ class Lexer:
         return ret
 
     def read(self):
-        if not self.canread(): return ""
+        if not self.canread():
+            self.text = ""
+            return
         ch = self.s[self.p]
         self.p += 1
         if isspace(ch):
-            return self.read()
+            self.readwhile(isspace)
+            self.read()
         elif isletter(ch):
-            return ch + self.readwhile(isletter)
+            self.text = ch + self.readwhile(isletter)
         elif ch == '.':
-            return ch + self.readwhile(str.isalnum)
-        return ch
-
-def gettokens(s):
-    ret = []
-    lexer = Lexer(s)
-    while True:
-        tok = lexer.read()
-        if tok == "": break
-        ret += [tok]
-    return ret
+            self.text = ch + self.readwhile(str.isalnum)
+        else:
+            self.text = ch
 
 regs = { "r0": "ax",
          "r1": "dx",
@@ -67,60 +63,62 @@ regs = { "r0": "ax",
 write = sys.stdout.write
 
 for line in lines:
-    toks = gettokens(line)
-    i = 0
-    while i < len(toks):
-        tok = toks[i]
-        i += 1
+    lexer = Lexer(line)
+    while lexer.text != "":
+        tok = lexer.text
+        lexer.read()
         if tok == ";":
             write("; ")
-        if tok == ".globl":
-            if i < len(toks):
-                write(".extern " + toks[i])
-                i += 1
+        elif tok == ".globl":
+            if lexer.text != "":
+                write(".extern " + lexer.text)
+                lexer.read()
         elif tok == ".text":
             write(".sect .text")
         elif tok == ".data":
             write(".sect .data")
         elif tok == ".byte":
             write(".data1 ")
-            while i < len(toks):
-                tok = toks[i]
+            while lexer.text != "":
+                tok = lexer.text
                 if str.isdigit(tok):
                     write("0x%02x" % int(tok, 8))
+                    lexer.read()
                 elif tok == ",":
                     write(", ")
+                    lexer.read()
                 else:
                     break
-                i += 1
-        elif i < len(toks) and toks[i] == ":":
+        elif lexer.text == ":":
             if tok[0] != "~":
                 write(tok + ":")
         elif tok == "jsr":
-            r = toks[i]
-            i += 2
-            if toks[i] == "*": i += 2
-            write("call " + toks[i])
-            i += 1
+            lexer.read()
+            lexer.read()
+            if lexer.text == "*":
+                lexer.read()
+                lexer.read()
+            write("call " + lexer.text)
         elif tok == "jmp":
-            write("jmp " + toks[i])
-            i += 1
+            write("jmp " + lexer.text)
+            lexer.read()
         elif tok == "mov":
-            src = toks[i]
-            i += 1
+            src = lexer.text
+            lexer.read()
             if src == "$":
-                tok = toks[i]
-                i += 1
+                tok = lexer.text
+                lexer.read()
                 if tok.isdigit():
                     src = "#0x%x" % int(tok, 8)
                 else:
                     src = "#" + tok
-            i += 1
-            dst = toks[i]
-            i += 1
+            dst = lexer.text
+            lexer.read()
             if dst == "(":
-                dst += regs[toks[i]] + toks[i + 1]
-                i += 2
+                dst += regs[lexer.text]
+                lexer.read()
+                dst += lexer.text
+                lexer.read()
                 if dst == "(sp)":
                     write("mov bx, sp; ")
                     dst = "(bx)"
