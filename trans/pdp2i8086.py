@@ -53,7 +53,7 @@ def gettokens(s):
 def convr(r):
     return { "r0": "ax",
              "r1": "dx",
-             "r2": "bx",
+             "r2": "cx",
              "r3": "si",
              "r4": "di",
              "r5": "bp",
@@ -114,6 +114,7 @@ for line in lines:
                 dst += toks[i] + toks[i + 1]
                 i += 2
                 if dst == "(sp)":
-                    dst = "-8(bp)"
+                    write("mov bx, sp; ")
+                    dst = "(bx)"
             write("mov " + dst + ", " + src)
     print
