@@ -106,10 +106,12 @@ def readopr(lexer):
             lexer.read()
     return ret, mode
 
-written = [False]
+written = False
+
 def write(a):
+    global written
     sys.stdout.write(a)
-    written[0] = True
+    written = True
 
 def convsrc(src):
     p = src.find("(")
@@ -121,7 +123,7 @@ def convsrc(src):
     return "bx"
 
 for line in lines:
-    written[0] = False
+    written = False
     lexer = Lexer(line)
     while lexer.text != "":
         tok = lexer.text
@@ -151,7 +153,7 @@ for line in lines:
         elif lexer.text == ":":
             if tok[0] != "~":
                 write(tok + ":")
-                written[0] = lexer.text != ""
+                written = lexer.text != ""
             lexer.read()
         elif tok == "jsr":
             if not regs.has_key(lexer.text):
@@ -239,7 +241,7 @@ for line in lines:
         elif tok == "jle":
             write("jle " + lexer.text)
             lexer.read()
-    if written[0]:
+    if written:
         print
     else:
         write("! " + line)
