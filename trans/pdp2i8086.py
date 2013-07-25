@@ -112,7 +112,6 @@ def readopr(lexer):
         lexer.read()
         if lexer.text == "+":
             post = "add " + rr + ", #2"
-            ret += lexer.text
             lexer.read()
     return ret, post
 
@@ -175,4 +174,8 @@ for line in lines:
             write("mov " + dst + ", " + src)
             if p1 != "": write("; " + p1)
             if p2 != "": write("; " + p2)
+        elif tok == "tst":
+            src, p1 = readopr(lexer)
+            write("cmp " + src + ", #0")
+            if p1 != "": write("; " + p1)
     print
