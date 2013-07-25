@@ -212,6 +212,15 @@ for line in lines:
             elif m1 != 0:
                 src = convsrc(src)
             write("cmp " + src + ", " + dst)
+        elif tok == "add":
+            src, m1 = readopr(lexer)
+            if lexer.text != ",":
+                continue
+            lexer.read()
+            dst, m2 = readopr(lexer)
+            assert m1 != 2 and m2 != 2, line
+            assert m1 != 4 and m2 != 4, line
+            write("add " + dst + ", " + src)
         elif tok == "clr":
             dst, m1 = readopr(lexer)
             assert m1 != 2 and m1 != 4, line
@@ -220,6 +229,10 @@ for line in lines:
             dst, m1 = readopr(lexer)
             assert m1 != 2 and m1 != 4, line
             write("inc " + dst)
+        elif tok == "asl":
+            src, m1 = readopr(lexer)
+            assert m1 == 0, line
+            write("sal " + src + ", #1")
         elif tok == "jbr":
             write("jmp " + lexer.text)
             lexer.read()
