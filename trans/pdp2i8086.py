@@ -140,6 +140,7 @@ for line in lines:
         elif lexer.text == ":":
             if tok[0] != "~":
                 write(tok + ":")
+            written[0] = False
         elif tok == "jsr":
             if not regs.has_key(lexer.text):
                 continue
@@ -171,7 +172,7 @@ for line in lines:
                     write("push " + src)
             else:
                 write("mov " + dst + ", " + src)
-            assert m1 != 2 and m2 != 2, "+(R)"
+            assert m1 != 2 and m2 != 2, "(R)+"
         elif tok == "tst":
             src, m1 = readopr(lexer)
             if src == "(sp)" and m1 == 2:
@@ -180,6 +181,34 @@ for line in lines:
                 write("sub sp, #2")
             else:
                 write("cmp " + src + ", #0")
+        elif tok == "cmp":
+            src, m1 = readopr(lexer)
+            if lexer.text != ",":
+                continue
+            lexer.read()
+            dst, m2 = readopr(lexer)
+            assert m1 != 2 and m2 != 2, "(R)+"
+            assert m1 != 4 and m2 != 4, "-(R)"
+            if src[0] == "#":
+                write("mov bx, " + src + "; ")
+                src = "bx"
+            write("cmp " + src + ", " + dst)
+        elif tok == "clr":
+            dst, m1 = readopr(lexer)
+            assert m1 != 2, "(R)+"
+            assert m1 != 4, "-(R)"
+            write("mov " + dst + ", #0")
+        elif tok == "inc":
+            dst, m1 = readopr(lexer)
+            assert m1 != 2, "(R)+"
+            assert m1 != 4, "-(R)"
+            write("inc " + dst)
+        elif tok == "jbr":
+            write("jmp " + lexer.text)
+            lexer.read()
+        elif tok == "jle":
+            write("jle " + lexer.text)
+            lexer.read()
     if written[0]:
         print
     else:

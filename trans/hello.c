@@ -1,6 +1,7 @@
 main() {
-	int a;
+	int i;
 	printf("hello\n");
-	a = 1234;
-	printf("%d\n", a);
+	for (i = 0; i < 5; i++) {
+		printf("%d\n", i);
+	}
 }
