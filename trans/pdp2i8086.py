@@ -62,6 +62,60 @@ regs = { "r0": "ax",
 
 write = sys.stdout.write
 
+def getnum(o):
+    if not o.isdigit():
+        return o
+    d = int(o, 8)
+    if d < 10:
+        return str(d)
+    return "0x%x" % d
+
+def readopr(lexer):
+    if lexer.text == "":
+        return "", ""
+    if lexer.text == "$":
+        lexer.read()
+        if lexer.text == "":
+            return "", ""
+        tok = lexer.text
+        lexer.read()
+        return "#" + getnum(tok), ""
+    ret, post = "", ""
+    dec, addr = False, False
+    if lexer.text == "-":
+        lexer.read()
+        if lexer.text.isdigit():
+            ret += "-"
+        else:
+            dec = True
+    if lexer.text.isdigit():
+        ret += getnum(lexer.text)
+        lexer.read()
+    if lexer.text == "(":
+        addr = True
+        ret += lexer.text
+        lexer.read()
+    r = lexer.text
+    if not regs.has_key(r):
+        return ret
+    rr = regs[r]
+    if dec:
+        write("sub " + rr + ", #2; ")
+    if addr and r == "sp":
+        write("mov bx, sp; ")
+        ret += "bx"
+    else:
+        ret += rr
+    lexer.read()
+    if lexer.text == ")":
+        ret += lexer.text
+        lexer.read()
+        if lexer.text == "+":
+            post = "add " + rr + ", #2"
+            ret += lexer.text
+            lexer.read()
+    return ret, post
+
 for line in lines:
     lexer = Lexer(line)
     while lexer.text != "":
@@ -93,34 +147,32 @@ for line in lines:
             if tok[0] != "~":
                 write(tok + ":")
         elif tok == "jsr":
+            if not regs.has_key(lexer.text):
+                write("! jsr")
+                continue
             lexer.read()
+            if lexer.text != ",":
+                write("! jsr")
+                continue
             lexer.read()
             if lexer.text == "*":
                 lexer.read()
+                if lexer.text != "$":
+                    write("! jsr")
+                    continue
                 lexer.read()
             write("call " + lexer.text)
         elif tok == "jmp":
             write("jmp " + lexer.text)
             lexer.read()
         elif tok == "mov":
-            src = lexer.text
+            src, p1 = readopr(lexer)
+            if lexer.text != ",":
+                write("! mov")
+                continue
             lexer.read()
-            if src == "$":
-                tok = lexer.text
-                lexer.read()
-                if tok.isdigit():
-                    src = "#0x%x" % int(tok, 8)
-                else:
-                    src = "#" + tok
-            dst = lexer.text
-            lexer.read()
-            if dst == "(":
-                dst += regs[lexer.text]
-                lexer.read()
-                dst += lexer.text
-                lexer.read()
-                if dst == "(sp)":
-                    write("mov bx, sp; ")
-                    dst = "(bx)"
+            dst, p2 = readopr(lexer)
             write("mov " + dst + ", " + src)
+            if p1 != "": write("; " + p1)
+            if p2 != "": write("; " + p2)
     print
