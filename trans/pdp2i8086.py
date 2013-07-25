@@ -106,11 +106,22 @@ def readopr(lexer):
             lexer.read()
     return ret, mode
 
+written = [False]
+def write(a):
+    sys.stdout.write(a)
+    written[0] = True
+
+def convsrc(src):
+    p = src.find("(")
+    r = src[p+1:p+3]
+    if r != "bp" and r != "si" and r != "di":
+        write("mov bx, " + r + "; ")
+        src = src[:p+1] + "bx" + src[p+3:]
+    write("mov bx, " + src + "; ")
+    return "bx"
+
 for line in lines:
-    written = [False]
-    def write(a):
-        sys.stdout.write(a)
-        written[0] = True
+    written[0] = False
     lexer = Lexer(line)
     while lexer.text != "":
         tok = lexer.text
@@ -140,7 +151,8 @@ for line in lines:
         elif lexer.text == ":":
             if tok[0] != "~":
                 write(tok + ":")
-            written[0] = False
+                written[0] = lexer.text != ""
+            lexer.read()
         elif tok == "jsr":
             if not regs.has_key(lexer.text):
                 continue
@@ -167,12 +179,14 @@ for line in lines:
                 if m2 == 1:
                     write("add sp, #2; ")
                 if src[0] == "#":
-                    write("mov bx, " + src + "; push bx")
-                else:
-                    write("push " + src)
+                    write("mov bx, " + src + "; ")
+                    src = "bx"
+                elif m1 != 0:
+                    src = convsrc(src)
+                write("push " + src)
             else:
                 write("mov " + dst + ", " + src)
-            assert m1 != 2 and m2 != 2, "(R)+"
+            assert m1 != 2 and m2 != 2, line
         elif tok == "tst":
             src, m1 = readopr(lexer)
             if src == "(sp)" and m1 == 2:
@@ -187,21 +201,24 @@ for line in lines:
                 continue
             lexer.read()
             dst, m2 = readopr(lexer)
-            assert m1 != 2 and m2 != 2, "(R)+"
-            assert m1 != 4 and m2 != 4, "-(R)"
+            if src == "(sp)" and dst == "(sp)" and m1 == 2 and m2 == 2:
+                write("add sp, #4")
+                continue
+            assert m1 != 2 and m2 != 2, line
+            assert m1 != 4 and m2 != 4, line
             if src[0] == "#":
                 write("mov bx, " + src + "; ")
                 src = "bx"
+            elif m1 != 0:
+                src = convsrc(src)
             write("cmp " + src + ", " + dst)
         elif tok == "clr":
             dst, m1 = readopr(lexer)
-            assert m1 != 2, "(R)+"
-            assert m1 != 4, "-(R)"
+            assert m1 != 2 and m1 != 4, line
             write("mov " + dst + ", #0")
         elif tok == "inc":
             dst, m1 = readopr(lexer)
-            assert m1 != 2, "(R)+"
-            assert m1 != 4, "-(R)"
+            assert m1 != 2 and m1 != 4, line
             write("inc " + dst)
         elif tok == "jbr":
             write("jmp " + lexer.text)

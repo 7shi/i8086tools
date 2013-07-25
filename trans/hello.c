@@ -1,7 +1,6 @@
-main() {
+main(argc, argv) int argc; char *argv[]; {
 	int i;
-	printf("hello\n");
-	for (i = 0; i < 5; i++) {
-		printf("%d\n", i);
+	for (i = 0; i < argc; i++) {
+		printf("%d: %s\n", i, argv[i]);
 	}
 }
