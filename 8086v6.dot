@@ -1,6 +1,6 @@
 digraph i8086v6 {
-	node [fontname="meiryo", shape=box]
-	edge [fontname="meiryo"]
+	node [fontname="MS PGothic", shape=box]
+	edge [fontname="MS PGothic"]
 
 	interp [label="インタプリタ開発"]
 	trans [label="トランスレータ開発"]
