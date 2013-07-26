@@ -39,6 +39,7 @@ digraph i8086v6 {
 	dev_pdp -> emu_pdp
 	emu_pdp -> emu_chi
 	emu_chi -> kern_chi
+	cc -> kern_chi
 	kern_chi -> kern_at
 	kern_chi -> run_user
 	user -> run_user
