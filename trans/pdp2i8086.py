@@ -218,21 +218,21 @@ for line in lines:
                     src.conv()
                     assert not dst.incdec(), line
                     write("cmp " + src.s + ", " + dst.s)
-        elif tok == "add":
+        elif tok == "add" or tok == "sub":
             src = Operand(lexer)
             if lexer.text == "," and lexer.read():
                 dst = Operand(lexer)
                 src.conv()
                 assert not dst.incdec(), line
-                write("add " + dst.s + ", " + src.s)
+                write(tok + " " + dst.s + ", " + src.s)
         elif tok == "clr":
             dst = Operand(lexer)
             assert not dst.incdec(), line
             write("mov " + dst.s + ", #0")
-        elif tok == "inc":
+        elif tok == "inc" or tok == "dec":
             dst = Operand(lexer)
             assert not dst.incdec(), line
-            write("inc " + dst.s)
+            write(tok + " " + dst.s)
         elif tok == "asl":
             dst = Operand(lexer)
             assert dst.m == 0, line
