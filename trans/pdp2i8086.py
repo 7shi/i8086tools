@@ -228,7 +228,10 @@ for line in lines:
         elif tok == "clr":
             dst = Operand(lexer)
             assert not dst.incdec(), line
-            write("mov " + dst.s + ", #0")
+            if dst.m == 0:
+                write("xor " + dst.s + ", " + dst.s)
+            else:
+                write("mov " + dst.s + ", #0")
         elif tok == "inc" or tok == "dec":
             dst = Operand(lexer)
             assert not dst.incdec(), line
