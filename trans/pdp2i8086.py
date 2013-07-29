@@ -14,6 +14,7 @@ with open(target) as f:
 
 def isspace(ch):
     return ch <= ' '
+
 def isletter(ch):
     return ch.isalnum() or ch == '_' or ch == '~'
 
@@ -36,7 +37,7 @@ class Lexer:
     def read(self):
         if not self.canread():
             self.text = ""
-            return
+            return False
         ch = self.s[self.p]
         self.p += 1
         if isspace(ch):
@@ -48,6 +49,7 @@ class Lexer:
             self.text = ch + self.readwhile(str.isalnum)
         else:
             self.text = ch
+        return True
 
 regs = { "r0": "ax",
          "r1": "dx",
@@ -68,44 +70,6 @@ def getnum(o):
         return str(d)
     return "0x%x" % d
 
-def readopr(lexer):
-    if lexer.text == "":
-        return "", -1
-    if lexer.text == "$":
-        lexer.read()
-        if lexer.text == "":
-            return "", -1
-        tok = lexer.text
-        lexer.read()
-        return "#" + getnum(tok), -1
-    ret = ""
-    mode = 0
-    if lexer.text == "-":
-        lexer.read()
-        if lexer.text.isdigit():
-            ret += "-"
-        else:
-            mode = 4 # -(R)
-    if lexer.text.isdigit():
-        ret += getnum(lexer.text)
-        lexer.read()
-    if lexer.text == "(":
-        if mode == 0: mode = 1
-        ret += lexer.text
-        lexer.read()
-    r = lexer.text
-    if not regs.has_key(r):
-        return ret, mode
-    ret += regs[r]
-    lexer.read()
-    if lexer.text == ")":
-        ret += lexer.text
-        lexer.read()
-        if lexer.text == "+":
-            mode = 2 # (R)+
-            lexer.read()
-    return ret, mode
-
 written = False
 
 def write(a):
@@ -113,14 +77,73 @@ def write(a):
     sys.stdout.write(a)
     written = True
 
-def convsrc(src):
-    p = src.find("(")
-    r = src[p+1:p+3]
-    if r != "bp" and r != "si" and r != "di":
-        write("mov bx, " + r + "; ")
-        src = src[:p+1] + "bx" + src[p+3:]
-    write("mov bx, " + src + "; ")
-    return "bx"
+class Operand:
+    def __init__(self, lexer):
+        self.s = ""
+        self.r = ""
+        self.t = lexer.text
+        self.m = -1
+        if lexer.text == "":
+            return
+        if lexer.text == "$":
+            if not lexer.read():
+                return
+            self.t += lexer.text
+            self.s = "#" + getnum(lexer.text)
+            lexer.read()
+            return
+        self.m = 0
+        if lexer.text == "-":
+            if not lexer.read():
+                return
+            self.t += lexer.text
+            if lexer.text.isdigit():
+                self.s += "-"
+            else:
+                self.m = 4 # -(R)
+        if lexer.text.isdigit():
+            self.s += getnum(lexer.text)
+            if not lexer.read():
+                return
+            self.t += lexer.text
+        if lexer.text == "(":
+            if self.m == 0: self.m = 1
+            self.s += lexer.text
+            if not lexer.read():
+                return
+            self.t += lexer.text
+        r = lexer.text
+        if not regs.has_key(r):
+            return
+        self.r = regs[r]
+        self.s += self.r
+        lexer.read()
+        if lexer.text == ")":
+            self.t += lexer.text
+            self.s += lexer.text
+            lexer.read()
+            if lexer.text == "+":
+                self.t += lexer.text
+                self.m = 2 # (R)+
+                lexer.read()
+
+    def incdec(self):
+        return 2 <= self.m <= 5
+
+    def conv(self):
+        if self.s[0] == "#":
+            write("mov bx, " + self.s + "; ")
+        elif self.m < 1:
+            return
+        else:
+            src = self.s
+            if self.r != "bp" and self.r != "si" and self.r != "di":
+                write("mov bx, " + self.r + "; ")
+                src = src.replace(self.r, "bx")
+            write("mov bx, " + src + "; ")
+        self.s = "bx"
+        self.r = "bx"
+        self.m = 0
 
 for line in lines:
     written = False
@@ -156,85 +179,71 @@ for line in lines:
                 written = lexer.text != ""
             lexer.read()
         elif tok == "jsr":
-            if not regs.has_key(lexer.text):
-                continue
             lexer.read()
-            if lexer.text != ",":
-                continue
-            lexer.read()
-            if lexer.text == "*":
+            if lexer.text == ",":
                 lexer.read()
-                if lexer.text != "$":
-                    continue
-                lexer.read()
-            write("call " + lexer.text)
+                if lexer.text == "*":
+                    lexer.read()
+                    if lexer.text == "$":
+                        lexer.read()
+                write("call " + lexer.text)
         elif tok == "jmp":
             write("jmp " + lexer.text)
             lexer.read()
         elif tok == "mov":
-            src, m1 = readopr(lexer)
-            if lexer.text != ",":
-                continue
-            lexer.read()
-            dst, m2 = readopr(lexer)
-            if dst == "(sp)" and (m2 == 1 or m2 == 4):
-                if m2 == 1:
-                    write("add sp, #2; ")
-                if src[0] == "#":
-                    write("mov bx, " + src + "; ")
-                    src = "bx"
-                elif m1 != 0:
-                    src = convsrc(src)
-                write("push " + src)
-            else:
-                write("mov " + dst + ", " + src)
-            assert m1 != 2 and m2 != 2, line
+            src = Operand(lexer)
+            if lexer.text == ",":
+                lexer.read()
+                dst = Operand(lexer)
+                if dst.t == "(sp)" or dst.t == "-(sp)":
+                    if dst.t == "(sp)":
+                        write("add sp, #2; ")
+                    src.conv()
+                    write("push " + src.s)
+                else:
+                    write("mov " + dst.s + ", " + src.s)
         elif tok == "tst":
-            src, m1 = readopr(lexer)
-            if src == "(sp)" and m1 == 2:
+            src = Operand(lexer)
+            if src.t == "(sp)+":
                 write("add sp, #2")
-            elif src == "(sp)" and m1 == 4:
+            elif src.t == "-(sp)":
                 write("sub sp, #2")
             else:
-                write("cmp " + src + ", #0")
+                assert not src.incdec(), line
+                write("cmp " + src.s + ", #0")
         elif tok == "cmp":
-            src, m1 = readopr(lexer)
-            if lexer.text != ",":
-                continue
-            lexer.read()
-            dst, m2 = readopr(lexer)
-            if src == "(sp)" and dst == "(sp)" and m1 == 2 and m2 == 2:
-                write("add sp, #4")
-                continue
-            assert m1 != 2 and m2 != 2, line
-            assert m1 != 4 and m2 != 4, line
-            if src[0] == "#":
-                write("mov bx, " + src + "; ")
-                src = "bx"
-            elif m1 != 0:
-                src = convsrc(src)
-            write("cmp " + src + ", " + dst)
+            src = Operand(lexer)
+            if lexer.text == ",":
+                lexer.read()
+                dst = Operand(lexer)
+                if src.t == "(sp)+" and dst.t == "(sp)+":
+                    write("add sp, #4")
+                elif src.t == "-(sp)" and dst.t == "-(sp)":
+                    write("sub sp, #4")
+                else:
+                    src.conv()
+                    assert not dst.incdec(), line
+                    write("cmp " + src.s + ", " + dst.s)
         elif tok == "add":
-            src, m1 = readopr(lexer)
-            if lexer.text != ",":
-                continue
-            lexer.read()
-            dst, m2 = readopr(lexer)
-            assert m1 != 2 and m2 != 2, line
-            assert m1 != 4 and m2 != 4, line
-            write("add " + dst + ", " + src)
+            src = Operand(lexer)
+            if lexer.text == ",":
+                lexer.read()
+                dst = Operand(lexer)
+                src.conv()
+                assert not dst.incdec(), line
+                write("add " + dst.s + ", " + src.s)
         elif tok == "clr":
-            dst, m1 = readopr(lexer)
-            assert m1 != 2 and m1 != 4, line
-            write("mov " + dst + ", #0")
+            dst = Operand(lexer)
+            assert not dst.incdec(), line
+            write("mov " + dst.s + ", #0")
         elif tok == "inc":
-            dst, m1 = readopr(lexer)
-            assert m1 != 2 and m1 != 4, line
-            write("inc " + dst)
+            dst = Operand(lexer)
+            assert not dst.incdec(), line
+            write("inc " + dst.s)
         elif tok == "asl":
-            src, m1 = readopr(lexer)
-            assert m1 == 0, line
-            write("sal " + src + ", #1")
+            dst = Operand(lexer)
+            assert dst.m == 0, line
+            write("sal " + dst.s + ", #1")
         elif tok == "jbr":
             write("jmp " + lexer.text)
             lexer.read()
