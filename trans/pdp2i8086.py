@@ -164,15 +164,13 @@ for line in lines:
         elif tok == ".byte":
             write(".data1 ")
             while lexer.text != "":
-                tok = lexer.text
-                if str.isdigit(tok):
-                    write("0x%02x" % int(tok, 8))
-                    lexer.read()
-                elif tok == ",":
+                if str.isdigit(lexer.text):
+                    write("0x%02x" % int(lexer.text, 8))
+                elif lexer.text == ",":
                     write(", ")
-                    lexer.read()
                 else:
                     break
+                lexer.read()
         elif lexer.text == ":":
             if tok[0] != "~":
                 write(tok + ":")
@@ -180,20 +178,17 @@ for line in lines:
             lexer.read()
         elif tok == "jsr":
             lexer.read()
-            if lexer.text == ",":
-                lexer.read()
-                if lexer.text == "*":
-                    lexer.read()
-                    if lexer.text == "$":
-                        lexer.read()
+            if lexer.text == "," and lexer.read():
+                if lexer.text == "*" and lexer.read():
+                    if lexer.text == "$" and lexer.read():
+                        pass
                 write("call " + lexer.text)
         elif tok == "jmp":
             write("jmp " + lexer.text)
             lexer.read()
         elif tok == "mov":
             src = Operand(lexer)
-            if lexer.text == ",":
-                lexer.read()
+            if lexer.text == "," and lexer.read():
                 dst = Operand(lexer)
                 if dst.t == "(sp)" or dst.t == "-(sp)":
                     if dst.t == "(sp)":
@@ -213,8 +208,7 @@ for line in lines:
                 write("cmp " + src.s + ", #0")
         elif tok == "cmp":
             src = Operand(lexer)
-            if lexer.text == ",":
-                lexer.read()
+            if lexer.text == "," and lexer.read():
                 dst = Operand(lexer)
                 if src.t == "(sp)+" and dst.t == "(sp)+":
                     write("add sp, #4")
@@ -226,8 +220,7 @@ for line in lines:
                     write("cmp " + src.s + ", " + dst.s)
         elif tok == "add":
             src = Operand(lexer)
-            if lexer.text == ",":
-                lexer.read()
+            if lexer.text == "," and lexer.read():
                 dst = Operand(lexer)
                 src.conv()
                 assert not dst.incdec(), line
