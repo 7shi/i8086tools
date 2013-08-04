@@ -3,6 +3,7 @@
 #include "../i8086/disasm.h"
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 
 using namespace UnixV6;
 using namespace i8086;
