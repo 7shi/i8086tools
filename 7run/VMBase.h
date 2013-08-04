@@ -8,7 +8,9 @@
 #ifdef WIN32
 #define NO_FORK
 #endif
+#ifdef unix
 #undef unix
+#endif
 
 extern int trace;
 extern int exitcode;
