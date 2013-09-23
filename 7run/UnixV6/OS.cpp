@@ -10,9 +10,11 @@
 using namespace UnixV6;
 
 OS::OS() {
+    memset(sighandlers, 0, sizeof (sighandlers));
 }
 
 OS::OS(const OS &os) : UnixBase(os) {
+    memset(sighandlers, 0, sizeof (sighandlers));
 }
 
 OS::~OS() {
