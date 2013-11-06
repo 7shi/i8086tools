@@ -138,7 +138,7 @@ int OSPDP11::v6_fork() { // 2
 
 int OSPDP11::v6_wait() { // 7
     int status, result = sys_wait(&status);
-    cpu.r[1] = status | 14;
+    cpu.r[1] = status;
     return result;
 }
 

@@ -137,7 +137,7 @@ int OSi8086::v6_fork() { // 2
 
 int OSi8086::v6_wait() { // 7
     int status, result = sys_wait(&status);
-    cpu.DX = status | 14;
+    cpu.DX = status;
     return result;
 }
 
