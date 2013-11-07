@@ -96,7 +96,9 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
             *result = sys_unlink(vm->str16(args));
             return 2;
         case 11:
+            //coredump("core");
             *result = v6_exec(vm->str16(args), read16(args + 2));
+            //sys_exit(0);
             return *result ? 4 : 0;
         case 12:
             *result = sys_chdir(vm->str16(args));

@@ -113,3 +113,9 @@ void OS::swtch(bool reset) {
         }
     }
 }
+
+void OS::coredump(const char *path) {
+    FILE *f = fopen(path, "wb");
+    fwrite(vm->data, 1, 0x10000, f);
+    fclose(f);
+}

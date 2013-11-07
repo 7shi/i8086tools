@@ -142,11 +142,6 @@ int OSi8086::v6_wait() { // 7
 }
 
 int OSi8086::v6_exec(const char *path, int argp) { // 11
-#if 0
-    FILE *f = fopen("core", "wb");
-    fwrite(data, 1, 0x10000, f);
-    fclose(f);
-#endif
     if (trace) fprintf(stderr, "<exec(\"%s\"", path);
     std::vector<std::string> args, envs;
     int slen = 0, p;
