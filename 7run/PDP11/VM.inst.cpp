@@ -297,17 +297,17 @@ void VM::run1() {
                 {
                     int src = get16(op->opr1) & 077;
                     int reg = op->opr2.reg;
-                    int val0 = int16_t(r[reg]);
+                    int16_t val0 = r[reg];
                     if (src == 0)
                         setZNCV(val0 == 0, val0 < 0, C, false);
                     else if ((src & 040) == 0) {
-                        int val1 = val0 << (src - 1);
-                        int val2 = val1 << 1;
+                        int16_t val1 = val0 << (src - 1);
+                        int16_t val2 = val1 << 1;
                         r[reg] = val2;
                         setZNCV(val2 == 0, val2 < 0, val1 < 0, (val0 < 0) != (val2 < 0));
                     } else {
-                        int val1 = val0 >> (63 - src);
-                        int val2 = val1 >> 1;
+                        int16_t val1 = val0 >> (63 - src);
+                        int16_t val2 = val1 >> 1;
                         r[reg] = val2;
                         setZNCV(val2 == 0, val2 < 0, (val1 & 1) != 0, (val0 < 0) != (val2 < 0));
                     }
