@@ -317,19 +317,19 @@ void VM::run1() {
                 {
                     int src = get16(op->opr1) & 077;
                     int reg = op->opr2.reg;
-                    int val0 = getReg32(reg);
+                    int32_t val0 = getReg32(reg);
                     if (src == 0)
                         setZNCV(val0 == 0, val0 < 0, C, false);
                     else if ((src & 040) == 0) {
-                        int val1 = val0 << (src - 1);
-                        int val2 = val1 << 1;
+                        int32_t val1 = val0 << (src - 1);
+                        int32_t val2 = val1 << 1;
                         setReg32(reg, val2);
-                        setZNCV(val2 == 0, val2 < 0, (val1 & 1) != 0, val0 != val2);
+                        setZNCV(val2 == 0, val2 < 0, val1 < 0, (val0 < 0) != (val2 < 0));
                     } else {
-                        int val1 = val0 >> (63 - src);
-                        int val2 = val1 >> 1;
+                        int32_t val1 = val0 >> (63 - src);
+                        int32_t val2 = val1 >> 1;
                         setReg32(reg, val2);
-                        setZNCV(val2 == 0, val2 < 0, val1 < 0, val0 != val2);
+                        setZNCV(val2 == 0, val2 < 0, (val1 & 1) != 0, (val0 < 0) != (val2 < 0));
                     }
                     return;
                 }
