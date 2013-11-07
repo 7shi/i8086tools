@@ -80,6 +80,7 @@ bool OSi8086::load2(const std::string &fn, FILE *f, size_t size) {
     vm->tsize = ::read16(h + 2);
     vm->dsize = ::read16(h + 4);
     uint16_t bss = ::read16(h + 6);
+    memset(cpu.r, 0, sizeof (cpu.r));
     cpu.ip = ::read16(h + 10);
     cpu.cache.clear();
     cpu.cache.resize(0x10000);
@@ -157,7 +158,6 @@ int OSi8086::v6_exec(const char *path, int argp) { // 11
         return -1;
     }
     resetsig();
-    cpu.SP = 0;
     setArgs(args, envs);
     if (trace) fprintf(stderr, ") => 0>\n");
     return 0;
