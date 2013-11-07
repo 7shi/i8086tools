@@ -232,17 +232,18 @@ bool OS::syscall(int *result, uint8_t *m) {
 }
 
 int OS::minix_fork() { // 2
-    if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
-    OS vm = *this;
-    vm.cpu.write16(cpu.BX + 2, 0);
-    vm.cpu.AX = 0;
-    vm.run();
-    return vm.pid;
+    OS *ub = new OS(*this);
+    ub->cpu.write16(cpu.BX + 2, 0);
+    ub->cpu.AX = 0;
+    forks.push_back(ub);
+    int result = ub->pid;
 #else
     int result = fork();
-    return result <= 0 ? result : (result % 30000) + 1;
+    if (result > 0) result = (result % 30000) + 1;
 #endif
+    if (trace) fprintf(stderr, "<fork() => %d>\n", result);
+    return result;
 }
 
 int OS::minix_brk(int nd) { // 17

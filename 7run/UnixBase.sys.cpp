@@ -15,7 +15,7 @@
 #include <algorithm>
 
 #ifdef NO_FORK
-static std::stack<std::pair<int, int> > exitcodes;
+std::list<UnixBase *> UnixBase::forks;
 #endif
 
 #ifdef WIN32
@@ -54,9 +54,6 @@ int UnixBase::close(int fd) {
 void UnixBase::sys_exit(int code) {
     if (trace) fprintf(stderr, "<exit(%d)>\n", code);
     exitcode = code;
-#ifdef NO_FORK
-    exitcodes.push(std::pair<int, int>(pid, code));
-#endif
     vm->hasExited = true;
 }
 
@@ -107,23 +104,24 @@ int UnixBase::sys_close(int fd) {
 }
 
 int UnixBase::sys_wait(int *status) {
+    if (trace) fprintf(stderr, "<wait()>\n");
 #ifdef NO_FORK
-    if (exitcodes.empty()) {
+    if (forks.empty()) {
         if (trace) fprintf(stderr, "<wait() => EINVAL>\n");
         errno = EINVAL;
         return -1;
     }
-    std::pair<int, int> ec = exitcodes.top();
-    exitcodes.pop();
-    *status = ec.second << 8;
-    if (trace) fprintf(stderr, "<wait() => %d, %d>\n", ec.first, *status);
-    return ec.first;
+    UnixBase *ub = forks.front();
+    forks.pop_front();
+    *status = ub->run() << 8;
+    int result = ub->pid;
+    delete ub;
 #else
     int result = wait(status);
     if (result > 0) result = (result % 30000) + 1;
-    if (trace) fprintf(stderr, "<wait() => %d, %d>\n", result, *status);
-    return result;
 #endif
+    if (trace) fprintf(stderr, "<wait() => %d, 0x%x>\n", result, *status);
+    return result;
 }
 
 int UnixBase::sys_creat(const char *path, mode_t mode) {

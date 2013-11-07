@@ -125,16 +125,17 @@ bool OSi8086::syscall(int n) {
 }
 
 int OSi8086::v6_fork() { // 2
-    if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
-    OSi8086 vm = *this;
-    vm.cpu.AX = sys_getpid();
-    vm.run();
-    return vm.pid;
+    OSi8086 *ub = new OSi8086(*this);
+    ub->cpu.AX = pid;
+    forks.push_back(ub);
+    int result = ub->pid;
 #else
     int result = fork();
-    return result <= 0 ? result : (result % 30000) + 1;
+    if (result > 0) result = (result % 30000) + 1;
 #endif
+    if (trace) fprintf(stderr, "<fork() => %d>\n", result);
+    return result;
 }
 
 int OSi8086::v6_wait() { // 7

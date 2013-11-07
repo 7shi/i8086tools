@@ -13,8 +13,11 @@
 class UnixBase {
 protected:
     static UnixBase *current;
+#ifdef NO_FORK
+    static std::list<UnixBase *> forks;
+#endif
     VMBase *vm;
-    int pid;
+    int exitcode, pid;
     uint16_t umask;
     std::vector<FileBase *> files;
 
@@ -26,10 +29,10 @@ public:
     virtual void disasm() = 0;
     virtual bool syscall(int n) = 0;
     bool load(const std::string &fn);
-    void run(
+    int run(
             const std::vector<std::string> &args,
             const std::vector<std::string> &envs);
-    void run();
+    int run();
     void swtch(UnixBase *to);
 
 protected:

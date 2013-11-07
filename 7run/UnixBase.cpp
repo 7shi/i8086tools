@@ -19,6 +19,7 @@ static int createpid() {
 }
 
 UnixBase::UnixBase() : umask(0) {
+    exitcode = 0;
     pid = createpid();
     files.push_back(new File(0, "stdin"));
     files.push_back(new File(1, "stdout"));
@@ -26,6 +27,7 @@ UnixBase::UnixBase() : umask(0) {
 }
 
 UnixBase::UnixBase(const UnixBase &os) {
+    exitcode = 0;
     pid = createpid();
     umask = os.umask;
     files = os.files;
@@ -56,20 +58,21 @@ bool UnixBase::load(const std::string &fn) {
     return ret;
 }
 
-void UnixBase::run(
+int UnixBase::run(
         const std::vector<std::string> &args,
         const std::vector<std::string> &envs) {
     if (trace >= 2) vm->showHeader();
     setArgs(args, envs);
-    run();
+    return run();
 }
 
-void UnixBase::run() {
+int UnixBase::run() {
     UnixBase *from = current;
     swtch(this);
     vm->hasExited = false;
     vm->run2();
     swtch(from);
+    return exitcode;
 }
 
 int UnixBase::getfd() {

@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 
 int trace;
-int exitcode;
 
 VMBase::VMBase()
 : text(NULL), data(NULL), tsize(0), brksize(0), hasExited(false) {

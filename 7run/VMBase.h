@@ -13,7 +13,6 @@
 #endif
 
 extern int trace;
-extern int exitcode;
 
 class UnixBase;
 

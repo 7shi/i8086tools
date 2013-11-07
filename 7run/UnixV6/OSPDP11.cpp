@@ -126,16 +126,17 @@ bool OSPDP11::syscall(int n) {
 }
 
 int OSPDP11::v6_fork() { // 2
-    if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
-    OSPDP11 vm = *this;
-    vm.cpu.r[0] = sys_getpid();
-    vm.run();
-    return vm.pid;
+    OSPDP11 *ub = new OSPDP11(*this);
+    ub->cpu.r[0] = pid;
+    forks.push_back(ub);
+    int result = ub->pid;
 #else
     int result = fork();
-    return result <= 0 ? result : (result % 30000) + 1;
+    if (result > 0) result = (result % 30000) + 1;
 #endif
+    if (trace) fprintf(stderr, "<fork() => %d>\n", result);
+    return result;
 }
 
 int OSPDP11::v6_wait() { // 7

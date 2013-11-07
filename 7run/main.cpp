@@ -53,25 +53,25 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    UnixBase *vm;
+    UnixBase *ub;
     if (pdp11 || UnixV6::OSPDP11::check(buf)) {
-        vm = new UnixV6::OSPDP11();
+        ub = new UnixV6::OSPDP11();
     } else if (i8086 || UnixV6::OSi8086::check(buf)) {
-        vm = new UnixV6::OSi8086();
+        ub = new UnixV6::OSi8086();
     } else {
-        vm = new Minix2::OS();
+        ub = new Minix2::OS();
     }
 
-    if (!vm->load(args[0])) {
+    int exitcode = 0;
+    if (!ub->load(args[0])) {
         exitcode = 1;
     } else if (dis) {
-        vm->disasm();
+        ub->disasm();
     } else {
-        exitcode = 0;
         std::vector<std::string> envs;
         envs.push_back("PATH=/bin:/usr/bin");
-        vm->run(args, envs);
+        exitcode = ub->run(args, envs);
     }
-    delete vm;
+    delete ub;
     return exitcode;
 }
