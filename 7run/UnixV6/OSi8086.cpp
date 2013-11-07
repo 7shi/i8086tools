@@ -128,6 +128,7 @@ int OSi8086::v6_fork() { // 2
     if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
     OSi8086 vm = *this;
+    vm.cpu.AX = sys_getpid();
     vm.run();
     return vm.pid;
 #else

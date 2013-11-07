@@ -69,8 +69,21 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
             sys_exit((int16_t) arg0);
             return -1;
         case 2:
+        {
+#ifdef NO_FORK
             *result = v6_fork();
+#else
+            int pid = sys_getpid();
+            *result = v6_fork();
+            if (*result < 0) {
+                return 0;
+            } else if (*result == 0) {
+                *result = pid;
+                return 0;
+            }
+#endif
             return 2;
+        }
         case 3:
             *result = sys_read(arg0, read16(args), read16(args + 2));
             return 4;

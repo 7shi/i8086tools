@@ -129,6 +129,7 @@ int OSPDP11::v6_fork() { // 2
     if (trace) fprintf(stderr, "<fork()>\n");
 #ifdef NO_FORK
     OSPDP11 vm = *this;
+    vm.cpu.r[0] = sys_getpid();
     vm.run();
     return vm.pid;
 #else
