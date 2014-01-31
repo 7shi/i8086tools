@@ -117,7 +117,15 @@ bool OSPDP11::load2(const std::string &fn, FILE *f, size_t size) {
 }
 
 bool OSPDP11::syscall(int n) {
-    int result, ret = OS::syscall(&result, n, cpu.r[0], vm->text + cpu.PC);
+    int result, ret;
+    if (n == 0) {
+        int p = read16(vm->text + cpu.PC);
+        int nn = vm->read8(p);
+        OS::syscall(&result, nn, cpu.r[0], vm->data + p + 2);
+        ret = nn == 11/*exec*/ && !result ? 0 : 2;
+    } else {
+        ret = OS::syscall(&result, n, cpu.r[0], vm->text + cpu.PC);
+    }
     if (ret >= 0) {
         cpu.PC += ret;
         cpu.r[0] = (cpu.C = (result == -1)) ? errno : result;

@@ -58,13 +58,6 @@ sysarg OS::sysargs[] = {
 int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
     *result = 0;
     switch (n) {
-        case 0:
-        {
-            int p = read16(args);
-            int nn = vm->read8(p);
-            syscall(result, nn, arg0, vm->data + p + 2);
-            return nn == 11/*exec*/ && !*result ? 0 : 2;
-        }
         case 1:
             sys_exit((int16_t) arg0);
             return -1;

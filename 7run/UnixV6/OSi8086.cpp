@@ -114,9 +114,16 @@ bool OSi8086::load2(const std::string &fn, FILE *f, size_t size) {
 }
 
 bool OSi8086::syscall(int n) {
-    if (n != 7)return false;
-    int result, nn = vm->text[cpu.ip++];
-    int ret = OS::syscall(&result, nn, cpu.AX, vm->text + cpu.ip);
+    if (n != 7) return false;
+    int result, nn = vm->text[cpu.ip++], ret;
+    if (nn == 0) {
+        int p = read16(vm->text + cpu.ip);
+        int nn = vm->read8(p + 2);
+        OS::syscall(&result, nn, cpu.AX, vm->data + p + 3);
+        ret = nn == 11/*exec*/ && !result ? 0 : 2;
+    } else {
+        ret = OS::syscall(&result, nn, cpu.AX, vm->text + cpu.ip);
+    }
     if (ret >= 0) {
         cpu.ip += ret;
         cpu.AX = (cpu.CF = (result == -1)) ? errno : result;

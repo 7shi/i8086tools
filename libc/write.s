@@ -3,9 +3,9 @@ _write:
 	push bp
 	mov bp, sp
 	mov ax, 6(bp)
-	mov 0f+2, ax
+	mov 1f, ax
 	mov ax, 8(bp)
-	mov 0f+4, ax
+	mov 2f, ax
 	mov ax, 4(bp)
 	int 7
 	.data1 0
@@ -15,4 +15,7 @@ _write:
 	ret
 
 .sect .data
-0:	.data2 4, 0, 0
+0:	int 7
+	.data1 4
+1:	.data2 0
+2:	.data2 0
