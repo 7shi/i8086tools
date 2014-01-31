@@ -2,6 +2,7 @@ include Makefile.inc
 
 all install uninstall:
 	$(MAKE) $@ -C 7run
+	$(MAKE) $@ -C distrib
 
 depend:
 	$(MAKE) $@ -C 7run
