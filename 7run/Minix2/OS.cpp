@@ -69,9 +69,7 @@ bool OS::load2(const std::string &fn, FILE *f, size_t size) {
     vm->dsize = ::read32(h + 12);
     uint16_t bss = ::read32(h + 16);
     cpu.ip = ::read32(h + 20);
-    cpu.cache.clear();
     if (h[2] & 0x20) {
-        cpu.cache.resize(0x10000);
         vm->data = new uint8_t[0x10000];
         memset(vm->data, 0, 0x10000);
         fread(vm->text, 1, vm->tsize, f);

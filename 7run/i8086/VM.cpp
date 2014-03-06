@@ -86,7 +86,6 @@ VM::VM(const VM &vm) : VMBase(vm) {
     PF = vm.PF;
     CF = vm.CF;
     start_sp = vm.start_sp;
-    cache = vm.cache;
 }
 
 VM::~VM() {
@@ -95,7 +94,6 @@ VM::~VM() {
 bool VM::load(const std::string& fn, FILE* f, size_t size) {
     if (!VMBase::load(fn, f, size)) return false;
     ip = 0;
-    cache.clear();
     return true;
 }
 

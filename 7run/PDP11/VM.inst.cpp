@@ -9,12 +9,7 @@ using namespace PDP11;
 
 void VM::run1() {
     OpCode *op, op1;
-    if (cache.empty()) {
-        op = &(op1 = disasm1(text, PC));
-    } else {
-        op = &cache[PC];
-        if (op->empty()) *op = disasm1(text, PC);
-    }
+    op = &(op1 = disasm1(text, PC));
     if (PC + op->len > runmax) {
         fprintf(stderr, "overrun: %04x\n", PC);
         hasExited = true;

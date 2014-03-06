@@ -10,7 +10,6 @@ namespace i8086 {
         uint8_t * r8[8];
         bool OF, DF, SF, ZF, PF, CF;
         uint16_t start_sp;
-        std::vector<OpCode> cache;
 
         static bool ptable[256];
         void init();

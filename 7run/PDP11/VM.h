@@ -9,7 +9,6 @@ namespace PDP11 {
         uint16_t r[8];
         bool Z, N, C, V;
         uint16_t start_sp, runmax;
-        std::vector<OpCode> cache;
 
         VM();
         VM(const VM &vm);

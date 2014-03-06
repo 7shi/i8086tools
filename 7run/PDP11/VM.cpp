@@ -55,7 +55,6 @@ VM::VM(const VM &vm) : VMBase(vm) {
     V = vm.V;
     start_sp = vm.start_sp;
     runmax = vm.runmax;
-    cache = vm.cache;
 }
 
 VM::~VM() {
@@ -64,7 +63,6 @@ VM::~VM() {
 bool VM::load(const std::string& fn, FILE* f, size_t size) {
     if (!VMBase::load(fn, f, size)) return false;
     PC = 0;
-    cache.clear();
     return true;
 }
 
