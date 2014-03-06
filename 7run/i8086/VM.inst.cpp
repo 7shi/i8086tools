@@ -723,6 +723,10 @@ void VM::run1(uint8_t rep) {
             SP += ::read16(p + 1);
             return;
         case 0xc3: // ret
+            if (SP == start_sp) {
+                hasExited = true;
+                return;
+            }
             IP = pop();
             return;
         case 0xc6: // mov r/m, imm8
