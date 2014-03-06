@@ -21,13 +21,13 @@ void OS::sighandler(int sig) {
 }
 
 void OS::sighandler2(int sig) {
-    uint16_t ip = cpu.ip, r[8];
+    uint16_t ip = cpu.IP, r[8];
     memcpy(r, cpu.r, sizeof (r));
     bool OF = cpu.OF, DF = cpu.DF, SF = cpu.SF;
     bool ZF = cpu.ZF, PF = cpu.PF, CF = cpu.CF;
     cpu.write16((cpu.SP -= 2), ip);
-    cpu.ip = sigacts[sig].handler;
-    while (!cpu.hasExited && !(cpu.ip == ip && cpu.SP == SP)) {
+    cpu.IP = sigacts[sig].handler;
+    while (!cpu.hasExited && !(cpu.IP == ip && cpu.SP == SP)) {
         cpu.run1();
     }
     if (!cpu.hasExited) {
