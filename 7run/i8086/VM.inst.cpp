@@ -154,21 +154,24 @@ struct NOperand {
 };
 
 inline void shift(NOperand *opr, int c, uint8_t *p) {
-    int val = opr->u(), m = opr->w ? 0x8000 : 0x80;
+    int val, m = opr->w ? 0x8000 : 0x80;
     switch ((p[1] >> 3) & 7) {
         case 0: // rol
+            val = opr->u();
             for (int i = 0; i < c; ++i)
                 val = (val << 1) | (opr->vm->CF = val & m);
             opr->vm->OF = opr->vm->CF ^ bool(val & m);
             *opr = val;
             break;
         case 1: // ror
+            val = opr->u();
             for (int i = 0; i < c; ++i)
                 val = (val >> 1) | ((opr->vm->CF = val & 1) ? m : 0);
             opr->vm->OF = opr->vm->CF ^ bool(val & (m >> 1));
             *opr = val;
             break;
         case 2: // rcl
+            val = opr->u();
             for (int i = 0; i < c; ++i) {
                 val = (val << 1) | opr->vm->CF;
                 opr->vm->CF = val & (m << 1);
@@ -177,6 +180,7 @@ inline void shift(NOperand *opr, int c, uint8_t *p) {
             *opr = val;
             break;
         case 3: // rcr
+            val = opr->u();
             for (int i = 0; i < c; ++i) {
                 bool f1 = val & 1, f2 = val & m;
                 val = (val >> 1) | (opr->vm->CF ? m : 0);
@@ -187,7 +191,7 @@ inline void shift(NOperand *opr, int c, uint8_t *p) {
             break;
         case 4: // shl/sal
             if (c > 0) {
-                val <<= c;
+                val = opr->u() << c;
                 *opr = opr->setf(val);
                 opr->vm->CF = val & (m << 1);
                 opr->vm->OF = opr->vm->CF != bool(val & m);
@@ -195,7 +199,7 @@ inline void shift(NOperand *opr, int c, uint8_t *p) {
             break;
         case 5: // shr
             if (c > 0) {
-                val >>= c - 1;
+                val = opr->u() >> (c - 1);
                 *opr = opr->setf(val >> 1);
                 opr->vm->CF = val & 1;
                 opr->vm->OF = val & m;
