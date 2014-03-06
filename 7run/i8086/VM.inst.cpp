@@ -151,70 +151,70 @@ struct NOperand {
     inline int setf(int value) {
         return w ? vm->setf16(value) : vm->setf8(value);
     }
-};
 
-inline void shift(NOperand *opr, int c, uint8_t *p) {
-    int val, m = opr->w ? 0x8000 : 0x80;
-    switch ((p[1] >> 3) & 7) {
-        case 0: // rol
-            val = opr->u();
-            for (int i = 0; i < c; ++i)
-                val = (val << 1) | (opr->vm->CF = val & m);
-            opr->vm->OF = opr->vm->CF ^ bool(val & m);
-            *opr = val;
-            break;
-        case 1: // ror
-            val = opr->u();
-            for (int i = 0; i < c; ++i)
-                val = (val >> 1) | ((opr->vm->CF = val & 1) ? m : 0);
-            opr->vm->OF = opr->vm->CF ^ bool(val & (m >> 1));
-            *opr = val;
-            break;
-        case 2: // rcl
-            val = opr->u();
-            for (int i = 0; i < c; ++i) {
-                val = (val << 1) | opr->vm->CF;
-                opr->vm->CF = val & (m << 1);
-            }
-            opr->vm->OF = opr->vm->CF ^ bool(val & m);
-            *opr = val;
-            break;
-        case 3: // rcr
-            val = opr->u();
-            for (int i = 0; i < c; ++i) {
-                bool f1 = val & 1, f2 = val & m;
-                val = (val >> 1) | (opr->vm->CF ? m : 0);
-                opr->vm->OF = opr->vm->CF ^ f2;
-                opr->vm->CF = f1;
-            }
-            *opr = val;
-            break;
-        case 4: // shl/sal
-            if (c > 0) {
-                val = opr->u() << c;
-                *opr = opr->setf(val);
-                opr->vm->CF = val & (m << 1);
-                opr->vm->OF = opr->vm->CF != bool(val & m);
-            }
-            break;
-        case 5: // shr
-            if (c > 0) {
-                val = opr->u() >> (c - 1);
-                *opr = opr->setf(val >> 1);
-                opr->vm->CF = val & 1;
-                opr->vm->OF = val & m;
-            }
-            break;
-        case 7: // sar
-            if (c > 0) {
-                val = **opr >> (c - 1);
-                *opr = opr->setf(val >> 1);
-                opr->vm->CF = val & 1;
-                opr->vm->OF = false;
-            }
-            break;
+    inline void shift(int c, uint8_t *p) {
+        int val, m = w ? 0x8000 : 0x80;
+        switch ((p[1] >> 3) & 7) {
+            case 0: // rol
+                val = u();
+                for (int i = 0; i < c; ++i)
+                    val = (val << 1) | (vm->CF = val & m);
+                vm->OF = vm->CF ^ bool(val & m);
+                *this = val;
+                break;
+            case 1: // ror
+                val = u();
+                for (int i = 0; i < c; ++i)
+                    val = (val >> 1) | ((vm->CF = val & 1) ? m : 0);
+                vm->OF = vm->CF ^ bool(val & (m >> 1));
+                *this = val;
+                break;
+            case 2: // rcl
+                val = u();
+                for (int i = 0; i < c; ++i) {
+                    val = (val << 1) | vm->CF;
+                    vm->CF = val & (m << 1);
+                }
+                vm->OF = vm->CF ^ bool(val & m);
+                *this = val;
+                break;
+            case 3: // rcr
+                val = u();
+                for (int i = 0; i < c; ++i) {
+                    bool f1 = val & 1, f2 = val & m;
+                    val = (val >> 1) | (vm->CF ? m : 0);
+                    vm->OF = vm->CF ^ f2;
+                    vm->CF = f1;
+                }
+                *this = val;
+                break;
+            case 4: // shl/sal
+                if (c > 0) {
+                    val = u() << c;
+                    *this = setf(val);
+                    vm->CF = val & (m << 1);
+                    vm->OF = vm->CF != bool(val & m);
+                }
+                break;
+            case 5: // shr
+                if (c > 0) {
+                    val = u() >> (c - 1);
+                    *this = setf(val >> 1);
+                    vm->CF = val & 1;
+                    vm->OF = val & m;
+                }
+                break;
+            case 7: // sar
+                if (c > 0) {
+                    val = operator*() >> (c - 1);
+                    *this = setf(val >> 1);
+                    vm->CF = val & 1;
+                    vm->OF = false;
+                }
+                break;
+        }
     }
-}
+};
 
 void VM::run1(uint8_t rep) {
     if (trace >= 2 && !rep) {
@@ -721,7 +721,7 @@ void VM::run1(uint8_t rep) {
         case 0xc0: // byte r/m, imm8 (80186)
         case 0xc1: // r/m, imm8 (80186)
             IP += opr1.modrm(p, b & 1) + 1;
-            return shift(&opr1, text[IP - 1], p);
+            return opr1.shift(text[IP - 1], p);
         case 0xc2: // ret imm16
             IP = pop();
             SP += ::read16(p + 1);
@@ -769,11 +769,11 @@ void VM::run1(uint8_t rep) {
         case 0xd0: // byte r/m, 1
         case 0xd1: // r/m, 1
             IP += opr1.modrm(p, b & 1);
-            return shift(&opr1, 1, p);
+            return opr1.shift(1, p);
         case 0xd2: // byte r/m, cl
         case 0xd3: // r/m, cl
             IP += opr1.modrm(p, b & 1);
-            return shift(&opr1, CL, p);
+            return opr1.shift(CL, p);
         case 0xd4: // aam
             IP += 2;
             AH = AL / p[1];
