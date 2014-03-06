@@ -6,10 +6,6 @@
 
 using namespace i8086;
 
-enum NOperandType {
-    NReg, NImm, NPtr, NModRM
-};
-
 enum NDirection {
     RmReg, RegRm
 };
@@ -33,31 +29,31 @@ struct NOperand {
         this->type = type;
         this->w = w;
         switch (type) {
-            case NPtr:
+            case Ptr:
                 this->v = uint16_t(v);
                 break;
-            case NModRM + 0:
+            case ModRM + 0:
                 this->v = uint16_t(vm->BX + vm->SI + v);
                 break;
-            case NModRM + 1:
+            case ModRM + 1:
                 this->v = uint16_t(vm->BX + vm->DI + v);
                 break;
-            case NModRM + 2:
+            case ModRM + 2:
                 this->v = uint16_t(vm->BP + vm->SI + v);
                 break;
-            case NModRM + 3:
+            case ModRM + 3:
                 this->v = uint16_t(vm->BP + vm->DI + v);
                 break;
-            case NModRM + 4:
+            case ModRM + 4:
                 this->v = uint16_t(vm->SI + v);
                 break;
-            case NModRM + 5:
+            case ModRM + 5:
                 this->v = uint16_t(vm->DI + v);
                 break;
-            case NModRM + 6:
+            case ModRM + 6:
                 this->v = uint16_t(vm->BP + v);
                 break;
-            case NModRM + 7:
+            case ModRM + 7:
                 this->v = uint16_t(vm->BX + v);
                 break;
             default:
@@ -71,34 +67,34 @@ struct NOperand {
         switch (mod) {
             case 0:
                 if (rm == 6) {
-                    set(NPtr, w, read16(p + 2));
+                    set(Ptr, w, read16(p + 2));
                     return 4;
                 }
-                set(NModRM + rm, w, 0);
+                set(ModRM + rm, w, 0);
                 return 2;
             case 1:
-                set(NModRM + rm, w, (int8_t) p[2]);
+                set(ModRM + rm, w, (int8_t) p[2]);
                 return 3;
             case 2:
-                set(NModRM + rm, w, (int16_t) read16(p + 2));
+                set(ModRM + rm, w, (int16_t) read16(p + 2));
                 return 4;
         }
-        set(NReg, w, rm);
+        set(Reg, w, rm);
         return 2;
     }
 
     inline size_t regrm(NOperand *opr, uint8_t *p, bool dir, bool w) {
         if (dir) {
-            set(NReg, w, (p[1] >> 3) & 7);
+            set(Reg, w, (p[1] >> 3) & 7);
             return opr->modrm(p, w);
         }
-        opr->set(NReg, w, (p[1] >> 3) & 7);
+        opr->set(Reg, w, (p[1] >> 3) & 7);
         return modrm(p, w);
     }
 
     inline size_t aimm(NOperand *opr, bool w, uint8_t *p) {
-        set(NReg, w, 0);
-        opr->set(NImm, w, w ? read16(p) : *p);
+        set(Reg, w, 0);
+        opr->set(Imm, w, w ? read16(p) : *p);
         return 2 + w;
     }
 
@@ -114,8 +110,8 @@ struct NOperand {
     }
 
     inline int u() const {
-        if (type == NReg) return w ? vm->r[v] : *vm->r8[v];
-        if (type == NImm) return v;
+        if (type == Reg) return w ? vm->r[v] : *vm->r8[v];
+        if (type == Imm) return v;
         uint8_t *p = ptr();
         return w ? read16(p) : *p;
     }
@@ -126,7 +122,7 @@ struct NOperand {
     }
 
     inline void operator =(int value) {
-        if (type == NReg) {
+        if (type == Reg) {
             if (w) {
                 vm->r[v] = value;
             } else {
@@ -428,13 +424,13 @@ void VM::run1(uint8_t rep) {
             IP += opr1.modrm(p, b & 1);
             switch (b) {
                 case 0x80:
-                    opr2.set(NImm, 0, text[IP]);
+                    opr2.set(Imm, 0, text[IP]);
                     break;
                 case 0x81:
-                    opr2.set(NImm, 1, ::read16(&text[IP]));
+                    opr2.set(Imm, 1, ::read16(&text[IP]));
                     break;
                 case 0x83:
-                    opr2.set(NImm, 0, int8_t(text[IP]));
+                    opr2.set(Imm, 0, int8_t(text[IP]));
                     break;
             }
             IP += 1 + opr2.w;
