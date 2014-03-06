@@ -217,6 +217,11 @@ void VM::run1(uint8_t rep) {
         OpCode op = disasm1(text, IP, tsize);
         debug(IP, op);
     }
+    if (SP < brksize) {
+        fprintf(stderr, "stack overflow: %04x\n", SP);
+        hasExited = true;
+        return;
+    }
     NOperand opr1(this), opr2(this);
     uint8_t *p = &text[IP], b = *p;
     int dst, src, val;
