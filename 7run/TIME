@@ -31,3 +31,13 @@ real    1m21.681s
 real    1m20.933s
 real    1m20.091s
 real    1m21.728s
+
+8086run core (rev.489)
+======================
+
+## MINIX 2
+
+real    0m27.597s
+real    0m26.816s
+real    0m26.739s
+real    0m26.426s
