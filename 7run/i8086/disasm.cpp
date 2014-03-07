@@ -7,6 +7,34 @@ std::string i8086::regs8 [] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
 std::string i8086::regs16[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"};
 std::string i8086::sregs [] = {"es", "cs", "ss", "ds"};
 
+inline Operand reg(int r, bool w) {
+    return getopr(0, w, Reg, r);
+}
+
+inline Operand imm16(uint16_t v) {
+    return getopr(2, true, Imm, v);
+}
+
+inline Operand imm8(uint8_t v) {
+    return getopr(1, false, Imm, v);
+}
+
+inline Operand far(uint32_t a) {
+    return getopr(4, false, Far, (int) a);
+}
+
+inline Operand ptr(uint16_t a, bool w) {
+    return getopr(2, w, Ptr, a);
+}
+
+inline Operand disp8(uint8_t *mem, uint16_t addr) {
+    return getopr(1, false, Addr, (uint16_t) (addr + 1 + (int8_t) mem[0]));
+}
+
+inline Operand disp16(uint8_t *mem, uint16_t addr) {
+    return getopr(2, true, Addr, (uint16_t) (addr + 2 + (int16_t) read16(mem)));
+}
+
 static inline Operand modrm(uint8_t *mem, bool w) {
     uint8_t b = mem[1], mod = b >> 6, rm = b & 7;
     switch (mod) {
