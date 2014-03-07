@@ -469,7 +469,8 @@ void VM::run1(uint8_t prefix) {
             return;
         case 0x9c: // pushf
             SP -= 2;
-            write16(SP, (OF << 11) | (DF << 10) | (SF << 7) | (ZF << 6) | (PF << 2) | 2 | CF);
+            write16(SP, (OF << 11) | (DF << 10) | (SF << 7) |
+                    (ZF << 6) | (AF << 4) | (PF << 2) | 2 | CF);
             return;
         case 0x9d: // popf
             val = read16(SP);
@@ -478,12 +479,14 @@ void VM::run1(uint8_t prefix) {
             DF = val & 1024;
             SF = val & 128;
             ZF = val & 64;
+            AF = val & 16;
             PF = val & 4;
             CF = val & 1;
             return;
         case 0x9e: // sahf
             SF = AH & 128;
             ZF = AH & 64;
+            AF = AH & 16;
             PF = AH & 4;
             CF = AH & 1;
             return;

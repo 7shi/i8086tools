@@ -8,7 +8,7 @@ namespace i8086 {
     struct VM : public VMBase {
         uint16_t IP, r[8];
         uint8_t * r8[8];
-        bool OF, DF, SF, ZF, PF, CF;
+        bool OF, DF, SF, ZF, AF, PF, CF;
         uint16_t start_sp;
         std::vector<OpCode> cache;
 

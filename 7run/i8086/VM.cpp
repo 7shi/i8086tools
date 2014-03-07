@@ -72,7 +72,7 @@ void VM::init() {
 VM::VM() : IP(0), start_sp(0) {
     init();
     memset(r, 0, sizeof (r));
-    OF = DF = SF = ZF = PF = CF = false;
+    OF = DF = SF = ZF = AF = PF = CF = false;
 }
 
 VM::VM(const VM &vm) : VMBase(vm) {
@@ -83,6 +83,7 @@ VM::VM(const VM &vm) : VMBase(vm) {
     DF = vm.DF;
     SF = vm.SF;
     ZF = vm.ZF;
+    AF = vm.AF;
     PF = vm.PF;
     CF = vm.CF;
     start_sp = vm.start_sp;

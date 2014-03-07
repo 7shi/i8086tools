@@ -181,7 +181,7 @@ void OSi8086::sighandler2(int sig) {
     memcpy(r, cpu.r, sizeof (r));
     uint16_t ip = cpu.IP;
     bool OF = cpu.OF, DF = cpu.DF, SF = cpu.SF;
-    bool ZF = cpu.ZF, PF = cpu.PF, CF = cpu.CF;
+    bool ZF = cpu.ZF, AF = cpu.AF, PF = cpu.PF, CF = cpu.CF;
     cpu.write16((cpu.SP -= 2), cpu.IP);
     cpu.IP = sighandlers[sig];
     while (!cpu.hasExited && !(cpu.IP == ip && cpu.SP == SP)) {
@@ -193,6 +193,7 @@ void OSi8086::sighandler2(int sig) {
         cpu.DF = DF;
         cpu.SF = SF;
         cpu.ZF = ZF;
+        cpu.AF = AF;
         cpu.PF = PF;
         cpu.CF = CF;
     }
