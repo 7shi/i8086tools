@@ -14,7 +14,7 @@ struct NOperand {
     VM *vm;
     int type;
     bool w;
-    int v;
+    int v, addr;
 
     NOperand(VM *vm) {
         this->vm = vm;
@@ -28,36 +28,34 @@ struct NOperand {
     inline void set(int type, bool w, int v) {
         this->type = type;
         this->w = w;
+        this->v = v;
         switch (type) {
             case Ptr:
-                this->v = uint16_t(v);
+                addr = uint16_t(v);
                 break;
             case ModRM + 0:
-                this->v = uint16_t(vm->BX + vm->SI + v);
+                addr = uint16_t(vm->BX + vm->SI + v);
                 break;
             case ModRM + 1:
-                this->v = uint16_t(vm->BX + vm->DI + v);
+                addr = uint16_t(vm->BX + vm->DI + v);
                 break;
             case ModRM + 2:
-                this->v = uint16_t(vm->BP + vm->SI + v);
+                addr = uint16_t(vm->BP + vm->SI + v);
                 break;
             case ModRM + 3:
-                this->v = uint16_t(vm->BP + vm->DI + v);
+                addr = uint16_t(vm->BP + vm->DI + v);
                 break;
             case ModRM + 4:
-                this->v = uint16_t(vm->SI + v);
+                addr = uint16_t(vm->SI + v);
                 break;
             case ModRM + 5:
-                this->v = uint16_t(vm->DI + v);
+                addr = uint16_t(vm->DI + v);
                 break;
             case ModRM + 6:
-                this->v = uint16_t(vm->BP + v);
+                addr = uint16_t(vm->BP + v);
                 break;
             case ModRM + 7:
-                this->v = uint16_t(vm->BX + v);
-                break;
-            default:
-                this->v = v;
+                addr = uint16_t(vm->BX + v);
                 break;
         }
     }
@@ -106,7 +104,7 @@ struct NOperand {
     }
 
     inline uint8_t * ptr() const {
-        return &vm->data[v];
+        return &vm->data[addr];
     }
 
     inline int u() const {
@@ -510,7 +508,7 @@ void VM::run1(uint8_t rep) {
             return;
         case 0x8d: // lea reg16, r/m
             IP += opr1.regrm(&opr2, p, RegRm, 1);
-            opr1 = opr2.v;
+            opr1 = opr2.addr;
             return;
         case 0x8f: // pop r/m
             IP += opr1.modrm(p, 1);
