@@ -6,213 +6,180 @@
 
 using namespace i8086;
 
-enum NDirection {
-    RmReg, RegRm
-};
-
-struct NOperand {
-    VM *vm;
-    int type;
-    bool w;
-    int v, addr;
-
-    NOperand(VM *vm) {
-        this->vm = vm;
+inline void Operand::set(int type, bool w, int v) {
+    this->type = type;
+    this->w = w;
+    this->value = v;
+    switch (type) {
+        case Ptr:
+            addr = uint16_t(v);
+            break;
+        case ModRM + 0:
+            addr = uint16_t(vm->BX + vm->SI + v);
+            break;
+        case ModRM + 1:
+            addr = uint16_t(vm->BX + vm->DI + v);
+            break;
+        case ModRM + 2:
+            addr = uint16_t(vm->BP + vm->SI + v);
+            break;
+        case ModRM + 3:
+            addr = uint16_t(vm->BP + vm->DI + v);
+            break;
+        case ModRM + 4:
+            addr = uint16_t(vm->SI + v);
+            break;
+        case ModRM + 5:
+            addr = uint16_t(vm->DI + v);
+            break;
+        case ModRM + 6:
+            addr = uint16_t(vm->BP + v);
+            break;
+        case ModRM + 7:
+            addr = uint16_t(vm->BX + v);
+            break;
     }
+}
 
-    NOperand(VM *vm, int type, bool w, int v) {
-        this->vm = vm;
-        set(type, w, v);
+inline uint8_t *Operand::ptr() const {
+    return &vm->data[addr];
+}
+
+inline void Operand::operator =(int val) {
+    if (type == Reg) {
+        if (w) {
+            vm->r[value] = val;
+        } else {
+            *vm->r8[value] = val;
+        }
+        return;
     }
-
-    inline void set(int type, bool w, int v) {
-        this->type = type;
-        this->w = w;
-        this->v = v;
-        switch (type) {
-            case Ptr:
-                addr = uint16_t(v);
-                break;
-            case ModRM + 0:
-                addr = uint16_t(vm->BX + vm->SI + v);
-                break;
-            case ModRM + 1:
-                addr = uint16_t(vm->BX + vm->DI + v);
-                break;
-            case ModRM + 2:
-                addr = uint16_t(vm->BP + vm->SI + v);
-                break;
-            case ModRM + 3:
-                addr = uint16_t(vm->BP + vm->DI + v);
-                break;
-            case ModRM + 4:
-                addr = uint16_t(vm->SI + v);
-                break;
-            case ModRM + 5:
-                addr = uint16_t(vm->DI + v);
-                break;
-            case ModRM + 6:
-                addr = uint16_t(vm->BP + v);
-                break;
-            case ModRM + 7:
-                addr = uint16_t(vm->BX + v);
-                break;
+    uint8_t *p = ptr();
+    if (p) {
+        if (w) {
+            write16(p, val);
+        } else {
+            *p = val;
         }
     }
+}
 
-    inline size_t modrm(uint8_t *p, bool w) {
-        uint8_t b = p[1], mod = b >> 6, rm = b & 7;
-        switch (mod) {
-            case 0:
-                if (rm == 6) {
-                    set(Ptr, w, read16(p + 2));
-                    return 4;
-                }
-                set(ModRM + rm, w, 0);
-                return 2;
-            case 1:
-                set(ModRM + rm, w, (int8_t) p[2]);
-                return 3;
-            case 2:
-                set(ModRM + rm, w, (int16_t) read16(p + 2));
+inline int Operand::u() const {
+    if (type == Reg) return w ? vm->r[value] : *vm->r8[value];
+    if (type == Imm) return value;
+    uint8_t *p = ptr();
+    return w ? read16(p) : *p;
+}
+
+inline int Operand::setf(int val) {
+    return w ? vm->setf16(val) : vm->setf8(val);
+}
+
+inline size_t Operand::modrm(uint8_t *p, bool w) {
+    uint8_t b = p[1], mod = b >> 6, rm = b & 7;
+    switch (mod) {
+        case 0:
+            if (rm == 6) {
+                set(Ptr, w, read16(p + 2));
                 return 4;
-        }
-        set(Reg, w, rm);
-        return 2;
-    }
-
-    inline size_t regrm(NOperand *opr, uint8_t *p, bool dir, bool w) {
-        if (dir) {
-            set(Reg, w, (p[1] >> 3) & 7);
-            return opr->modrm(p, w);
-        }
-        opr->set(Reg, w, (p[1] >> 3) & 7);
-        return modrm(p, w);
-    }
-
-    inline size_t aimm(NOperand *opr, bool w, uint8_t *p) {
-        set(Reg, w, 0);
-        opr->set(Imm, w, w ? read16(p) : *p);
-        return 2 + w;
-    }
-
-    inline size_t getopr(NOperand *opr, uint8_t b, uint8_t *p) {
-        if (b & 4) {
-            return aimm(opr, b & 1, p + 1);
-        }
-        return regrm(opr, p, b & 2, b & 1);
-    }
-
-    inline uint8_t * ptr() const {
-        return &vm->data[addr];
-    }
-
-    inline int u() const {
-        if (type == Reg) return w ? vm->r[v] : *vm->r8[v];
-        if (type == Imm) return v;
-        uint8_t *p = ptr();
-        return w ? read16(p) : *p;
-    }
-
-    inline int operator *() const {
-        int ret = u();
-        return w ? int16_t(ret) : int8_t(ret);
-    }
-
-    inline void operator =(int value) {
-        if (type == Reg) {
-            if (w) {
-                vm->r[v] = value;
-            } else {
-                *vm->r8[v] = value;
             }
-            return;
-        }
-        uint8_t *p = ptr();
-        if (p) {
-            if (w) {
-                write16(p, value);
-            } else {
-                *p = value;
+            set(ModRM + rm, w, 0);
+            return 2;
+        case 1:
+            set(ModRM + rm, w, (int8_t) p[2]);
+            return 3;
+        case 2:
+            set(ModRM + rm, w, (int16_t) read16(p + 2));
+            return 4;
+    }
+    set(Reg, w, rm);
+    return 2;
+}
+
+inline size_t Operand::regrm(Operand *opr, uint8_t *p, bool dir, bool w) {
+    if (dir) {
+        set(Reg, w, (p[1] >> 3) & 7);
+        return opr->modrm(p, w);
+    }
+    opr->set(Reg, w, (p[1] >> 3) & 7);
+    return modrm(p, w);
+}
+
+inline size_t Operand::aimm(Operand *opr, bool w, uint8_t *p) {
+    set(Reg, w, 0);
+    opr->set(Imm, w, w ? read16(p) : *p);
+    return 2 + w;
+}
+
+inline size_t Operand::getopr(Operand *opr, uint8_t b, uint8_t *p) {
+    if (b & 4) {
+        return aimm(opr, b & 1, p + 1);
+    }
+    return regrm(opr, p, b & 2, b & 1);
+}
+
+inline void VM::shift(Operand *opr, int c, uint8_t *p) {
+    int val, m = opr->w ? 0x8000 : 0x80;
+    switch ((p[1] >> 3) & 7) {
+        case 0: // rol
+            val = opr->u();
+            for (int i = 0; i < c; ++i)
+                val = (val << 1) | (CF = val & m);
+            OF = CF ^ bool(val & m);
+            *opr = val;
+            break;
+        case 1: // ror
+            val = opr->u();
+            for (int i = 0; i < c; ++i)
+                val = (val >> 1) | ((CF = val & 1) ? m : 0);
+            OF = CF ^ bool(val & (m >> 1));
+            *opr = val;
+            break;
+        case 2: // rcl
+            val = opr->u();
+            for (int i = 0; i < c; ++i) {
+                val = (val << 1) | CF;
+                CF = val & (m << 1);
             }
-        }
+            OF = CF ^ bool(val & m);
+            *opr = val;
+            break;
+        case 3: // rcr
+            val = opr->u();
+            for (int i = 0; i < c; ++i) {
+                bool f1 = val & 1, f2 = val & m;
+                val = (val >> 1) | (CF ? m : 0);
+                OF = CF ^ f2;
+                CF = f1;
+            }
+            *opr = val;
+            break;
+        case 4: // shl/sal
+            if (c > 0) {
+                val = opr->u() << c;
+                *opr = opr->setf(val);
+                CF = val & (m << 1);
+                OF = CF != bool(val & m);
+            }
+            break;
+        case 5: // shr
+            if (c > 0) {
+                val = opr->u() >> (c - 1);
+                *opr = opr->setf(val >> 1);
+                CF = val & 1;
+                OF = val & m;
+            }
+            break;
+        case 7: // sar
+            if (c > 0) {
+                val = **opr >> (c - 1);
+                *opr = opr->setf(val >> 1);
+                CF = val & 1;
+                OF = false;
+            }
+            break;
     }
-
-    inline bool operator>(int val) {
-        return u() > (w ? uint16_t(val) : uint8_t(val));
-    }
-
-    inline bool operator<(int val) {
-        return u() < (w ? uint16_t(val) : uint8_t(val));
-    }
-
-    inline int setf(int value) {
-        return w ? vm->setf16(value) : vm->setf8(value);
-    }
-
-    inline void shift(int c, uint8_t *p) {
-        int val, m = w ? 0x8000 : 0x80;
-        switch ((p[1] >> 3) & 7) {
-            case 0: // rol
-                val = u();
-                for (int i = 0; i < c; ++i)
-                    val = (val << 1) | (vm->CF = val & m);
-                vm->OF = vm->CF ^ bool(val & m);
-                *this = val;
-                break;
-            case 1: // ror
-                val = u();
-                for (int i = 0; i < c; ++i)
-                    val = (val >> 1) | ((vm->CF = val & 1) ? m : 0);
-                vm->OF = vm->CF ^ bool(val & (m >> 1));
-                *this = val;
-                break;
-            case 2: // rcl
-                val = u();
-                for (int i = 0; i < c; ++i) {
-                    val = (val << 1) | vm->CF;
-                    vm->CF = val & (m << 1);
-                }
-                vm->OF = vm->CF ^ bool(val & m);
-                *this = val;
-                break;
-            case 3: // rcr
-                val = u();
-                for (int i = 0; i < c; ++i) {
-                    bool f1 = val & 1, f2 = val & m;
-                    val = (val >> 1) | (vm->CF ? m : 0);
-                    vm->OF = vm->CF ^ f2;
-                    vm->CF = f1;
-                }
-                *this = val;
-                break;
-            case 4: // shl/sal
-                if (c > 0) {
-                    val = u() << c;
-                    *this = setf(val);
-                    vm->CF = val & (m << 1);
-                    vm->OF = vm->CF != bool(val & m);
-                }
-                break;
-            case 5: // shr
-                if (c > 0) {
-                    val = u() >> (c - 1);
-                    *this = setf(val >> 1);
-                    vm->CF = val & 1;
-                    vm->OF = val & m;
-                }
-                break;
-            case 7: // sar
-                if (c > 0) {
-                    val = operator*() >> (c - 1);
-                    *this = setf(val >> 1);
-                    vm->CF = val & 1;
-                    vm->OF = false;
-                }
-                break;
-        }
-    }
-};
+}
 
 void VM::run1(uint8_t rep) {
     if (trace >= 2 && !rep) {
@@ -224,7 +191,7 @@ void VM::run1(uint8_t rep) {
         hasExited = true;
         return;
     }
-    NOperand opr1(this), opr2(this);
+    Operand opr1(this), opr2(this);
     uint8_t *p = &text[IP], b = *p;
     int dst, src, val;
     switch (b) {
@@ -719,7 +686,7 @@ void VM::run1(uint8_t rep) {
         case 0xc0: // byte r/m, imm8 (80186)
         case 0xc1: // r/m, imm8 (80186)
             IP += opr1.modrm(p, b & 1) + 1;
-            return opr1.shift(text[IP - 1], p);
+            return shift(&opr1, text[IP - 1], p);
         case 0xc2: // ret imm16
             IP = pop();
             SP += ::read16(p + 1);
@@ -767,11 +734,11 @@ void VM::run1(uint8_t rep) {
         case 0xd0: // byte r/m, 1
         case 0xd1: // r/m, 1
             IP += opr1.modrm(p, b & 1);
-            return opr1.shift(1, p);
+            return shift(&opr1, 1, p);
         case 0xd2: // byte r/m, cl
         case 0xd3: // r/m, cl
             IP += opr1.modrm(p, b & 1);
-            return opr1.shift(CL, p);
+            return shift(&opr1, CL, p);
         case 0xd4: // aam
             IP += 2;
             AH = AL / p[1];

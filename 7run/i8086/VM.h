@@ -27,6 +27,7 @@ namespace i8086 {
         void run1(uint8_t rep = 0);
         void debug(uint16_t ip, const OpCode &op);
         int addr(const Operand &opr);
+        void shift(Operand *opr, int c, uint8_t *p);
 
         inline int setf8(int value) {
             int8_t v = value;

@@ -8,45 +8,45 @@ std::string i8086::regs16[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"};
 std::string i8086::sregs [] = {"es", "cs", "ss", "ds"};
 
 inline Operand reg(int r, bool w) {
-    return getopr(0, w, Reg, r);
+    return Operand(0, w, Reg, r);
 }
 
 inline Operand imm16(uint16_t v) {
-    return getopr(2, true, Imm, v);
+    return Operand(2, true, Imm, v);
 }
 
 inline Operand imm8(uint8_t v) {
-    return getopr(1, false, Imm, v);
+    return Operand(1, false, Imm, v);
 }
 
 inline Operand far(uint32_t a) {
-    return getopr(4, false, Far, (int) a);
+    return Operand(4, false, Far, (int) a);
 }
 
 inline Operand ptr(uint16_t a, bool w) {
-    return getopr(2, w, Ptr, a);
+    return Operand(2, w, Ptr, a);
 }
 
 inline Operand disp8(uint8_t *mem, uint16_t addr) {
-    return getopr(1, false, Addr, (uint16_t) (addr + 1 + (int8_t) mem[0]));
+    return Operand(1, false, Addr, (uint16_t) (addr + 1 + (int8_t) mem[0]));
 }
 
 inline Operand disp16(uint8_t *mem, uint16_t addr) {
-    return getopr(2, true, Addr, (uint16_t) (addr + 2 + (int16_t) read16(mem)));
+    return Operand(2, true, Addr, (uint16_t) (addr + 2 + (int16_t) read16(mem)));
 }
 
 static inline Operand modrm(uint8_t *mem, bool w) {
     uint8_t b = mem[1], mod = b >> 6, rm = b & 7;
     switch (mod) {
         case 0:
-            if (rm == 6) return getopr(3, w, Ptr, read16(mem + 2));
-            return getopr(1, w, ModRM + rm, 0);
+            if (rm == 6) return Operand(3, w, Ptr, read16(mem + 2));
+            return Operand(1, w, ModRM + rm, 0);
         case 1:
-            return getopr(2, w, ModRM + rm, (int8_t) mem[2]);
+            return Operand(2, w, ModRM + rm, (int8_t) mem[2]);
         case 2:
-            return getopr(3, w, ModRM + rm, (int16_t) read16(mem + 2));
+            return Operand(3, w, ModRM + rm, (int16_t) read16(mem + 2));
         default:
-            return getopr(1, w, Reg, rm);
+            return Operand(1, w, Reg, rm);
     }
 }
 
@@ -58,9 +58,9 @@ static inline OpCode modrm(uint8_t *mem, const char *mne, bool w) {
 static inline OpCode regrm(uint8_t *mem, const char *mne, bool d, int w) {
     OpCode op = modrm(mem, mne, w);
     if (w == 2) {
-        op.opr2 = getopr(0, w, SReg, (mem[1] >> 3) & 3);
+        op.opr2 = Operand(0, w, SReg, (mem[1] >> 3) & 3);
     } else {
-        op.opr2 = getopr(0, w, Reg, (mem[1] >> 3) & 7);
+        op.opr2 = Operand(0, w, Reg, (mem[1] >> 3) & 7);
     }
     if (d) op.swap();
     return op;
@@ -204,7 +204,7 @@ OpCode i8086::disasm1(uint8_t *text, uint16_t addr) {
             off_t iimm = op.len;
             if (b & 2) {
                 op.len++;
-                op.opr2 = getopr(1, false, Imm, (int8_t) mem[iimm]);
+                op.opr2 = Operand(1, false, Imm, (int8_t) mem[iimm]);
             } else if (b & 1) {
                 op.len += 2;
                 op.opr2 = imm16(::read16(mem + iimm));
@@ -301,7 +301,7 @@ OpCode i8086::disasm1(uint8_t *text, uint16_t addr) {
             const char *mne = mnes[(mem[1] >> 3) & 7];
             if (!mne) break;
             OpCode op = modrm(mem, mne, b & 1);
-            op.opr2 = b & 2 ? cl : getopr(0, false, Imm, 1);
+            op.opr2 = b & 2 ? cl : Operand(0, false, Imm, 1);
             return op;
         }
         case 0xd4: if (mem[1] == 0x0a) return getop(2, "aam");
