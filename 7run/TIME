@@ -1,22 +1,5 @@
-cache on
-========
-
-## UNIX V6
-
-real    0m18.064s
-real    0m16.833s
-real    0m16.786s
-real    0m16.848s
-
-## MINIX 2
-
-real    1m21.681s
-real    1m20.933s
-real    1m20.091s
-real    1m21.728s
-
-cache off
-=========
+cache on (rev.480)
+==================
 
 ## UNIX V6
 
@@ -31,3 +14,20 @@ real    0m26.520s
 real    0m26.240s
 real    0m26.379s
 real    0m26.223s
+
+cache off (rev.481)
+===================
+
+## UNIX V6
+
+real    0m18.064s
+real    0m16.833s
+real    0m16.786s
+real    0m16.848s
+
+## MINIX 2
+
+real    1m21.681s
+real    1m20.933s
+real    1m20.091s
+real    1m21.728s
