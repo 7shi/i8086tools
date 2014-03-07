@@ -69,7 +69,7 @@ void VM::init() {
     }
 }
 
-VM::VM() : ip(0), start_sp(0) {
+VM::VM() : IP(0), start_sp(0) {
     init();
     memset(r, 0, sizeof (r));
     OF = DF = SF = ZF = PF = CF = false;
@@ -78,7 +78,7 @@ VM::VM() : ip(0), start_sp(0) {
 VM::VM(const VM &vm) : VMBase(vm) {
     init();
     memcpy(r, vm.r, sizeof (r));
-    ip = vm.ip;
+    IP = vm.IP;
     OF = vm.OF;
     DF = vm.DF;
     SF = vm.SF;
@@ -94,7 +94,7 @@ VM::~VM() {
 
 bool VM::load(const std::string& fn, FILE* f, size_t size) {
     if (!VMBase::load(fn, f, size)) return false;
-    ip = 0;
+    IP = 0;
     cache.clear();
     return true;
 }

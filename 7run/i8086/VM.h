@@ -6,7 +6,7 @@ namespace i8086 {
     extern const char *header;
 
     struct VM : public VMBase {
-        uint16_t ip, r[8];
+        uint16_t IP, r[8];
         uint8_t * r8[8];
         bool OF, DF, SF, ZF, PF, CF;
         uint16_t start_sp;

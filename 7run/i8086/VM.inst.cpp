@@ -9,16 +9,16 @@ using namespace i8086;
 void VM::run1(uint8_t prefix) {
     OpCode *op, op1;
     if (cache.empty()) {
-        op = &(op1 = disasm1(text, ip, tsize));
+        op = &(op1 = disasm1(text, IP, tsize));
     } else {
-        if (cache[ip].len > 0) {
-            op = &cache[ip];
+        if (cache[IP].len > 0) {
+            op = &cache[IP];
         } else {
-            op = &(cache[ip] = disasm1(text, ip, tsize));
+            op = &(cache[IP] = disasm1(text, IP, tsize));
         }
     }
-    if (ip + op->len > tsize) {
-        fprintf(stderr, "overrun: %04x\n", ip);
+    if (IP + op->len > tsize) {
+        fprintf(stderr, "overrun: %04x\n", IP);
         hasExited = true;
         return;
     }
@@ -28,11 +28,11 @@ void VM::run1(uint8_t prefix) {
         return;
     }
     int opr1 = op->opr1.value, opr2 = op->opr2.value;
-    if (trace >= 2 && !prefix) debug(ip, *op);
-    uint8_t b = text[ip];
-    uint16_t oldip = ip;
+    if (trace >= 2 && !prefix) debug(IP, *op);
+    uint8_t b = text[IP];
+    uint16_t oldip = IP;
     int dst, src, val;
-    ip += op->len;
+    IP += op->len;
     switch (b) {
         case 0x00: // add r/m, reg8
             val = int8_t(dst = get8(op->opr1)) + int8_t(*r8[opr2]);
@@ -252,52 +252,52 @@ void VM::run1(uint8_t prefix) {
             SP += 2;
             return;
         case 0x70: // jo
-            if (OF) ip = opr1;
+            if (OF) IP = opr1;
             return;
         case 0x71: // jno
-            if (!OF) ip = opr1;
+            if (!OF) IP = opr1;
             return;
         case 0x72: // jb/jnae
-            if (CF) ip = opr1;
+            if (CF) IP = opr1;
             return;
         case 0x73: // jnb/jae
-            if (!CF) ip = opr1;
+            if (!CF) IP = opr1;
             return;
         case 0x74: // je/jz
-            if (ZF) ip = opr1;
+            if (ZF) IP = opr1;
             return;
         case 0x75: // jne/jnz
-            if (!ZF) ip = opr1;
+            if (!ZF) IP = opr1;
             return;
         case 0x76: // jbe/jna
-            if (CF || ZF) ip = opr1;
+            if (CF || ZF) IP = opr1;
             return;
         case 0x77: // jnbe/ja
-            if (!CF && !ZF) ip = opr1;
+            if (!CF && !ZF) IP = opr1;
             return;
         case 0x78: // js
-            if (SF) ip = opr1;
+            if (SF) IP = opr1;
             return;
         case 0x79: // jns
-            if (!SF) ip = opr1;
+            if (!SF) IP = opr1;
             return;
         case 0x7a: // jp
-            if (PF) ip = opr1;
+            if (PF) IP = opr1;
             return;
         case 0x7b: // jnp
-            if (!PF) ip = opr1;
+            if (!PF) IP = opr1;
             return;
         case 0x7c: // jl/jnge
-            if (SF != OF) ip = opr1;
+            if (SF != OF) IP = opr1;
             return;
         case 0x7d: // jnl/jge
-            if (SF == OF) ip = opr1;
+            if (SF == OF) IP = opr1;
             return;
         case 0x7e: // jle/jng
-            if (ZF || SF != OF) ip = opr1;
+            if (ZF || SF != OF) IP = opr1;
             return;
         case 0x7f: // jnle/jg
-            if (!ZF && SF == OF) ip = opr1;
+            if (!ZF && SF == OF) IP = opr1;
             return;
         case 0x80: // r/m, imm8
             switch ((text[oldip + 1] >> 3) & 7) {
@@ -633,7 +633,7 @@ void VM::run1(uint8_t prefix) {
             r[opr1] = opr2;
             return;
         case 0xc2: // ret imm16
-            ip = read16(SP);
+            IP = read16(SP);
             SP += 2 + opr1;
             return;
         case 0xc3: // ret
@@ -641,7 +641,7 @@ void VM::run1(uint8_t prefix) {
                 hasExited = true;
                 return;
             }
-            ip = read16(SP);
+            IP = read16(SP);
             SP += 2;
             return;
         case 0xc6: // mov r/m, imm8
@@ -824,32 +824,32 @@ void VM::run1(uint8_t prefix) {
             AL = read8(BX + AL);
             return;
         case 0xe0: // loopnz/loopne
-            if (--CX > 0 && !ZF) ip = opr1;
+            if (--CX > 0 && !ZF) IP = opr1;
             return;
         case 0xe1: // loopz/loope
-            if (--CX > 0 && ZF) ip = opr1;
+            if (--CX > 0 && ZF) IP = opr1;
             return;
         case 0xe2: // loop
-            if (--CX > 0) ip = opr1;
+            if (--CX > 0) IP = opr1;
             return;
         case 0xe3: // jcxz
-            if (CX == 0) ip = opr1;
+            if (CX == 0) IP = opr1;
             return;
         case 0xe8: // call disp
             SP -= 2;
-            write16(SP, ip);
-            ip = opr1;
+            write16(SP, IP);
+            IP = opr1;
             return;
         case 0xe9: // jmp disp
-            ip = opr1;
+            IP = opr1;
             return;
         case 0xeb: // jmp short
-            ip = opr1;
+            IP = opr1;
             return;
         case 0xf2: // repnz/repne
         case 0xf3: // rep/repz/repe
             if (CX) {
-                ip = oldip + 1;
+                IP = oldip + 1;
                 run1(b);
             }
             return;
@@ -968,13 +968,13 @@ void VM::run1(uint8_t prefix) {
                     return;
                 case 2: // call
                     SP -= 2;
-                    write16(SP, ip);
-                    ip = get16(op->opr1);
+                    write16(SP, IP);
+                    IP = get16(op->opr1);
                     return;
                 case 3: // callf
                     break;
                 case 4: // jmp
-                    ip = get16(op->opr1);
+                    IP = get16(op->opr1);
                     return;
                 case 5: // jmpf
                     break;

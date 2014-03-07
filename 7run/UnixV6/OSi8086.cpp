@@ -81,7 +81,7 @@ bool OSi8086::load2(const std::string &fn, FILE *f, size_t size) {
     vm->dsize = ::read16(h + 4);
     uint16_t bss = ::read16(h + 6);
     memset(cpu.r, 0, sizeof (cpu.r));
-    cpu.ip = ::read16(h + 10);
+    cpu.IP = ::read16(h + 10);
     cpu.cache.clear();
     cpu.cache.resize(0x10000);
     if (h[1] == 0x12) { // 0411
@@ -115,17 +115,17 @@ bool OSi8086::load2(const std::string &fn, FILE *f, size_t size) {
 
 bool OSi8086::syscall(int n) {
     if (n != 7) return false;
-    int result, nn = vm->text[cpu.ip++], ret;
+    int result, nn = vm->text[cpu.IP++], ret;
     if (nn == 0) {
-        int p = read16(vm->text + cpu.ip);
+        int p = read16(vm->text + cpu.IP);
         int nn = vm->read8(p + 2);
         OS::syscall(&result, nn, cpu.AX, vm->data + p + 3);
         ret = nn == 11/*exec*/ && !result ? 0 : 2;
     } else {
-        ret = OS::syscall(&result, nn, cpu.AX, vm->text + cpu.ip);
+        ret = OS::syscall(&result, nn, cpu.AX, vm->text + cpu.IP);
     }
     if (ret >= 0) {
-        cpu.ip += ret;
+        cpu.IP += ret;
         cpu.AX = (cpu.CF = (result == -1)) ? errno : result;
     }
     return true;
@@ -179,12 +179,12 @@ int OSi8086::v6_brk(int nd) { // 17
 void OSi8086::sighandler2(int sig) {
     uint16_t r[8];
     memcpy(r, cpu.r, sizeof (r));
-    uint16_t ip = cpu.ip;
+    uint16_t ip = cpu.IP;
     bool OF = cpu.OF, DF = cpu.DF, SF = cpu.SF;
     bool ZF = cpu.ZF, PF = cpu.PF, CF = cpu.CF;
-    cpu.write16((cpu.SP -= 2), cpu.ip);
-    cpu.ip = sighandlers[sig];
-    while (!cpu.hasExited && !(cpu.ip == ip && cpu.SP == SP)) {
+    cpu.write16((cpu.SP -= 2), cpu.IP);
+    cpu.IP = sighandlers[sig];
+    while (!cpu.hasExited && !(cpu.IP == ip && cpu.SP == SP)) {
         cpu.run1();
     }
     if (!cpu.hasExited) {
