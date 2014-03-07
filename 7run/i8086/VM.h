@@ -47,42 +47,6 @@ namespace i8086 {
             return value;
         }
 
-        inline uint8_t get8(const Operand &opr) {
-            switch (opr.type) {
-                case Reg: return *r8[opr.value];
-                case Imm: return opr.value;
-            }
-            int ad = addr(opr);
-            return ad < 0 ? 0 : read8(ad);
-        }
-
-        inline uint16_t get16(const Operand &opr) {
-            switch (opr.type) {
-                case Reg: return r[opr.value];
-                case Imm: return opr.value;
-            }
-            int ad = addr(opr);
-            return ad < 0 ? 0 : read16(ad);
-        }
-
-        inline void set8(const Operand &opr, uint8_t value) {
-            if (opr.type == Reg) {
-                *r8[opr.value] = value;
-            } else {
-                int ad = addr(opr);
-                if (ad >= 0) write8(ad, value);
-            }
-        }
-
-        inline void set16(const Operand &opr, uint16_t value) {
-            if (opr.type == Reg) {
-                r[opr.value] = value;
-            } else {
-                int ad = addr(opr);
-                if (ad >= 0) write16(ad, value);
-            }
-        }
-
         inline uint16_t getf() {
             return 0xf002 | (OF << 11) | (DF << 10) | (SF << 7) |
                     (ZF << 6) | (AF << 4) | (PF << 2) | CF;
