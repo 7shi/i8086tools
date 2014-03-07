@@ -8,50 +8,61 @@ namespace i8086 {
         Reg, SReg, Imm, Addr, Far, Ptr, ModRM
     };
 
+    enum Direction {
+        RmReg, RegRm
+    };
+
+    struct VM;
+
     struct Operand {
+        VM *vm;
         int len;
         bool w;
-        int type, value, seg;
+        int type, value, addr, seg;
 
         inline bool empty() const {
             return len < 0;
         }
 
         std::string str() const;
+
+        inline Operand(int len, bool w, int type, int value, int seg = -1) {
+            this->len = len;
+            this->w = w;
+            this->type = type;
+            this->value = value;
+            this->seg = seg;
+        }
+
+        inline Operand(VM *vm) {
+            this->vm = vm;
+        }
+
+        void set(int type, bool w, int v);
+        uint8_t * ptr() const;
+        int u() const;
+        int setf(int val);
+        void operator =(int val);
+        
+        size_t modrm(uint8_t *p, bool w);
+        size_t regrm(Operand *opr, uint8_t *p, bool dir, bool w);
+        size_t aimm(Operand *opr, bool w, uint8_t *p);
+        size_t getopr(Operand *opr, uint8_t b, uint8_t *p);
+
+        inline int operator *() const {
+            int ret = u();
+            return w ? int16_t(ret) : int8_t(ret);
+        }
+
+        inline bool operator>(int val) {
+            return u() > (w ? uint16_t(val) : uint8_t(val));
+        }
+
+        inline bool operator<(int val) {
+            return u() < (w ? uint16_t(val) : uint8_t(val));
+        }
+
     };
 
-    inline Operand getopr(int len, bool w, int type, int value, int seg = -1) {
-        Operand ret = {len, w, type, value, seg};
-        return ret;
-    }
-
     extern Operand noopr, dx, cl, es, cs, ss, ds;
-
-    inline Operand reg(int r, bool w) {
-        return getopr(0, w, Reg, r);
-    }
-
-    inline Operand imm16(uint16_t v) {
-        return getopr(2, true, Imm, v);
-    }
-
-    inline Operand imm8(uint8_t v) {
-        return getopr(1, false, Imm, v);
-    }
-
-    inline Operand far(uint32_t a) {
-        return getopr(4, false, Far, (int) a);
-    }
-
-    inline Operand ptr(uint16_t a, bool w) {
-        return getopr(2, w, Ptr, a);
-    }
-
-    inline Operand disp8(uint8_t *mem, uint16_t addr) {
-        return getopr(1, false, Addr, (uint16_t) (addr + 1 + (int8_t) mem[0]));
-    }
-
-    inline Operand disp16(uint8_t *mem, uint16_t addr) {
-        return getopr(2, true, Addr, (uint16_t) (addr + 2 + (int16_t) read16(mem)));
-    }
 }
