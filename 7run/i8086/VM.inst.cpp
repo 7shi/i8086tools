@@ -8,15 +8,7 @@ using namespace i8086;
 
 void VM::run1(uint8_t prefix) {
     OpCode *op, op1;
-    if (cache.empty()) {
-        op = &(op1 = disasm1(text, IP, tsize));
-    } else {
-        if (cache[IP].len > 0) {
-            op = &cache[IP];
-        } else {
-            op = &(cache[IP] = disasm1(text, IP, tsize));
-        }
-    }
+    op = &(op1 = disasm1(text, IP, tsize));
     if (IP + op->len > tsize) {
         fprintf(stderr, "overrun: %04x\n", IP);
         hasExited = true;

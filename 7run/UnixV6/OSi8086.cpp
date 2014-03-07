@@ -82,8 +82,6 @@ bool OSi8086::load2(const std::string &fn, FILE *f, size_t size) {
     uint16_t bss = ::read16(h + 6);
     memset(cpu.r, 0, sizeof (cpu.r));
     cpu.IP = ::read16(h + 10);
-    cpu.cache.clear();
-    cpu.cache.resize(0x10000);
     if (h[1] == 0x12) { // 0411
         vm->data = new uint8_t[0x10000];
         memset(vm->data, 0, 0x10000);
