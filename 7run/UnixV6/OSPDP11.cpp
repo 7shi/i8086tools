@@ -13,12 +13,14 @@ bool OSPDP11::check(uint8_t h[2]) {
     return magic == 0407 || magic == 0410 || magic == 0411;
 }
 
-OSPDP11::OSPDP11() {
+OSPDP11::OSPDP11(bool v2) {
+    textbase = v2 ? 0x4000 : 0;
     vm = &cpu;
     cpu.unix = this;
 }
 
 OSPDP11::OSPDP11(const OSPDP11 &os) : OS(os), cpu(os.cpu) {
+    textbase = os.textbase;
     vm = &cpu;
     cpu.unix = this;
 }
@@ -27,8 +29,8 @@ OSPDP11::~OSPDP11() {
 }
 
 void OSPDP11::disasm() {
-    int addr = 0, undef = 0;
-    while (addr < (int) vm->tsize) {
+    int addr = textbase, undef = 0, end = textbase + vm->tsize;
+    while (addr < end) {
         vm->showsym(addr);
         OpCode op = disasm1(vm->text, addr);
         std::string ops = cpu.disstr(op);
@@ -85,14 +87,15 @@ bool OSPDP11::load2(const std::string &fn, FILE *f, size_t size) {
     cpu.PC = ::read16(h + 10);
     cpu.cache.clear();
     cpu.cache.resize(0x10000);
-    if (h[0] == 9) { // 0411
+    uint16_t magic = read16(h);
+    if (magic == 0411) {
         vm->data = new uint8_t[0x10000];
         memset(vm->data, 0, 0x10000);
         fread(vm->text, 1, vm->tsize, f);
         fread(vm->data, 1, vm->dsize, f);
         cpu.runmax = vm->tsize;
         vm->brksize = vm->dsize + bss;
-    } else if (h[0] == 8) { // 0410
+    } else if (magic == 0410) {
         vm->data = vm->text;
         fread(vm->text, 1, vm->tsize, f);
         uint16_t doff = (vm->tsize + 0x1fff) & ~0x1fff;
@@ -101,9 +104,14 @@ bool OSPDP11::load2(const std::string &fn, FILE *f, size_t size) {
         vm->brksize = doff + vm->dsize + bss;
     } else { // 0407
         vm->data = vm->text;
-        cpu.runmax = vm->tsize + vm->dsize; // for as
-        fread(vm->text, 1, cpu.runmax, f);
+        int len = vm->tsize + vm->dsize; // for as
+        if (textbase + len > 0x10000) {
+            len = 0x10000 - textbase;
+        }
+        cpu.runmax = textbase + len;
+        fread(vm->text + textbase, 1, len, f);
         vm->brksize = cpu.runmax + bss;
+        if (textbase) cpu.PC = textbase;
     }
 
     uint16_t ssize = ::read16(h + 8);
