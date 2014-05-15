@@ -31,7 +31,7 @@ sysarg OS::sysargs[] = {
     {/*24*/ 0, "getuid"},
     {/*25*/ 0, "stime"},
     {/*26*/ 3, "ptrace"},
-    {/*27*/ 0, ""},
+    {/*27*/ 1, "intr"}, // for UNIX V2
     {/*28*/ 1, "fstat"},
     {/*29*/ 0, ""},
     {/*30*/ 1, "smdate"},
@@ -124,6 +124,9 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
         case 20:
             *result = sys_getpid();
             return 0;
+        case 27: // intr (V2)
+            *result = v6_signal(2, read16(args));
+            return 2;
         case 41:
             *result = sys_dup(arg0);
             return 0;
