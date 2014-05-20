@@ -64,9 +64,13 @@ namespace PDP11 {
             return ad < 0 ? opr.value : read16(ad);
         }
 
-        inline void set8(const Operand &opr, uint8_t value) {
+        inline void set8(const Operand &opr, uint8_t value, bool sx = false) {
             if (opr.mode == 0) {
-                r[opr.reg] = (int16_t) (int8_t) value;
+                if (sx) {
+                    r[opr.reg] = (int16_t) (int8_t) value;
+                } else {
+                    r[opr.reg] = (r[opr.reg] & 0xff00) | value;
+                }
             } else {
                 int ad = addr(opr);
                 if (ad >= 0) write8(ad, value);

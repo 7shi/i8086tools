@@ -497,7 +497,7 @@ void VM::run1() {
             break;
         case 011: // movb: MOVe Byte
             src = get8(op->opr1);
-            set8(op->opr2, src);
+            set8(op->opr2, src, true);
             setZNCV(src == 0, int8_t(src) < 0, C, false);
             return;
         case 012: // cmpb: CoMPare Byte
