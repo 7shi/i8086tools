@@ -10,7 +10,7 @@ namespace UnixV6 {
 
     class OS : public UnixBase {
     public:
-        OS();
+        OS(int ver);
         OS(const OS &os);
         virtual ~OS();
 
@@ -42,5 +42,7 @@ namespace UnixV6 {
 
         static const int nsig = 20;
         uint16_t sighandlers[nsig];
+
+        uint16_t textbase;
     };
 }

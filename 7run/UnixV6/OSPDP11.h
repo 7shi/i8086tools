@@ -10,10 +10,9 @@ namespace UnixV6 {
 
     private:
         PDP11::VM cpu;
-        uint16_t textbase;
 
     public:
-        OSPDP11(bool v2);
+        OSPDP11(int ver);
         OSPDP11(const OSPDP11 &os);
         virtual ~OSPDP11();
 

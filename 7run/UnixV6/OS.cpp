@@ -9,12 +9,14 @@
 
 using namespace UnixV6;
 
-OS::OS() {
+OS::OS(int ver) {
     memset(sighandlers, 0, sizeof (sighandlers));
+    textbase = ver <= 2 ? 0x4000 : 0;
 }
 
 OS::OS(const OS &os) : UnixBase(os) {
     memset(sighandlers, 0, sizeof (sighandlers));
+    textbase = os.textbase;
 }
 
 OS::~OS() {
@@ -27,7 +29,7 @@ void OS::readsym(FILE *f, int ssize) {
     for (int i = 0; i < ssize; i += 12) {
         fread(buf, sizeof (buf), 1, f);
         Symbol sym = {
-            readstr(buf, 8), ::read16(buf + 8), ::read16(buf + 10)
+            readstr(buf, 8), ::read16(buf + 8), ::read16(buf + 10) + textbase
         };
         int t = sym.type;
         if (t < 6) {

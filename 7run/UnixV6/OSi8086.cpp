@@ -12,7 +12,7 @@ bool OSi8086::check(uint8_t h[2]) {
     return h[0] == 0xeb && (h[1] == 0x0e || h[1] == 0x10 || h[1] == 0x12);
 }
 
-OSi8086::OSi8086() {
+OSi8086::OSi8086() : OS(6) {
     vm = &cpu;
     cpu.unix = this;
 }

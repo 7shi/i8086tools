@@ -5,7 +5,8 @@
 #include <string.h>
 
 int main(int argc, char *argv[]) {
-    bool dis = false, pdp11 = false, i8086 = false, v2 = false;
+    bool dis = false, pdp11 = false, i8086 = false;
+    int ver = 6;
     std::vector<std::string> args;
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -25,7 +26,7 @@ int main(int argc, char *argv[]) {
         } else if (arg == "-8") {
             i8086 = true;
         } else if (arg == "-2") {
-            v2 = true;
+            ver = 2;
         } else {
             for (; i < argc; i++) {
                 args.push_back(argv[i]);
@@ -57,8 +58,8 @@ int main(int argc, char *argv[]) {
     }
 
     UnixBase *ub;
-    if (pdp11 || v2 || UnixV6::OSPDP11::check(buf)) {
-        ub = new UnixV6::OSPDP11(v2);
+    if (pdp11 || UnixV6::OSPDP11::check(buf)) {
+        ub = new UnixV6::OSPDP11(ver);
     } else if (i8086 || UnixV6::OSi8086::check(buf)) {
         ub = new UnixV6::OSi8086();
     } else {

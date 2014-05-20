@@ -13,14 +13,12 @@ bool OSPDP11::check(uint8_t h[2]) {
     return magic == 0407 || magic == 0410 || magic == 0411;
 }
 
-OSPDP11::OSPDP11(bool v2) {
-    textbase = v2 ? 0x4000 : 0;
+OSPDP11::OSPDP11(int ver) : OS(ver) {
     vm = &cpu;
     cpu.unix = this;
 }
 
 OSPDP11::OSPDP11(const OSPDP11 &os) : OS(os), cpu(os.cpu) {
-    textbase = os.textbase;
     vm = &cpu;
     cpu.unix = this;
 }
