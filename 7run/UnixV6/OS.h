@@ -33,6 +33,7 @@ namespace UnixV6 {
         virtual int v6_brk(int nd) = 0; // 17
         int v6_seek(int fd, off_t o, int w); // 19
         int v6_signal(int sig, int h); // 48
+        int convmode(int mode);
         void coredump(const char *path);
 
     protected:
