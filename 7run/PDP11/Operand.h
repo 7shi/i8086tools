@@ -19,7 +19,7 @@ namespace PDP11 {
         }
 
         inline int diff() const {
-            return w || (mode && reg >= 6) ? 2 : 1;
+            return w || (mode && reg >= 6) || mode == 3 || mode == 5 ? 2 : 1;
         }
 
         inline bool isaddr() const {
