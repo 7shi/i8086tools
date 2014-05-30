@@ -10,6 +10,13 @@ void delexit();
 struct symbol *enter();
 struct symbol *lookloc();
 
+void put16(v, f)
+short v;
+FILE *f;
+{
+	fwrite(&v, sizeof(v), 1, f);
+}
+
 #define	SIGINT	2
 #define	ARCMAGIC 0177555
 #define	FMAGIC	0407
@@ -610,9 +617,9 @@ FILE *b1, *b2;
 		}
 		if (r&01)
 			t -= creloc;
-		putw(t, b1);
+		put16(t, b1);
 		if (rflag)
-			putw(r, b2);
+			put16(r, b2);
 	}
 }
 
@@ -624,9 +631,9 @@ finishout()
 		n = torigin;
 		while (n&077) {
 			n += 2;
-			putw(0, tout);
+			put16(0, tout);
 			if (rflag)
-				putw(0, trout);
+				put16(0, trout);
 		}
 	}
 	copy(dout, 'a');
@@ -638,7 +645,7 @@ finishout()
 		if (xflag==0)
 			copy(sout, 'b');
 		for (p=(short *)symtab; p < (short *)symp;)
-			putw(*p++, tout);
+			put16(*p++, tout);
 	}
 	fflush(tout);
 	fclose(tout);
@@ -728,7 +735,7 @@ short *aloc;
 	loc = aloc;
 	n = an>>1;
 	do {
-		putw(*loc++, buf);
+		put16(*loc++, buf);
 	} while (--n);
 }
 
