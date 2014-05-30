@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #ifdef WIN32
+#include <limits.h>
 #include <windows.h>
 #endif
 
@@ -56,12 +57,20 @@ void setroot(std::string root) {
     rootpath = root;
 }
 
+#ifdef WIN32
+static std::string gettemp() {
+    char buf[PATH_MAX];
+    GetTempPath(sizeof(buf), buf);
+    return buf;
+}
+#endif
+
 std::string convpath(const std::string &path) {
 #ifdef WIN32
     if (startsWith(path, "/tmp/"))
-        return getenv("TEMP") + path.substr(4);
+        return gettemp() + path.substr(5);
     if (startsWith(path, "/usr/tmp/"))
-        return getenv("TEMP") + path.substr(8);
+        return gettemp() + path.substr(9);
 #else
     if (startsWith(path, "/usr/tmp/"))
         return path.substr(4);
