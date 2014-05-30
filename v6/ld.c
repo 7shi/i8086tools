@@ -617,7 +617,7 @@ FILE *b1, *b2;
 			break;
 		}
 		if (r&01)
-			t =- creloc;
+			t -= creloc;
 		putw(t, b1);
 		if (rflag)
 			putw(r, b2);
@@ -709,8 +709,8 @@ short *aloc;
 	n = an;
 	n >>= 1;
 	loc = aloc;
-	if ((text.nibuf =- n) >= 0) {
-		if ((text.size =- n) > 0) {
+	if ((text.nibuf -= n) >= 0) {
+		if ((text.size -= n) > 0) {
 			p = text.ptr;
 			do
 				*loc++ = *p++;
