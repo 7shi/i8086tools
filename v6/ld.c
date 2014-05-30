@@ -10,21 +10,6 @@ void delexit();
 struct symbol *enter();
 struct symbol *lookloc();
 
-#ifdef _WIN32
-void link(char *src, char *dst) {
-	FILE *s, *d;
-	int len;
-	char buf[512];
-	s = fopen(src, "rb");
-	d = fopen(dst, "wb");
-	while ((len = fread(buf, 1, sizeof(buf), s)) > 0) {
-		fwrite(buf, 1, len, d);
-	}
-	fclose(d);
-	fclose(s);
-}
-#endif
-
 #define	SIGINT	2
 #define	ARCMAGIC 0177555
 #define	FMAGIC	0407
@@ -479,9 +464,16 @@ setupout()
 tcreat(buf, letter)
 FILE *buf;
 {
+#ifdef _WIN32
+	extern const char *convtemp(const char *);
 	tfname[6] = letter;
-	if (!(buf = fopen(tfname, "rb")))
+	if (!(buf = fopen(convtemp(tfname), "wb")))
 		error(1, "Can't create temp");
+#else
+	tfname[6] = letter;
+	if (!(buf = fopen(tfname, "wb")))
+		error(1, "Can't create temp");
+#endif
 }
 
 load2arg(acp)
