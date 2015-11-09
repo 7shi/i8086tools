@@ -561,7 +561,11 @@ runvec(vec, pass, in, out)
 	if (
 		strncmp(vec->al_argv[1], "/usr/", 5) == 0
 		&&
+#if 0
 		access(vec->al_argv[1] + 4, 1) == 0
+#else
+		access(vec->al_argv[1] + 4, 4) == 0
+#endif
 	) {
 		vec->al_argv[1] += 4;
 		shifted = 1;
