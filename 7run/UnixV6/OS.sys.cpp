@@ -1,5 +1,6 @@
 #include "OS.h"
 #include <errno.h>
+#include <unistd.h>
 
 using namespace UnixV6;
 
@@ -53,6 +54,12 @@ sysarg OS::sysargs[] = {
     {/*46*/ 0, "setgid"},
     {/*47*/ 0, "getgid"},
     {/*48*/ 2, "signal"},
+    {/*49*/ 0, ""},
+    {/*50*/ 0, ""},
+    {/*51*/ 0, ""},
+    {/*52*/ 0, ""},
+    {/*53*/ 0, ""},
+    {/*54*/ 3, "ioctl"},
 };
 
 int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
@@ -133,6 +140,14 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
         case 48:
             *result = v6_signal(read16(args), read16(args + 2));
             return 4;
+        case 54: {
+            uint16_t arg1 = read16(args), arg2 = read16(args + 2);
+            if (trace) fprintf(stderr, "<ioctl(%d, 0x%04x, 0x%04x)>\n", arg1, arg2, read16(args + 4));
+            if (arg2 == 0x7408/*TIOCGETP*/) {
+                *result = isatty(arg1) ? 0 : -1;
+                return 6;
+            }
+        }
         default:
             if (n < nsys && !sysargs[n].name.empty()) {
                 fprintf(stderr, "<%s: not implemented>\n", sysargs[n].name.c_str());
