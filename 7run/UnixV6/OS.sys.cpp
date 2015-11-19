@@ -60,6 +60,12 @@ sysarg OS::sysargs[] = {
     {/*52*/ 0, ""},
     {/*53*/ 0, ""},
     {/*54*/ 3, "ioctl"}, // for UNIX V7
+    {/*55*/ 0, ""},
+    {/*56*/ 0, ""},
+    {/*57*/ 0, ""},
+    {/*58*/ 0, ""},
+    {/*59*/ 0, ""},
+    {/*60*/ 1, "umask"}, // for UNIX V7
 };
 
 int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
@@ -149,6 +155,9 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
         case 54:
             *result = sys_ioctl(read16(args), read16(args + 2), read16(args + 4));
             return 6;
+        case 60:
+            *result = sys_umask(read16(args));
+            return 2;
         default:
             if (n < nsys && !sysargs[n].name.empty()) {
                 fprintf(stderr, "<%s: not implemented>\n", sysargs[n].name.c_str());

@@ -23,7 +23,7 @@ namespace UnixV6 {
         void readsym(FILE *f, int ssize);
         int syscall(int *result, int n, int arg0, uint8_t *args);
         
-        static const int nsys = 55;
+        static const int nsys = 61;
         static sysarg sysargs[nsys];
 
     public:
