@@ -116,7 +116,7 @@ bool OSi8086::syscall(int n) {
     int result, nn = vm->text[cpu.IP++], ret;
     if (nn == 0) {
         int p = read16(vm->text + cpu.IP);
-        int nn = vm->read8(p + 2);
+        nn = vm->read8(p + 2);
         OS::syscall(&result, nn, cpu.AX, vm->data + p + 3);
         ret = nn == 11/*exec*/ && !result ? 0 : 2;
     } else {
@@ -125,6 +125,9 @@ bool OSi8086::syscall(int n) {
     if (ret >= 0) {
         cpu.IP += ret;
         cpu.AX = (cpu.CF = (result == -1)) ? errno : result;
+        if (ver >= 7 && nn == 19/*lseek*/) {
+            cpu.DX = result >> 16;
+        }
     }
     return true;
 }

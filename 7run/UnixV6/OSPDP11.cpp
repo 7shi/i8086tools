@@ -135,6 +135,9 @@ bool OSPDP11::syscall(int n) {
     if (ret >= 0) {
         cpu.PC += ret;
         cpu.r[0] = (cpu.C = (result == -1)) ? errno : result;
+        if (ver >= 7 && n == 19/*lseek*/) {
+            cpu.r[1] = result >> 16;
+        }
     }
     return true;
 }

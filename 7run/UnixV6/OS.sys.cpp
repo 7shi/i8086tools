@@ -126,7 +126,12 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
             *result = sys_stat(vm->str16(args), read16(args + 2));
             return 4;
         case 19:
-            *result = v6_seek(arg0, read16(args), read16(args + 2));
+            if (ver < 7) {
+                *result = v6_seek(arg0, read16(args), read16(args + 2));
+            } else {
+                off_t o = read16(args) << 16 | read16(args + 2);
+                *result = sys_lseek(arg0, o, read16(args + 4));
+            }
             return 4;
         case 20:
             *result = sys_getpid();
