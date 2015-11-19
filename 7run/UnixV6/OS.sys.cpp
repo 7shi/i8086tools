@@ -64,7 +64,7 @@ sysarg OS::sysargs[] = {
     {/*56*/ 0, ""},
     {/*57*/ 0, ""},
     {/*58*/ 0, ""},
-    {/*59*/ 0, ""},
+    {/*59*/ 3, "exece"}, // for UNIX V7
     {/*60*/ 1, "umask"}, // for UNIX V7
 };
 
@@ -158,6 +158,11 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
         case 54:
             *result = sys_ioctl(read16(args), read16(args + 2), read16(args + 4));
             return 6;
+        case 59:
+            //coredump("core");
+            *result = v6_exec(vm->str16(args), read16(args + 2));
+            //sys_exit(0);
+            return *result ? 6 : 0;
         case 60:
             *result = sys_umask(read16(args));
             return 2;
