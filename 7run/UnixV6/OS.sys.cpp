@@ -140,7 +140,8 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
         case 48:
             *result = v6_signal(read16(args), read16(args + 2));
             return 4;
-        case 54: {
+        case 54:
+        {
             uint16_t arg1 = read16(args), arg2 = read16(args + 2);
             if (trace) fprintf(stderr, "<ioctl(%d, 0x%04x, 0x%04x)>\n", arg1, arg2, read16(args + 4));
             if (arg2 == 0x7408/*TIOCGETP*/) {
