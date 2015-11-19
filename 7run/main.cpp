@@ -27,6 +27,8 @@ int main(int argc, char *argv[]) {
             i8086 = true;
         } else if (arg == "-2") {
             ver = 2;
+        } else if (arg == "-7") {
+            ver = 7;
         } else {
             for (; i < argc; i++) {
                 args.push_back(argv[i]);
@@ -38,6 +40,7 @@ int main(int argc, char *argv[]) {
         printf("    -p: PDP-11 mode\n");
         printf("    -8: 8086/V6 mode\n");
         printf("    -2: UNIX V2 mode\n");
+        printf("    -7: UNIX V7 mode\n");
         printf("    -d: disassemble mode (not run)\n");
         printf("    -m: verbose mode with memory dump\n");
         printf("    -v: verbose mode (output syscall and disassemble)\n");

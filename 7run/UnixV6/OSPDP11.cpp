@@ -119,6 +119,9 @@ bool OSPDP11::load2(const std::string &fn, FILE *f, size_t size) {
         }
         readsym(f, ssize);
     }
+    if (read16(vm->text + 2) == 0x1d80) {
+        ver = 7;
+    }
     return true;
 }
 
