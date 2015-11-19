@@ -292,9 +292,18 @@ int UnixBase::sys_getgid() {
 }
 
 int UnixBase::sys_ioctl(int fd, int rq, int d) {
-    if (trace) fprintf(stderr, "<ioctl(%d, 0x%04x, 0x%04x)>\n", fd, rq, d);
-    errno = EINVAL;
-    return -1;
+    if (trace) fprintf(stderr, "<ioctl(%d, 0x%04x, 0x%04x)", fd, rq, d);
+    int result = -1;
+    switch (rq) {
+        case 0x7408: // TIOCGETP
+            result = isatty(fd) ? 0 : -1;
+            break;
+        default:
+            errno = EINVAL;
+            break;
+    }
+    if (trace) fprintf(stderr, " => %d>\n", result);
+    return result;
 }
 
 int UnixBase::sys_umask(mode_t mask) {

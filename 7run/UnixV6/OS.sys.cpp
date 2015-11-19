@@ -141,14 +141,8 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
             *result = v6_signal(read16(args), read16(args + 2));
             return 4;
         case 54:
-        {
-            uint16_t arg1 = read16(args), arg2 = read16(args + 2);
-            if (trace) fprintf(stderr, "<ioctl(%d, 0x%04x, 0x%04x)>\n", arg1, arg2, read16(args + 4));
-            if (arg2 == 0x7408/*TIOCGETP*/) {
-                *result = isatty(arg1) ? 0 : -1;
-                return 6;
-            }
-        }
+            *result = sys_ioctl(read16(args), read16(args + 2), read16(args + 4));
+            return 6;
         default:
             if (n < nsys && !sysargs[n].name.empty()) {
                 fprintf(stderr, "<%s: not implemented>\n", sysargs[n].name.c_str());
