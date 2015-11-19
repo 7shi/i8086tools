@@ -223,11 +223,11 @@ int UnixBase::sys_stat(const char *path, int p) {
 }
 
 off_t UnixBase::sys_lseek(int fd, off_t o, int w) {
-    if (trace) fprintf(stderr, "<lseek(%d, %ld, %d)", fd, o, w);
+    if (trace) fprintf(stderr, "<lseek(%d, %ld, %d)", fd, long(o), w);
     FileBase *f = file(fd);
     off_t result = -1;
     if (f) result = f->lseek(o, w);
-    if (trace) fprintf(stderr, " => %ld>\n", result);
+    if (trace) fprintf(stderr, " => %ld>\n", long(result));
     return result;
 }
 
