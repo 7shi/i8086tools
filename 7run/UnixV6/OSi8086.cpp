@@ -37,9 +37,14 @@ void OSi8086::disasm() {
         if (op.len == 2 && read16(vm->text + addr - 2) == 0x07cd) {
             int n = vm->text[addr];
             if (n < nsys && !sysargs[n].name.empty()) {
-                ::disout(vm->text, addr, 1, "; sys " + sysargs[n].name);
-                addr++;
                 int argc = sysargs[n].argc;
+                if (ver >= 7 && n == 19) {
+                    ++argc;
+                    ::disout(vm->text, addr, 1, "; sys lseek");
+                } else {
+                    ::disout(vm->text, addr, 1, "; sys " + sysargs[n].name);
+                }
+                addr++;
                 for (int i = 0; i < argc; i++, addr += 2) {
                     ::disout(vm->text, addr, 2, "; arg");
                 }

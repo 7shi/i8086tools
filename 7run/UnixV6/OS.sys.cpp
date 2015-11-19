@@ -24,7 +24,7 @@ sysarg OS::sysargs[] = {
     {/*16*/ 2, "chown"},
     {/*17*/ 1, "brk"},
     {/*18*/ 2, "stat"},
-    {/*19*/ 2, "seek"},
+    {/*19*/ 2, "seek"}, // lseek for UNIX V7
     {/*20*/ 0, "getpid"},
     {/*21*/ 3, "mount"},
     {/*22*/ 1, "umount"},
@@ -128,11 +128,12 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
         case 19:
             if (ver < 7) {
                 *result = v6_seek(arg0, read16(args), read16(args + 2));
+                return 4;
             } else {
                 off_t o = read16(args) << 16 | read16(args + 2);
                 *result = sys_lseek(arg0, o, read16(args + 4));
+                return 6;
             }
-            return 4;
         case 20:
             *result = sys_getpid();
             return 0;

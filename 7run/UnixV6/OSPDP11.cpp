@@ -37,7 +37,12 @@ void OSPDP11::disasm() {
             int n = vm->text[addr];
             if (n < nsys && !sysargs[n].name.empty()) {
                 argc = sysargs[n].argc;
-                ops += " ; " + sysargs[n].name;
+                if (ver >= 7 && n == 19) {
+                    ++argc;
+                    ops += " ; lseek";
+                } else {
+                    ops += " ; " + sysargs[n].name;
+                }
             }
         }
         disout(vm->text, addr, op.len, ops);
