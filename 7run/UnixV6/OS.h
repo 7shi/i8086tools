@@ -27,7 +27,7 @@ namespace UnixV6 {
         static sysarg sysargs[nsys];
 
     public:
-        virtual int v6_fork() = 0; //  2
+        virtual int v6_fork() = 0; // 2
         virtual int v6_wait() = 0; // 7
         virtual int v6_exec(const char *path, int argp) = 0; // 11
         virtual int v6_brk(int nd) = 0; // 17
