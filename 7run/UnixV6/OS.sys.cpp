@@ -38,7 +38,7 @@ sysarg OS::sysargs[] = {
     {/*30*/ 1, "smdate"},
     {/*31*/ 1, "stty"},
     {/*32*/ 1, "gtty"},
-    {/*33*/ 0, ""},
+    {/*33*/ 2, "access"}, // for UNIX V7
     {/*34*/ 0, "nice"},
     {/*35*/ 0, "sleep"},
     {/*36*/ 0, "sync"},
@@ -146,6 +146,9 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
         case 27: // intr (V2)
             *result = v6_signal(2, read16(args));
             return 2;
+        case 33:
+            *result = sys_access(vm->str16(args), read16(args + 6));
+            return 4;
         case 41:
             *result = sys_dup(arg0);
             return 0;
