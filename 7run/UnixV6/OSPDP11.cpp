@@ -59,7 +59,7 @@ void OSPDP11::setArgs(
     }
     cpu.SP -= (slen + 1) & ~1;
     uint16_t ad1 = cpu.SP;
-    cpu.SP -= (1 + args.size()) * 2;
+    cpu.SP -= (1 + args.size() + 1) * 2;
     uint16_t ad2 = cpu.start_sp = cpu.SP;
     vm->write16(cpu.SP, args.size()); // argc
     for (int i = 0; i < (int) args.size(); i++) {
