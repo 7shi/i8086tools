@@ -123,7 +123,7 @@ bool OSi8086::syscall(int n) {
         int p = read16(vm->text + cpu.IP);
         nn = vm->read8(p + 2);
         OS::syscall(&result, nn, cpu.AX, vm->data + p + 3);
-        ret = nn == 11/*exec*/ && !result ? 0 : 2;
+        ret = (nn == 11/*exec*/ || nn == 59/*exece*/) && !result ? 0 : 2;
     } else {
         ret = OS::syscall(&result, nn, cpu.AX, vm->text + cpu.IP);
     }

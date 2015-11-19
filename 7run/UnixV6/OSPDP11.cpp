@@ -133,7 +133,7 @@ bool OSPDP11::syscall(int n) {
         int p = read16(vm->text + cpu.PC);
         int nn = vm->read8(p);
         OS::syscall(&result, nn, cpu.r[0], vm->data + p + 2);
-        ret = nn == 11/*exec*/ && !result ? 0 : 2;
+        ret = (nn == 11/*exec*/ || nn == 59/*exece*/) && !result ? 0 : 2;
     } else {
         ret = OS::syscall(&result, n, cpu.r[0], vm->text + cpu.PC);
     }
