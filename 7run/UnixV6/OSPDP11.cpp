@@ -91,14 +91,12 @@ bool OSPDP11::load2(const std::string &fn, FILE *f, size_t size) {
         memset(vm->data, 0, 0x10000);
         fread(vm->text, 1, vm->tsize, f);
         fread(vm->data, 1, vm->dsize, f);
-        cpu.runmax = vm->tsize;
         vm->brksize = vm->dsize + bss;
     } else if (magic == 0410) {
         vm->data = vm->text;
         fread(vm->text, 1, vm->tsize, f);
         uint16_t doff = (vm->tsize + 0x1fff) & ~0x1fff;
         fread(vm->text + doff, 1, vm->dsize, f);
-        cpu.runmax = vm->tsize;
         vm->brksize = doff + vm->dsize + bss;
     } else { // 0407
         vm->data = vm->text;
@@ -106,9 +104,8 @@ bool OSPDP11::load2(const std::string &fn, FILE *f, size_t size) {
         if (textbase + len > 0x10000) {
             len = 0x10000 - textbase;
         }
-        cpu.runmax = textbase + len;
         fread(vm->text + textbase, 1, len, f);
-        vm->brksize = cpu.runmax + bss;
+        vm->brksize = textbase + len + bss;
         if (textbase) cpu.PC = textbase;
     }
 

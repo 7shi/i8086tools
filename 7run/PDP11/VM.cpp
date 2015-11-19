@@ -42,7 +42,7 @@ void VM::debug(uint16_t pc, const OpCode &op) {
     fprintf(stderr, "\n");
 }
 
-VM::VM() : start_sp(0), runmax(0) {
+VM::VM() : start_sp(0) {
     memset(r, 0, sizeof (r));
     Z = N = C = V = false;
 }
@@ -54,8 +54,6 @@ VM::VM(const VM &vm) : VMBase(vm) {
     C = vm.C;
     V = vm.V;
     start_sp = vm.start_sp;
-    runmax = vm.runmax;
-    cache = vm.cache;
 }
 
 VM::~VM() {

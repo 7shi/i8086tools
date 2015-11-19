@@ -15,7 +15,7 @@ void VM::run1() {
         op = &cache[PC];
         if (op->empty()) *op = disasm1(text, PC);
     }
-    if (PC + op->len > runmax) {
+    if (PC + op->len > 0x10000) {
         fprintf(stderr, "overrun: %04x\n", PC);
         hasExited = true;
         return;

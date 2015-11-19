@@ -8,7 +8,7 @@ namespace PDP11 {
     struct VM : public VMBase {
         uint16_t r[8];
         bool Z, N, C, V;
-        uint16_t start_sp, runmax;
+        uint16_t start_sp;
         std::vector<OpCode> cache;
 
         VM();
