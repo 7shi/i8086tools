@@ -156,7 +156,7 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
 }
 
 int OS::v6_seek(int fd, off_t o, int w) { // 19
-    if (trace) fprintf(stderr, "<lseek(%d, %ld, %d)", fd, long(o), w);
+    if (trace) fprintf(stderr, "<seek(%d, %ld, %d)", fd, long(o), w);
     FileBase *f = file(fd);
     off_t result = -1;
     switch (w) {
