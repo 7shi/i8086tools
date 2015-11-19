@@ -59,7 +59,7 @@ sysarg OS::sysargs[] = {
     {/*51*/ 0, ""},
     {/*52*/ 0, ""},
     {/*53*/ 0, ""},
-    {/*54*/ 3, "ioctl"},
+    {/*54*/ 3, "ioctl"}, // for UNIX V7
 };
 
 int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
