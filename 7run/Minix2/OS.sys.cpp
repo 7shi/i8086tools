@@ -97,6 +97,7 @@ bool OS::syscall(int *result, uint8_t *m) {
                 *result = -1;
             } else {
                 write32(m + 10, o);
+                *result = 0;
             }
             return true;
         }
