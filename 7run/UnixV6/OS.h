@@ -45,5 +45,6 @@ namespace UnixV6 {
         uint16_t sighandlers[nsig];
 
         uint16_t textbase;
+        int ver;
     };
 }

@@ -12,11 +12,13 @@ using namespace UnixV6;
 OS::OS(int ver) {
     memset(sighandlers, 0, sizeof (sighandlers));
     textbase = ver <= 2 ? 0x4000 : 0;
+    this->ver = ver;
 }
 
 OS::OS(const OS &os) : UnixBase(os) {
     memset(sighandlers, 0, sizeof (sighandlers));
     textbase = os.textbase;
+    ver = os.ver;
 }
 
 OS::~OS() {
