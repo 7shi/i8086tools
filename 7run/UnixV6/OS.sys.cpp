@@ -146,6 +146,9 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
         case 27: // intr (V2)
             *result = v6_signal(2, read16(args));
             return 2;
+        case 28:
+            *result = sys_fstat(arg0, read16(args));
+            return 2;
         case 33:
             *result = sys_access(vm->str16(args), read16(args + 6));
             return 4;
