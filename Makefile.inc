@@ -10,6 +10,10 @@ V6ROOT = $(PREFIX)/v6root
 V6BIN  = $(V6ROOT)/bin
 V6LIB  = $(V6ROOT)/lib
 
+V7ROOT = $(PREFIX)/v7root
+V7BIN  = $(V7ROOT)/bin
+V7LIB  = $(V7ROOT)/lib
+
 ACKROOT= $(PREFIX)/8086v6-ack
 ACKBIN = $(ACKROOT)/bin
 ACKLIB = $(ACKROOT)/lib
