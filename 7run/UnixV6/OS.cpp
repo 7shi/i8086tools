@@ -63,14 +63,10 @@ void OS::setstat(uint16_t addr, struct stat * st) {
         vm->write16(addr + 8, st->st_uid);
         vm->write16(addr + 10, st->st_gid);
         vm->write16(addr + 12, st->st_rdev);
-        vm->write16(addr + 14, st->st_size >> 16);
-        vm->write16(addr + 16, st->st_size);
-        vm->write16(addr + 18, st->st_atime >> 16);
-        vm->write16(addr + 20, st->st_atime);
-        vm->write16(addr + 22, st->st_mtime >> 16);
-        vm->write16(addr + 24, st->st_mtime);
-        vm->write16(addr + 26, st->st_ctime >> 16);
-        vm->write16(addr + 28, st->st_ctime);
+        vm->write32pdp(addr + 14, st->st_size);
+        vm->write32pdp(addr + 18, st->st_atime);
+        vm->write32pdp(addr + 22, st->st_mtime);
+        vm->write32pdp(addr + 26, st->st_ctime);
     } else {
         memset(vm->data + addr, 0, 36);
         vm->write16(addr, st->st_dev);
@@ -81,10 +77,8 @@ void OS::setstat(uint16_t addr, struct stat * st) {
         vm->write8(addr + 8, st->st_gid);
         vm->write8(addr + 9, st->st_size >> 16);
         vm->write16(addr + 10, st->st_size);
-        vm->write16(addr + 28, st->st_atime >> 16);
-        vm->write16(addr + 30, st->st_atime);
-        vm->write16(addr + 32, st->st_mtime >> 16);
-        vm->write16(addr + 34, st->st_mtime);
+        vm->write32pdp(addr + 28, st->st_atime);
+        vm->write32pdp(addr + 32, st->st_mtime);
     }
 }
 

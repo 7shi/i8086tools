@@ -42,6 +42,15 @@ inline void write32(uint8_t *mem, uint32_t v) {
 }
 #endif
 
+inline uint32_t read32pdp(uint8_t *mem) {
+    return read16(mem) << 16 | read16(mem + 2);
+}
+
+inline void write32pdp(uint8_t *mem, uint32_t v) {
+    write16(mem, v >> 16);
+    write16(mem + 2, v);
+}
+
 std::string readstr(uint8_t *mem, int max);
 
 std::string hex(int v, int len = 0);

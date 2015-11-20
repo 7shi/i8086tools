@@ -54,6 +54,10 @@ struct VMBase {
         return ::read32(data + addr);
     }
 
+    inline uint32_t read32pdp(uint16_t addr) {
+        return ::read32pdp(data + addr);
+    }
+
     inline void write8(uint16_t addr, uint8_t value) {
         data[addr] = value;
     }
@@ -64,6 +68,10 @@ struct VMBase {
 
     inline void write32(uint16_t addr, uint32_t value) {
         ::write32(data + addr, value);
+    }
+
+    inline void write32pdp(uint16_t addr, uint32_t value) {
+        ::write32pdp(data + addr, value);
     }
 
     inline const char *str(uint16_t addr) {

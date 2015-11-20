@@ -136,7 +136,7 @@ int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
                 *result = v6_seek(arg0, read16(args), read16(args + 2));
                 return 4;
             } else {
-                off_t o = read16(args) << 16 | read16(args + 2);
+                off_t o = read32pdp(args);
                 *result = sys_lseek(arg0, o, read16(args + 4));
                 return 6;
             }
