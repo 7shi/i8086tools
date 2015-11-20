@@ -24,7 +24,7 @@ sysarg OS::sysargs[] = {
     {/*16*/ 2, "chown"},
     {/*17*/ 1, "brk"},
     {/*18*/ 2, "stat"},
-    {/*19*/ 2, "seek"},     // lseek for UNIX V7
+    {/*19*/ 2, "seek"}, // lseek for UNIX V7
     {/*20*/ 0, "getpid"},
     {/*21*/ 3, "mount"},
     {/*22*/ 1, "umount"},
@@ -32,13 +32,13 @@ sysarg OS::sysargs[] = {
     {/*24*/ 0, "getuid"},
     {/*25*/ 0, "stime"},
     {/*26*/ 3, "ptrace"},
-    {/*27*/ 1, "intr"},     // for UNIX V2
+    {/*27*/ 1, "intr"}, // for UNIX V2
     {/*28*/ 1, "fstat"},
     {/*29*/ 0, ""},
     {/*30*/ 1, "smdate"},
     {/*31*/ 1, "stty"},
     {/*32*/ 1, "gtty"},
-    {/*33*/ 2, "access"},   // for UNIX V7
+    {/*33*/ 2, "access"}, // for UNIX V7
     {/*34*/ 0, "nice"},
     {/*35*/ 0, "sleep"},
     {/*36*/ 0, "sync"},
@@ -59,13 +59,13 @@ sysarg OS::sysargs[] = {
     {/*51*/ 0, ""},
     {/*52*/ 0, ""},
     {/*53*/ 0, ""},
-    {/*54*/ 3, "ioctl"},    // for UNIX V7
+    {/*54*/ 3, "ioctl"}, // for UNIX V7
     {/*55*/ 0, ""},
     {/*56*/ 0, ""},
     {/*57*/ 0, ""},
     {/*58*/ 0, ""},
-    {/*59*/ 3, "exece"},    // for UNIX V7
-    {/*60*/ 1, "umask"},    // for UNIX V7
+    {/*59*/ 3, "exece"}, // for UNIX V7
+    {/*60*/ 1, "umask"}, // for UNIX V7
 };
 
 int OS::syscall(int *result, int n, int arg0, uint8_t *args) {
